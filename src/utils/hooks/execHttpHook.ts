@@ -3,6 +3,7 @@ import type { HookEvent } from 'src/entrypoints/agentSdkTypes.js'
 import { createCombinedAbortSignal } from '../combinedAbortSignal.js'
 import { logForDebugging } from '../debug.js'
 import { errorMessage } from '../errors.js'
+import { assertOnlineOrLoopbackUrl } from '../offline.js'
 import { getProxyUrl, shouldBypassProxy } from '../proxy.js'
 // Import as namespace so spyOn works in tests (direct imports bypass spies)
 import * as settingsModule from '../settings/settings.js'
@@ -132,6 +133,8 @@ export async function execHttpHook(
   error?: string
   aborted?: boolean
 }> {
+  assertOnlineOrLoopbackUrl('HTTP hook', hook.url)
+
   // Enforce URL allowlist before any I/O. Follows allowedMcpServers semantics:
   // undefined → no restriction; [] → block all; non-empty → must match a pattern.
   const policy = getHttpHookPolicy()

@@ -25,6 +25,7 @@ import { getFsImplementation } from './fsOperations.js'
 import { getAncestorPidsAsync } from './genericProcessUtils.js'
 import { isJetBrainsPluginInstalledCached } from './jetbrains.js'
 import { logError } from './log.js'
+import { assertOnlineFeature } from './offline.js'
 import { getPlatform } from './platform.js'
 import { lt } from './semver.js'
 
@@ -1420,6 +1421,7 @@ async function installFromArtifactory(command: string): Promise<string> {
   }
 
   // Fetch the version from artifactory
+  assertOnlineFeature('IDE extension download')
   const versionUrl =
     'https://artifactory.infra.ant.dev/artifactory/armorcode-claude-code-internal/claude-vscode-releases/stable'
 

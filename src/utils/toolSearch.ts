@@ -38,6 +38,7 @@ import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
 } from './model/providers.js'
+import { isOfflineMode } from './offline.js'
 import { jsonStringify } from './slowOperations.js'
 import { zodToJsonSchema } from './zodToJsonSchema.js'
 
@@ -170,6 +171,10 @@ export type ToolSearchMode = 'tst' | 'tst-auto' | 'standard'
  *   (unset)               tst (default: always defer MCP and shouldDefer tools)
  */
 export function getToolSearchMode(): ToolSearchMode {
+  if (isOfflineMode()) {
+    return 'standard'
+  }
+
   // CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS is a kill switch for beta API
   // features. Tool search emits defer_loading on tool definitions and
   // tool_reference content blocks — both require the API to accept a beta

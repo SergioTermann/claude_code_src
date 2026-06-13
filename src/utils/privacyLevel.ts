@@ -11,13 +11,23 @@
  *                       (telemetry + auto-updates, grove, release notes, model capabilities, etc.).
  *
  * The resolved level is the most restrictive signal from:
+ *   CLAUDE_CODE_OFFLINE / local model provider →  essential-traffic
  *   CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC  →  essential-traffic
  *   DISABLE_TELEMETRY                         →  no-telemetry
  */
 
+import { isEnvTruthy } from './envUtils.js'
+import { getAPIProvider, isLocalModelProvider } from './model/providers.js'
+
 type PrivacyLevel = 'default' | 'no-telemetry' | 'essential-traffic'
 
 export function getPrivacyLevel(): PrivacyLevel {
+  if (
+    isEnvTruthy(process.env.CLAUDE_CODE_OFFLINE) ||
+    isLocalModelProvider()
+  ) {
+    return 'essential-traffic'
+  }
   if (process.env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC) {
     return 'essential-traffic'
   }
@@ -48,6 +58,16 @@ export function isTelemetryDisabled(): boolean {
  * or null if unrestricted. Used for user-facing "unset X to re-enable" messages.
  */
 export function getEssentialTrafficOnlyReason(): string | null {
+  if (isEnvTruthy(process.env.CLAUDE_CODE_OFFLINE)) {
+    return 'CLAUDE_CODE_OFFLINE'
+  }
+  const provider = getAPIProvider()
+  if (provider === 'lmstudio') {
+    return 'CLAUDE_CODE_USE_LMSTUDIO'
+  }
+  if (provider === 'lmstudio') {
+    return 'CLAUDE_CODE_USE_LMSTUDIO'
+  }
   if (process.env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC) {
     return 'CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC'
   }

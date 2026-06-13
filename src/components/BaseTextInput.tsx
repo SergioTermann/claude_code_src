@@ -57,6 +57,10 @@ export function BaseTextInput(t0) {
   } = usePasteHandler({
     onPaste: props.onPaste,
     onInput: (input, key) => {
+      if (process.env.WINDRISE === '1' && !key.meta && !key.shift && (key.return || input === '\r' || input === '\n' || input === '\r\n')) {
+        props.onSubmit?.(props.value);
+        return;
+      }
       if (isPasting && key.return) {
         return;
       }

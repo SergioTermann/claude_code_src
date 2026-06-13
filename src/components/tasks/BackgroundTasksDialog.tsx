@@ -1,7 +1,7 @@
 import { c as _c } from "react/compiler-runtime";
 import { feature } from 'bun:bundle';
 import figures from 'figures';
-import React, { type ReactNode, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react';
+import React, { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import { isCoordinatorMode } from 'src/coordinator/coordinatorMode.js';
 import { useTerminalSize } from 'src/hooks/useTerminalSize.js';
 import { useAppState, useSetAppState } from 'src/state/AppState.js';
@@ -38,6 +38,7 @@ import { AsyncAgentDetailDialog } from './AsyncAgentDetailDialog.js';
 import { BackgroundTask as BackgroundTaskComponent } from './BackgroundTask.js';
 import { DreamDetailDialog } from './DreamDetailDialog.js';
 import { InProcessTeammateDetailDialog } from './InProcessTeammateDetailDialog.js';
+import { useEventCallback } from '../../utils/react/useEventCallback.js';
 import { RemoteSessionDetailDialog } from './RemoteSessionDetailDialog.js';
 import { ShellDetailDialog } from './ShellDetailDialog.js';
 type ViewState = {
@@ -319,9 +320,8 @@ export function BackgroundTasksDialog({
     await RemoteAgentTask.kill(taskId_3, setAppState);
   }
 
-  // Wrap onDone in useEffectEvent to get a stable reference that always calls
-  // the current onDone callback without causing the effect to re-fire.
-  const onDoneEvent = useEffectEvent(onDone);
+  // Wrap onDone in a stable callback that always calls the latest onDone.
+  const onDoneEvent = useEventCallback(onDone);
   useEffect(() => {
     if (viewState.mode !== 'list') {
       const task = (typedTasks ?? {})[viewState.itemId];

@@ -17,6 +17,7 @@ import { logEvent } from '../../services/analytics/index.js'
 import { logForDebugging } from '../debug.js'
 import { parseZipModes, unzipFile } from '../dxt/zip.js'
 import { errorMessage, getErrnoCode } from '../errors.js'
+import { isOfflineMode } from '../offline.js'
 
 type SafeString = AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS
 
@@ -48,6 +49,11 @@ export async function fetchOfficialMarketplaceFromGcs(
   installLocation: string,
   marketplacesCacheDir: string,
 ): Promise<string | null> {
+  if (isOfflineMode()) {
+    logForDebugging('Skipping official marketplace GCS fetch in offline/LM Studio mode')
+    return null
+  }
+
   // Defense in depth: this function does `rm(installLocation, {recursive})`
   // during the atomic swap. A corrupted known_marketplaces.json (gh-32793 —
   // Windows path read on WSL, literal tilde, manual edit) could point at the

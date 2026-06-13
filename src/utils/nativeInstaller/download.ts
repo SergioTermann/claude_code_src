@@ -18,6 +18,7 @@ import { toError } from '../errors.js'
 import { execFileNoThrowWithCwd } from '../execFileNoThrow.js'
 import { getFsImplementation } from '../fsOperations.js'
 import { logError } from '../log.js'
+import { assertOnlineFeature } from '../offline.js'
 import { sleep } from '../sleep.js'
 import { jsonStringify, writeFileSync_DEPRECATED } from '../slowOperations.js'
 import { getBinaryName, getPlatform } from './installer.js'
@@ -76,6 +77,7 @@ export async function getLatestVersionFromBinaryRepo(
   baseUrl: string,
   authConfig?: { auth: { username: string; password: string } },
 ): Promise<string> {
+  assertOnlineFeature('Native installer version check')
   const startTime = Date.now()
   try {
     const response = await axios.get(`${baseUrl}/${channel}`, {

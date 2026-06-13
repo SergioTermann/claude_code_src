@@ -11,6 +11,7 @@ import { logForDebugging } from '../utils/debug.js'
 import { errorMessage } from '../utils/errors.js'
 import { logError } from '../utils/log.js'
 import { getWebSocketTLSOptions } from '../utils/mtls.js'
+import { assertOnlineFeature } from '../utils/offline.js'
 import { getWebSocketProxyAgent, getWebSocketProxyUrl } from '../utils/proxy.js'
 import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
 
@@ -98,6 +99,7 @@ export class SessionsWebSocket {
    * Connect to the sessions WebSocket endpoint
    */
   async connect(): Promise<void> {
+    assertOnlineFeature('Remote sessions')
     if (this.state === 'connecting') {
       logForDebugging('[SessionsWebSocket] Already connecting')
       return

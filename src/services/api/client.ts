@@ -28,6 +28,7 @@ import {
   getVertexRegionForModel,
   isEnvTruthy,
 } from '../../utils/envUtils.js'
+import { createLmStudioAnthropicClient } from './lmstudioClient.js'
 
 /**
  * Environment variables for different client types:
@@ -119,6 +120,11 @@ export async function getAnthropicClient({
   logForDebugging(
     `[API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: ${!!process.env.ANTHROPIC_CUSTOM_HEADERS}, has Authorization header: ${!!customHeaders['Authorization']}`,
   )
+
+  if (getAPIProvider() === 'lmstudio') {
+    logForDebugging(`[API:request] Using local ${getAPIProvider()} client`)
+    return createLmStudioAnthropicClient() as Anthropic
+  }
 
   // Add additional protection header if enabled via env var
   const additionalProtectionEnabled = isEnvTruthy(

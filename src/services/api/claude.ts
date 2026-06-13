@@ -23,6 +23,7 @@ import { randomUUID } from 'crypto'
 import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
+  isLocalModelProvider,
 } from 'src/utils/model/providers.js'
 import {
   getAttributionHeader,
@@ -531,6 +532,10 @@ export async function verifyApiKey(
   apiKey: string,
   isNonInteractiveSession: boolean,
 ): Promise<boolean> {
+  if (isLocalModelProvider()) {
+    return true
+  }
+
   // Skip API verification if running in print mode (isNonInteractiveSession)
   if (isNonInteractiveSession) {
     return true

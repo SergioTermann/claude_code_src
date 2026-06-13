@@ -11,6 +11,7 @@ import {
   getClaudeAIOAuthTokens,
 } from '../../utils/auth.js'
 import { lazySchema } from '../../utils/lazySchema.js'
+import { assertOnlineFeature, isOfflineMode } from '../../utils/offline.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 import { DESCRIPTION, PROMPT, REMOTE_TRIGGER_TOOL_NAME } from './prompt.js'
 import { renderToolResultMessage, renderToolUseMessage } from './UI.js'
@@ -57,7 +58,8 @@ export const RemoteTriggerTool = buildTool({
   isEnabled() {
     return (
       getFeatureValue_CACHED_MAY_BE_STALE('tengu_surreal_dali', false) &&
-      isPolicyAllowed('allow_remote_sessions')
+      isPolicyAllowed('allow_remote_sessions') &&
+      !isOfflineMode()
     )
   },
   isConcurrencySafe() {
@@ -76,6 +78,7 @@ export const RemoteTriggerTool = buildTool({
     return PROMPT
   },
   async call(input: Input, context: ToolUseContext) {
+    assertOnlineFeature('Remote trigger tool')
     await checkAndRefreshOAuthTokenIfNeeded()
     const accessToken = getClaudeAIOAuthTokens()?.accessToken
     if (!accessToken) {

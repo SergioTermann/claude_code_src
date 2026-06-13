@@ -1,16 +1,36 @@
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/analytics/index.js'
 import { isEnvTruthy } from '../envUtils.js'
 
-export type APIProvider = 'firstParty' | 'bedrock' | 'vertex' | 'foundry'
+export type APIProvider =
+  | 'firstParty'
+  | 'bedrock'
+  | 'vertex'
+  | 'foundry'
+  | 'lmstudio'
 
 export function getAPIProvider(): APIProvider {
+  const explicitProvider = process.env.ANTHROPIC_MODEL_PROVIDER
+  if (
+    explicitProvider === 'lmstudio' ||
+    explicitProvider === 'lm-studio' ||
+    explicitProvider === 'lms'
+  ) {
+    return 'lmstudio'
+  }
+
   return isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)
     ? 'bedrock'
     : isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX)
       ? 'vertex'
       : isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)
         ? 'foundry'
-        : 'firstParty'
+        : isEnvTruthy(process.env.CLAUDE_CODE_USE_LMSTUDIO)
+          ? 'lmstudio'
+          : 'firstParty'
+}
+
+export function isLocalModelProvider(provider = getAPIProvider()): boolean {
+  return provider === 'lmstudio'
 }
 
 export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS {

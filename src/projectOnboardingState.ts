@@ -17,23 +17,31 @@ export type Step = {
 }
 
 export function getSteps(): Step[] {
-  const hasClaudeMd = getFsImplementation().existsSync(
-    join(getCwd(), 'CLAUDE.md'),
+  const instructionFiles =
+    process.env.WINDRISE === '1' ? ['WINDRISE.md', 'CLAUDE.md'] : ['CLAUDE.md']
+  const hasInstructionFile = instructionFiles.some(file =>
+    getFsImplementation().existsSync(join(getCwd(), file)),
   )
   const isWorkspaceDirEmpty = isDirEmpty(getCwd())
 
   return [
     {
       key: 'workspace',
-      text: 'Ask Claude to create a new app or clone a repository',
+      text:
+        process.env.WINDRISE === '1'
+          ? 'Ask Windrise to create a new app or clone a repository'
+          : 'Ask Claude to create a new app or clone a repository',
       isComplete: false,
       isCompletable: true,
       isEnabled: isWorkspaceDirEmpty,
     },
     {
       key: 'claudemd',
-      text: 'Run /init to create a CLAUDE.md file with instructions for Claude',
-      isComplete: hasClaudeMd,
+      text:
+        process.env.WINDRISE === '1'
+          ? 'Run /init to create project instructions for Windrise'
+          : 'Run /init to create a CLAUDE.md file with instructions for Claude',
+      isComplete: hasInstructionFile,
       isCompletable: true,
       isEnabled: !isWorkspaceDirEmpty,
     },

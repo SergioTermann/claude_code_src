@@ -19,6 +19,7 @@ import { getErrnoCode } from '../../utils/errors.js'
 import { getFsImplementation } from '../../utils/fsOperations.js'
 import { safeParseJSON } from '../../utils/json.js'
 import { logError } from '../../utils/log.js'
+import { isLoopbackUrl, isOfflineMode } from '../../utils/offline.js'
 import { getPluginMcpServers } from '../../utils/plugins/mcpPluginIntegration.js'
 import { loadAllPluginsCacheOnly } from '../../utils/plugins/pluginLoader.js'
 import { isSettingSourceEnabled } from '../../utils/settings/constants.js'
@@ -541,13 +542,28 @@ export function filterMcpServersByPolicy<T>(configs: Record<string, T>): {
   const blocked: string[] = []
   for (const [name, config] of Object.entries(configs)) {
     const c = config as McpServerConfig
-    if (c.type === 'sdk' || isMcpServerAllowedByPolicy(name, c)) {
+    if (
+      (c.type === 'sdk' || isMcpServerAllowedByPolicy(name, c)) &&
+      isMcpServerAllowedOffline(c)
+    ) {
       allowed[name] = config
     } else {
       blocked.push(name)
     }
   }
   return { allowed, blocked }
+}
+
+function isMcpServerAllowedOffline(config: McpServerConfig): boolean {
+  if (!isOfflineMode()) return true
+  if (!config.type || config.type === 'stdio' || config.type === 'sdk') {
+    return true
+  }
+  if (config.type === 'claudeai-proxy') return false
+
+  const url = getServerUrl(config)
+  if (!url) return false
+  return isLoopbackUrl(url)
 }
 
 /**
@@ -1086,7 +1102,10 @@ export async function getClaudeCodeMcpConfigs(
     const filtered: Record<string, ScopedMcpServerConfig> = {}
 
     for (const [name, serverConfig] of Object.entries(enterpriseServers)) {
-      if (!isMcpServerAllowedByPolicy(name, serverConfig)) {
+      if (
+        !isMcpServerAllowedByPolicy(name, serverConfig) ||
+        !isMcpServerAllowedOffline(serverConfig)
+      ) {
         continue
       }
       filtered[name] = serverConfig
@@ -1187,7 +1206,8 @@ export async function getClaudeCodeMcpConfigs(
   })) {
     if (
       !isMcpServerDisabled(name) &&
-      isMcpServerAllowedByPolicy(name, config)
+      isMcpServerAllowedByPolicy(name, config) &&
+      isMcpServerAllowedOffline(config)
     ) {
       enabledManualServers[name] = config
     }
@@ -1201,7 +1221,8 @@ export async function getClaudeCodeMcpConfigs(
   for (const [name, config] of Object.entries(pluginMcpServers)) {
     if (
       isMcpServerDisabled(name) ||
-      !isMcpServerAllowedByPolicy(name, config)
+      !isMcpServerAllowedByPolicy(name, config) ||
+      !isMcpServerAllowedOffline(config)
     ) {
       disabledPluginServers[name] = config
     } else {
@@ -1241,7 +1262,10 @@ export async function getClaudeCodeMcpConfigs(
   const filtered: Record<string, ScopedMcpServerConfig> = {}
 
   for (const [name, serverConfig] of Object.entries(configs)) {
-    if (!isMcpServerAllowedByPolicy(name, serverConfig as McpServerConfig)) {
+    if (
+      !isMcpServerAllowedByPolicy(name, serverConfig as McpServerConfig) ||
+      !isMcpServerAllowedOffline(serverConfig as McpServerConfig)
+    ) {
       continue
     }
     filtered[name] = serverConfig as ScopedMcpServerConfig

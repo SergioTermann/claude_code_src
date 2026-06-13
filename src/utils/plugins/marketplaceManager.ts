@@ -37,6 +37,7 @@ import { execFileNoThrow, execFileNoThrowWithCwd } from '../execFileNoThrow.js'
 import { getFsImplementation } from '../fsOperations.js'
 import { gitExe } from '../git.js'
 import { logError } from '../log.js'
+import { assertOnlineOrLoopbackUrl } from '../offline.js'
 import {
   getInitialSettings,
   getSettingsForSource,
@@ -1259,6 +1260,7 @@ async function cacheMarketplaceFromUrl(
   customHeaders?: Record<string, string>,
   onProgress?: MarketplaceProgressCallback,
 ): Promise<void> {
+  assertOnlineOrLoopbackUrl('Plugin marketplace download', url)
   const fs = getFsImplementation()
 
   const redactedUrl = redactUrlCredentials(url)

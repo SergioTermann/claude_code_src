@@ -4,6 +4,7 @@ import { getOrganizationUUID } from 'src/services/oauth/client.js'
 import { getClaudeAIOAuthTokens } from '../auth.js'
 import { toError } from '../errors.js'
 import { logError } from '../log.js'
+import { assertOnlineFeature } from '../offline.js'
 import { getOAuthHeaders } from './api.js'
 
 export type EnvironmentKind = 'anthropic_cloud' | 'byoc' | 'bridge'
@@ -30,6 +31,7 @@ export type EnvironmentListResponse = {
  * @throws Error if the API request fails or no access token is available
  */
 export async function fetchEnvironments(): Promise<EnvironmentResource[]> {
+  assertOnlineFeature('Claude Code remote environments')
   const accessToken = getClaudeAIOAuthTokens()?.accessToken
   if (!accessToken) {
     throw new Error(
@@ -76,6 +78,7 @@ export async function fetchEnvironments(): Promise<EnvironmentResource[]> {
 export async function createDefaultCloudEnvironment(
   name: string,
 ): Promise<EnvironmentResource> {
+  assertOnlineFeature('Claude Code remote environments')
   const accessToken = getClaudeAIOAuthTokens()?.accessToken
   if (!accessToken) {
     throw new Error('No access token available')

@@ -26,6 +26,7 @@ import {
 import { getOauthConfig } from '../../constants/oauth.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { lazySchema } from '../../utils/lazySchema.js'
+import { isOfflineMode } from '../../utils/offline.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
 
 // Matches the private_api backend limit
@@ -97,6 +98,7 @@ export async function uploadBriefAttachment(
   // Positive pattern so bun:bundle eliminates the entire body from
   // non-BRIDGE_MODE builds (negative `if (!feature(...)) return` does not).
   if (feature('BRIDGE_MODE')) {
+    if (isOfflineMode()) return undefined
     if (!ctx.replBridgeEnabled) return undefined
 
     if (size > MAX_UPLOAD_BYTES) {

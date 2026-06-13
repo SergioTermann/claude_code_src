@@ -4,13 +4,17 @@ import { registerBatchSkill } from './batch.js'
 import { registerClaudeInChromeSkill } from './claudeInChrome.js'
 import { registerDebugSkill } from './debug.js'
 import { registerKeybindingsSkill } from './keybindings.js'
+import { registerLlmWikiSkill } from './llmwiki.js'
+import { registerLocalVerifySkill } from './localVerify.js'
 import { registerLoremIpsumSkill } from './loremIpsum.js'
+import { registerLmStudioLocalSkill } from './lmstudioLocal.js'
 import { registerRememberSkill } from './remember.js'
 import { registerSimplifySkill } from './simplify.js'
 import { registerSkillifySkill } from './skillify.js'
 import { registerStuckSkill } from './stuck.js'
 import { registerUpdateConfigSkill } from './updateConfig.js'
 import { registerVerifySkill } from './verify.js'
+import { registerWindFaultSkill } from './windFault.js'
 
 /**
  * Initialize all bundled skills.
@@ -26,6 +30,10 @@ export function initBundledSkills(): void {
   registerKeybindingsSkill()
   registerVerifySkill()
   registerDebugSkill()
+  registerLlmWikiSkill()
+  registerWindFaultSkill()
+  registerLmStudioLocalSkill()
+  registerLocalVerifySkill()
   registerLoremIpsumSkill()
   registerSkillifySkill()
   registerRememberSkill()

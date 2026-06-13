@@ -23,6 +23,7 @@ import { logForDebugging } from '../utils/debug.js'
 import { getUserAgent } from '../utils/http.js'
 import { logError } from '../utils/log.js'
 import { getWebSocketTLSOptions } from '../utils/mtls.js'
+import { assertOnlineFeature, isOfflineMode } from '../utils/offline.js'
 import { getWebSocketProxyAgent, getWebSocketProxyUrl } from '../utils/proxy.js'
 import { jsonParse, jsonStringify } from '../utils/slowOperations.js'
 
@@ -96,6 +97,9 @@ type VoiceStreamMessage =
 // ─── Availability ──────────────────────────────────────────────────────
 
 export function isVoiceStreamAvailable(): boolean {
+  if (isOfflineMode()) {
+    return false
+  }
   // voice_stream uses the same OAuth as Claude Code — available when the
   // user is authenticated with Anthropic (Claude.ai subscriber or has
   // valid OAuth tokens).
@@ -112,6 +116,7 @@ export async function connectVoiceStream(
   callbacks: VoiceStreamCallbacks,
   options?: { language?: string; keyterms?: string[] },
 ): Promise<VoiceStreamConnection | null> {
+  assertOnlineFeature('Voice stream')
   // Ensure OAuth token is fresh before connecting
   await checkAndRefreshOAuthTokenIfNeeded()
 

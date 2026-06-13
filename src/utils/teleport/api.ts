@@ -9,6 +9,7 @@ import { parseGitHubRepository } from '../detectRepository.js'
 import { errorMessage, toError } from '../errors.js'
 import { lazySchema } from '../lazySchema.js'
 import { logError } from '../log.js'
+import { assertOnlineFeature } from '../offline.js'
 import { sleep } from '../sleep.js'
 import { jsonStringify } from '../slowOperations.js'
 
@@ -48,6 +49,7 @@ export async function axiosGetWithRetry<T>(
   url: string,
   config?: AxiosRequestConfig,
 ): Promise<AxiosResponse<T>> {
+  assertOnlineFeature('Teleport')
   let lastError: unknown
 
   for (let attempt = 0; attempt <= MAX_TELEPORT_RETRIES; attempt++) {
@@ -182,6 +184,7 @@ export async function prepareApiRequest(): Promise<{
   accessToken: string
   orgUUID: string
 }> {
+  assertOnlineFeature('Claude Code remote sessions')
   const accessToken = getClaudeAIOAuthTokens()?.accessToken
   if (accessToken === undefined) {
     throw new Error(

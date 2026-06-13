@@ -4,6 +4,7 @@ import { getGlobalConfig } from './config.js'
 import { isEnvTruthy } from './envUtils.js'
 import { getCanonicalName } from './model/model.js'
 import { getModelCapability } from './model/modelCapabilities.js'
+import { getAPIProvider, isLocalModelProvider } from './model/providers.js'
 
 // Model context window size (200k tokens for all models right now)
 export const MODEL_CONTEXT_WINDOW_DEFAULT = 200_000
@@ -14,6 +15,9 @@ export const COMPACT_MAX_OUTPUT_TOKENS = 20_000
 // Default max output tokens
 const MAX_OUTPUT_TOKENS_DEFAULT = 32_000
 const MAX_OUTPUT_TOKENS_UPPER_LIMIT = 64_000
+const LMSTUDIO_CONTEXT_WINDOW_DEFAULT = 32_768
+const LMSTUDIO_MAX_OUTPUT_TOKENS_DEFAULT = 8_192
+const LMSTUDIO_MAX_OUTPUT_TOKENS_UPPER_LIMIT = 16_384
 
 // Capped default for slot-reservation optimization. BQ p99 output = 4,911
 // tokens, so 32k/64k defaults over-reserve 8-16× slot capacity. With the cap
@@ -52,6 +56,16 @@ export function getContextWindowForModel(
   model: string,
   betas?: string[],
 ): number {
+  if (isLocalModelProvider()) {
+    const override = parseInt(
+      process.env.LMSTUDIO_CONTEXT_TOKENS ||
+        process.env.LMSTUDIO_CONTEXT_TOKENS ||
+        '',
+      10,
+    )
+    return override > 0 ? override : LMSTUDIO_CONTEXT_WINDOW_DEFAULT
+  }
+
   // Allow override via environment variable (ant-only)
   // This takes precedence over all other context window resolution, including 1M detection,
   // so users can cap the effective context window for local decisions (auto-compact, etc.)
@@ -150,6 +164,26 @@ export function getModelMaxOutputTokens(model: string): {
   default: number
   upperLimit: number
 } {
+  if (isLocalModelProvider()) {
+    const defaultOverride = parseInt(
+      process.env.LMSTUDIO_MAX_TOKENS || process.env.LMSTUDIO_MAX_TOKENS || '',
+      10,
+    )
+    const upperOverride = parseInt(
+      process.env.LMSTUDIO_MAX_OUTPUT_TOKENS ||
+        process.env.LMSTUDIO_MAX_OUTPUT_TOKENS ||
+        '',
+      10,
+    )
+    const upperLimit =
+      upperOverride > 0 ? upperOverride : LMSTUDIO_MAX_OUTPUT_TOKENS_UPPER_LIMIT
+    const defaultTokens =
+      defaultOverride > 0
+        ? Math.min(defaultOverride, upperLimit)
+        : Math.min(LMSTUDIO_MAX_OUTPUT_TOKENS_DEFAULT, upperLimit)
+    return { default: defaultTokens, upperLimit }
+  }
+
   let defaultTokens: number
   let upperLimit: number
 

@@ -33,6 +33,7 @@ import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
 } from '../../utils/model/providers.js'
+import { isOfflineMode } from '../../utils/offline.js'
 import { markInternalWrite } from '../../utils/settings/internalWrites.js'
 import { getSettingsFilePathForSource } from '../../utils/settings/settings.js'
 import { resetSettingsCache } from '../../utils/settings/settingsCache.js'
@@ -210,6 +211,9 @@ async function doDownloadUserSettings(
  * download a no-op there. Upload is independently guarded by getIsInteractive().
  */
 function isUsingOAuth(): boolean {
+  if (isOfflineMode()) {
+    return false
+  }
   if (getAPIProvider() !== 'firstParty' || !isFirstPartyAnthropicBaseUrl()) {
     return false
   }

@@ -439,6 +439,20 @@ export function useTextInput({
       return
     }
 
+    // Some terminals/PTY wrappers can deliver Enter as a bare CR/LF text token
+    // instead of a parsed key.return. Treat that like a normal submit.
+    if (
+      !key.return &&
+      !key.meta &&
+      !key.shift &&
+      (filteredInput === '\r' ||
+        filteredInput === '\n' ||
+        filteredInput === '\r\n')
+    ) {
+      onSubmit?.(originalValue)
+      return
+    }
+
     // Fix Issue #1853: Filter DEL characters that interfere with backspace in SSH/tmux
     // In SSH/tmux environments, backspace generates both key events and raw DEL chars
     if (!key.backspace && !key.delete && input.includes('\x7f')) {

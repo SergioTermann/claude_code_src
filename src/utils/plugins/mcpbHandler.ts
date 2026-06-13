@@ -13,6 +13,7 @@ import { parseZipModes, unzipFile } from '../dxt/zip.js'
 import { errorMessage, getErrnoCode, isENOENT, toError } from '../errors.js'
 import { getFsImplementation } from '../fsOperations.js'
 import { logError } from '../log.js'
+import { assertOnlineOrLoopbackUrl } from '../offline.js'
 import { getSecureStorage } from '../secureStorage/index.js'
 import {
   getSettings_DEPRECATED,
@@ -484,6 +485,7 @@ async function downloadMcpb(
   destPath: string,
   onProgress?: ProgressCallback,
 ): Promise<Uint8Array> {
+  assertOnlineOrLoopbackUrl('Plugin package download', url)
   logForDebugging(`Downloading MCPB from ${url}`)
   if (onProgress) {
     onProgress(`Downloading ${url}...`)

@@ -47,5 +47,6 @@ function keyFromParsed(parsed: ParsedKey): string {
   // Special keys (arrows, F-keys, return, tab, escape, etc.): sequence is
   // either an escape sequence (\x1b[B) or a control byte (\r, \t), so use
   // the parsed name. Browsers report e.key === 'ArrowDown'.
+  if (name === 'enter') return 'return'
   return name || seq
 }

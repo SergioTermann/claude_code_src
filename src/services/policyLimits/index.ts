@@ -36,6 +36,7 @@ import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
 } from '../../utils/model/providers.js'
+import { isOfflineMode } from '../../utils/offline.js'
 import { isEssentialTrafficOnly } from '../../utils/privacyLevel.js'
 import { sleep } from '../../utils/sleep.js'
 import { jsonStringify } from '../../utils/slowOperations.js'
@@ -165,6 +166,10 @@ function computeChecksum(
  * getSettings() to avoid circular dependencies during settings loading.
  */
 export function isPolicyLimitsEligible(): boolean {
+  if (isOfflineMode()) {
+    return false
+  }
+
   // 3p provider users should not hit the policy limits endpoint
   if (getAPIProvider() !== 'firstParty') {
     return false

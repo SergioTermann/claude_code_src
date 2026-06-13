@@ -22,6 +22,7 @@ import {
   getDefaultMainLoopModelSetting,
   type ModelShortName,
 } from './model/model.js'
+import { isLocalModelProvider } from './model/providers.js'
 
 // @see https://platform.claude.com/docs/en/about-claude/pricing
 export type ModelCosts = {
@@ -86,6 +87,14 @@ export const COST_HAIKU_45 = {
   webSearchRequests: 0.01,
 } as const satisfies ModelCosts
 
+export const COST_FREE_LOCAL = {
+  inputTokens: 0,
+  outputTokens: 0,
+  promptCacheWriteTokens: 0,
+  promptCacheReadTokens: 0,
+  webSearchRequests: 0,
+} as const satisfies ModelCosts
+
 const DEFAULT_UNKNOWN_MODEL_COST = COST_TIER_5_25
 
 /**
@@ -142,6 +151,10 @@ function tokensToUSDCost(modelCosts: ModelCosts, usage: Usage): number {
 }
 
 export function getModelCosts(model: string, usage: Usage): ModelCosts {
+  if (isLocalModelProvider()) {
+    return COST_FREE_LOCAL
+  }
+
   const shortName = getCanonicalName(model)
 
   // Check if this is an Opus 4.6 model with fast mode active.

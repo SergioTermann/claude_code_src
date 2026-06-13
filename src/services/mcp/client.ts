@@ -88,6 +88,7 @@ import {
 import { WebSocketTransport } from '../../utils/mcpWebSocketTransport.js'
 import { memoizeWithLRU } from '../../utils/memoize.js'
 import { getWebSocketTLSOptions } from '../../utils/mtls.js'
+import { isLoopbackUrl, isOfflineMode } from '../../utils/offline.js'
 import {
   getProxyFetchOptions,
   getWebSocketProxyAgent,
@@ -564,6 +565,14 @@ function isLocalMcpServer(config: ScopedMcpServerConfig): boolean {
   return !config.type || config.type === 'stdio' || config.type === 'sdk'
 }
 
+function isLoopbackMcpServer(config: ScopedMcpServerConfig): boolean {
+  if (isLocalMcpServer(config)) return true
+  if (config.type === 'claudeai-proxy') return false
+
+  if (!('url' in config)) return false
+  return isLoopbackUrl(config.url)
+}
+
 // For the IDE MCP servers, we only include specific tools
 const ALLOWED_IDE_TOOLS = ['mcp__ide__executeCode', 'mcp__ide__getDiagnostics']
 function isIncludedMcpTool(tool: Tool): boolean {
@@ -610,6 +619,12 @@ export const connectToServer = memoize(
       | { connect(t: Transport): Promise<void>; close(): Promise<void> }
       | undefined
     try {
+      if (isOfflineMode() && !isLoopbackMcpServer(serverRef)) {
+        throw new Error(
+          `Remote MCP server "${name}" is disabled in offline/LM Studio mode`,
+        )
+      }
+
       let transport
 
       // If we have the session ingress JWT, we will connect via the session ingress rather than

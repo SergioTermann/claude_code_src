@@ -6,6 +6,7 @@ import { logForDebugging } from '../../utils/debug.js'
 import { logForDiagnosticsNoPII } from '../../utils/diagLogs.js'
 import { isEnvTruthy } from '../../utils/envUtils.js'
 import { logError } from '../../utils/log.js'
+import { assertOnlineFeature } from '../../utils/offline.js'
 import { sequential } from '../../utils/sequential.js'
 import { getSessionIngressAuthToken } from '../../utils/sessionIngressAuth.js'
 import { sleep } from '../../utils/sleep.js'
@@ -195,6 +196,7 @@ export async function appendSessionLog(
   entry: TranscriptMessage,
   url: string,
 ): Promise<boolean> {
+  assertOnlineFeature('Session ingress')
   const sessionToken = getSessionIngressAuthToken()
   if (!sessionToken) {
     logForDebugging('No session token available for session persistence')
@@ -218,6 +220,7 @@ export async function getSessionLogs(
   sessionId: string,
   url: string,
 ): Promise<Entry[] | null> {
+  assertOnlineFeature('Session ingress')
   const sessionToken = getSessionIngressAuthToken()
   if (!sessionToken) {
     logForDebugging('No session token available for fetching session logs')
@@ -248,6 +251,7 @@ export async function getSessionLogsViaOAuth(
   accessToken: string,
   orgUUID: string,
 ): Promise<Entry[] | null> {
+  assertOnlineFeature('Session ingress')
   const url = `${getOauthConfig().BASE_API_URL}/v1/session_ingress/session/${sessionId}`
   logForDebugging(`[session-ingress] Fetching session logs from: ${url}`)
   const headers = {
@@ -293,6 +297,7 @@ export async function getTeleportEvents(
   accessToken: string,
   orgUUID: string,
 ): Promise<Entry[] | null> {
+  assertOnlineFeature('Teleport events')
   const baseUrl = `${getOauthConfig().BASE_API_URL}/v1/code/sessions/${sessionId}/teleport-events`
   const headers = {
     ...getOAuthHeaders(accessToken),

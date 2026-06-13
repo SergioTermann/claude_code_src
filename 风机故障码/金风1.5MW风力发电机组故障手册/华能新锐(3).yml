@@ -1,0 +1,409 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: 华能新锐
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/xinference:0.0.8@144b246cac8fcac04ea2f6ec40fa8eda06b7650518b7e855d81ec17cc8df1dde
+    version: null
+kind: app
+version: 0.5.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: knowledge-retrieval
+      id: 1765287650654-true-1765180881656-target
+      selected: false
+      source: '1765287650654'
+      sourceHandle: 'true'
+      target: '1765180881656'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: code
+      id: 1765180881656-source-1765289305278-target
+      source: '1765180881656'
+      sourceHandle: source
+      target: '1765289305278'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: answer
+      id: 1765289305278-source-answer-target
+      source: '1765289305278'
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: 1764419121399-source-1765289745262-target
+      source: '1764419121399'
+      sourceHandle: source
+      target: '1765289745262'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: if-else
+      id: 1765289745262-source-1765287650654-target
+      source: '1765289745262'
+      sourceHandle: source
+      target: '1765287650654'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1765287650654-false-17652901251850-target
+      source: '1765287650654'
+      sourceHandle: 'false'
+      target: '17652901251850'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: answer
+      id: 17652901251850-source-answer-target
+      source: '17652901251850'
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 用户输入
+        type: start
+        variables: []
+      height: 75
+      id: '1764419121399'
+      position:
+        x: -122.4424820859799
+        y: 149.96152630251547
+      positionAbsolute:
+        x: -122.4424820859799
+        y: 149.96152630251547
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        answer: '{{#1765289305278.result#}}{{#17652901251850.result#}}'
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 123
+      id: answer
+      position:
+        x: 1620.097600514497
+        y: 257.9607711444726
+      positionAbsolute:
+        x: 1620.097600514497
+        y: 257.9607711444726
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        dataset_ids:
+        - Ub6LRoNmNmsVNqIHWrxrOWFA3+kGAf0CJFCiAZXZC4m79lAGEOmJvuan0cuer+gl
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: reranking_model
+          reranking_model:
+            model: Qwen3-Reranker-0.6B
+            provider: langgenius/xinference/xinference
+          score_threshold: null
+          top_k: 3
+        query_variable_selector:
+        - '1764419121399'
+        - sys.query
+        retrieval_mode: multiple
+        selected: false
+        title: 知识检索
+        type: knowledge-retrieval
+      height: 92
+      id: '1765180881656'
+      position:
+        x: 873.8141905529158
+        y: 125.52467626739406
+      positionAbsolute:
+        x: 873.8141905529158
+        y: 125.52467626739406
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: bb4e34a6-f34e-42b1-a294-ee492aec9d03
+            value: '1'
+            varType: string
+            variable_selector:
+            - '1765289745262'
+            - result
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: 条件分支
+        type: if-else
+      height: 126
+      id: '1765287650654'
+      position:
+        x: 493.72628562471084
+        y: 170.96152630251547
+      positionAbsolute:
+        x: 493.72628562471084
+        y: 170.96152630251547
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "def main(knowledge: str, question: str) -> dict:\n    import json\n\
+          \    import urllib.request\n\n    api_url = \"http://192.168.16.92:9518/v1/chat/completions\"\
+          \n\n    if not len(knowledge):\n        knowledge_text = \"未找到相关知识库内容。\"\
+          \n    else:\n        knowledge_text = knowledge\n\n    payload = {\n   \
+          \     \"model\": \"qwen2.5-72b\",\n        \"messages\": [\n           \
+          \ {\n                \"role\": \"system\",\n                \"content\"\
+          : \"你是一个专业的AI助手。请严格根据提供的知识库内容回答用户问题。如果知识库中没有相关信息，请明确告知用户。\"\n          \
+          \  },\n            {\n                \"role\": \"user\",\n            \
+          \    \"content\": \"知识库内容{}【用户问题】{}请根据上述知识库内容准确回答用户问题。\".format(knowledge_text,\
+          \ question)\n            }\n        ],\n        \"temperature\": 0.7\n \
+          \   }\n\n    req = urllib.request.Request(\n        api_url,\n        data=json.dumps(payload).encode('utf-8'),\n\
+          \        headers={'Content-Type': 'application/json'}\n    )\n\n    with\
+          \ urllib.request.urlopen(req, timeout=60) as response:\n        result =\
+          \ json.loads(response.read().decode('utf-8'))\n\n    answer = result['choices'][0]['message']['content']\n\
+          \n    tokens = result.get('usage', {}).get('total_tokens', 0)\n\n    return\
+          \ {\n        \"result\": answer\n    }"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 检索结果处理
+        type: code
+        variables:
+        - value_selector:
+          - '1765180881656'
+          - result
+          value_type: array[object]
+          variable: knowledge
+        - value_selector:
+          - sys
+          - query
+          value_type: string
+          variable: question
+      height: 54
+      id: '1765289305278'
+      position:
+        x: 1239.3737013834673
+        y: 155.18241164968313
+      positionAbsolute:
+        x: 1239.3737013834673
+        y: 155.18241164968313
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "def main(user_input: str) -> dict:\n    \"\"\"\n    判断用户输入是否属于运维问题\n\
+          \    输出: {'result': '1'} 或 {'result': '0'}\n    \"\"\"\n    import json\n\
+          \    import urllib.request\n    import socket\n\n    api_url = \"http://192.168.16.92:9518/v1/chat/completions\"\
+          \n\n    payload = {\n        \"model\": \"qwen2.5-72b\",\n        \"messages\"\
+          : [\n            {\n                \"role\": \"system\",\n            \
+          \    \"content\": \"你是一个分类助手。判断问题是否属于运维类（服务器、网络、部署、监控等）。只回答1或0。\"\n    \
+          \        },\n            {\n                \"role\": \"user\",\n      \
+          \          \"content\": f\"问题：{user_input}\\n\\n是运维问题吗？只回答1或0。\"\n     \
+          \       }\n        ],\n        \"temperature\": 0.1,\n        \"max_tokens\"\
+          : 5\n    }\n\n    try:\n        req = urllib.request.Request(\n        \
+          \    api_url,\n            data=json.dumps(payload).encode('utf-8'),\n \
+          \           headers={'Content-Type': 'application/json'}\n        )\n\n\
+          \        with urllib.request.urlopen(req, timeout=120) as response:\n  \
+          \          result = json.loads(response.read().decode('utf-8'))\n\n    \
+          \    answer = result['choices'][0]['message']['content'].strip()\n\n   \
+          \     # 清洗输出\n        if '1' in answer:\n            return {'result': '1'}\n\
+          \        elif '0' in answer:\n            return {'result': '0'}\n     \
+          \   else:\n            return {'result': '0'}\n\n    except (socket.timeout,\
+          \ urllib.error.URLError, urllib.error.HTTPError):\n        # 超时或网络错误，返回默认值\n\
+          \        return {'result': '0'}\n\n    except Exception:\n        # 其他错误，返回默认值\n\
+          \        return {'result': '0'}"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 代码执行 2
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - query
+          value_type: string
+          variable: user_input
+      height: 54
+      id: '1765289745262'
+      position:
+        x: 171.9330245001384
+        y: 149.96152630251547
+      positionAbsolute:
+        x: 171.9330245001384
+        y: 149.96152630251547
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    - data:
+        code: "def main(question: str) -> dict:\n    \"\"\"\n    Dify 工作流专用版本 - 流式接收但不打印，避免污染输出\n\
+          \    \"\"\"\n    import json\n    import urllib.request\n\n    api_url =\
+          \ \"http://192.168.16.92:9518/v1/chat/completions\"\n\n    payload = {\n\
+          \        \"model\": \"qwen2.5-72b\",\n        \"messages\": [\n        \
+          \    {\n                \"role\": \"user\",\n                \"content\"\
+          : question\n            }\n        ],\n        \"temperature\": 0.7,\n \
+          \       \"max_tokens\": 256,\n        \"stream\": True  # 开启流式输出\n    }\n\
+          \n    full_text = \"\"  # 累积完整回复文本\n\n    try:\n        req = urllib.request.Request(\n\
+          \            api_url,\n            data=json.dumps(payload).encode('utf-8'),\n\
+          \            headers={'Content-Type': 'application/json'}\n        )\n\n\
+          \        # 流式读取响应\n        with urllib.request.urlopen(req, timeout=180)\
+          \ as response:\n            buffer = b\"\"  # 缓冲区，处理不完整的行\n            \n\
+          \            while True:\n                # 每次读取一小块数据\n                chunk\
+          \ = response.read(1024)\n                if not chunk:\n               \
+          \     break\n                \n                buffer += chunk\n       \
+          \         \n                # 按行分割\n                while b'\\n' in buffer:\n\
+          \                    line, buffer = buffer.split(b'\\n', 1)\n          \
+          \          line = line.decode('utf-8', errors='ignore').strip()\n      \
+          \              \n                    # 跳过空行或非 data 行\n                 \
+          \   if not line or not line.startswith('data: '):\n                    \
+          \    continue\n                    \n                    data = line[6:]\
+          \  # 去掉 \"data: \" 前缀\n                    \n                    # 遇到结束标志\n\
+          \                    if data == '[DONE]':\n                        return\
+          \ {\"result\": full_text}\n                    \n                    try:\n\
+          \                        # 解析 JSON 数据块\n                        chunk_data\
+          \ = json.loads(data)\n                        \n                       \
+          \ # 提取增量内容（delta）\n                        choices = chunk_data.get('choices',\
+          \ [])\n                        if choices:\n                           \
+          \ delta = choices[0].get('delta', {})\n                            content\
+          \ = delta.get('content', '')\n                            \n           \
+          \                 if content:\n                                full_text\
+          \ += content\n                                # 不打印，避免污染 Dify 工作流输出\n  \
+          \                  \n                    except (json.JSONDecodeError, KeyError,\
+          \ IndexError):\n                        # 忽略解析错误，继续处理下一行\n             \
+          \           pass\n        \n        return {\"result\": full_text}\n\n \
+          \   except Exception:\n        # 超时或出错时返回默认回复\n        return {\"result\"\
+          : \"抱歉，我现在有点忙，请稍后再试。\"}"
+        code_language: python3
+        outputs:
+          result:
+            children: null
+            type: string
+        selected: false
+        title: 其它对话
+        type: code
+        variables:
+        - value_selector:
+          - sys
+          - query
+          value_type: string
+          variable: question
+      height: 54
+      id: '17652901251850'
+      position:
+        x: 903.9557799093229
+        y: 383.6705121517019
+      positionAbsolute:
+        x: 903.9557799093229
+        y: 383.6705121517019
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 243
+    viewport:
+      x: -320.61127385070904
+      y: 97.6056775756598
+      zoom: 1.2345626068935387
+  rag_pipeline_variables: []

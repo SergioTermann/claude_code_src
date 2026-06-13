@@ -16,6 +16,7 @@ import { logForDebugging } from '../debug.js'
 import { errorMessage, getErrnoCode } from '../errors.js'
 import { getFsImplementation } from '../fsOperations.js'
 import { logError } from '../log.js'
+import { assertOnlineFeature } from '../offline.js'
 import { jsonParse, jsonStringify } from '../slowOperations.js'
 import { classifyFetchError, logPluginFetch } from './fetchTelemetry.js'
 import { getPluginsDirectory } from './pluginDirectories.js'
@@ -184,6 +185,7 @@ async function saveInstallCountsCache(
 async function fetchInstallCountsFromGitHub(): Promise<
   Array<{ plugin: string; unique_installs: number }>
 > {
+  assertOnlineFeature('Plugin install counts')
   logForDebugging(`Fetching install counts from ${INSTALL_COUNTS_URL}`)
 
   const started = performance.now()

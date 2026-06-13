@@ -16,6 +16,7 @@ import {
   getAPIProvider,
   isFirstPartyAnthropicBaseUrl,
 } from '../../utils/model/providers.js'
+import { isOfflineMode } from '../../utils/offline.js'
 
 import {
   resetSyncCache as resetLeafCache,
@@ -48,6 +49,10 @@ export function resetSyncCache(): void {
  */
 export function isRemoteManagedSettingsEligible(): boolean {
   if (cached !== undefined) return cached
+
+  if (isOfflineMode()) {
+    return (cached = setEligibility(false))
+  }
 
   // 3p provider users should not hit the settings endpoint
   if (getAPIProvider() !== 'firstParty') {

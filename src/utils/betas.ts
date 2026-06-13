@@ -27,7 +27,7 @@ import { has1mContext } from './context.js'
 import { isEnvDefinedFalsy, isEnvTruthy } from './envUtils.js'
 import { getCanonicalName } from './model/model.js'
 import { get3PModelCapabilityOverride } from './model/modelSupportOverrides.js'
-import { getAPIProvider } from './model/providers.js'
+import { getAPIProvider, isLocalModelProvider } from './model/providers.js'
 import { getInitialSettings } from './settings/settings.js'
 
 /**
@@ -99,6 +99,9 @@ export function modelSupportsISP(model: string): boolean {
   }
   const canonical = getCanonicalName(model)
   const provider = getAPIProvider()
+  if (isLocalModelProvider(provider)) {
+    return false
+  }
   // Foundry supports interleaved thinking for all models
   if (provider === 'foundry') {
     return true
@@ -125,6 +128,9 @@ function vertexModelSupportsWebSearch(model: string): boolean {
 export function modelSupportsContextManagement(model: string): boolean {
   const canonical = getCanonicalName(model)
   const provider = getAPIProvider()
+  if (isLocalModelProvider(provider)) {
+    return false
+  }
   if (provider === 'foundry') {
     return true
   }

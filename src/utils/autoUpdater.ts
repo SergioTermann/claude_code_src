@@ -17,6 +17,7 @@ import { execFileNoThrowWithCwd } from './execFileNoThrow.js'
 import { getFsImplementation } from './fsOperations.js'
 import { gracefulShutdownSync } from './gracefulShutdown.js'
 import { logError } from './log.js'
+import { isOfflineMode } from './offline.js'
 import { gte, lt } from './semver.js'
 import { getInitialSettings } from './settings/settings.js'
 import {
@@ -384,6 +385,7 @@ export async function getNpmDistTags(): Promise<NpmDistTags> {
 export async function getLatestVersionFromGcs(
   channel: ReleaseChannel,
 ): Promise<string | null> {
+  if (isOfflineMode()) return null
   try {
     const response = await axios.get(`${GCS_BUCKET_URL}/${channel}`, {
       timeout: 5000,

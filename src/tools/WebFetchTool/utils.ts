@@ -12,6 +12,7 @@ import {
   isBinaryContentType,
   persistBinaryContent,
 } from '../../utils/mcpOutputStorage.js'
+import { assertOnlineOrLoopbackUrl, isOfflineMode } from '../../utils/offline.js'
 import { getSettings_DEPRECATED } from '../../utils/settings/settings.js'
 import { asSystemPrompt } from '../../utils/systemPromptType.js'
 import { isPreapprovedHost } from './preapproved.js'
@@ -159,6 +160,10 @@ export function validateURL(url: string): boolean {
 
   // Initial filter that this isn't a privileged, company-internal URL
   // by checking that the hostname is publicly resolvable
+  if (isOfflineMode()) {
+    return true
+  }
+
   const hostname = parsed.hostname
   const parts = hostname.split('.')
   if (parts.length < 2) {
@@ -176,6 +181,9 @@ type DomainCheckResult =
 export async function checkDomainBlocklist(
   domain: string,
 ): Promise<DomainCheckResult> {
+  if (isOfflineMode()) {
+    return { status: 'allowed' }
+  }
   if (DOMAIN_CHECK_CACHE.has(domain)) {
     return { status: 'allowed' }
   }
@@ -348,6 +356,7 @@ export async function getURLMarkdownContent(
   url: string,
   abortController: AbortController,
 ): Promise<FetchedContent | RedirectInfo> {
+  assertOnlineOrLoopbackUrl('WebFetch', url)
   if (!validateURL(url)) {
     throw new Error('Invalid URL')
   }
@@ -372,8 +381,9 @@ export async function getURLMarkdownContent(
   try {
     parsedUrl = new URL(url)
 
-    // Upgrade http to https if needed
-    if (parsedUrl.protocol === 'http:') {
+    // Upgrade http to https if needed. Preserve http for offline loopback
+    // services such as local docs/dev servers.
+    if (parsedUrl.protocol === 'http:' && !isOfflineMode()) {
       parsedUrl.protocol = 'https:'
       upgradedUrl = parsedUrl.toString()
     }

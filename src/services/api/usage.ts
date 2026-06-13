@@ -6,6 +6,7 @@ import {
   isClaudeAISubscriber,
 } from '../../utils/auth.js'
 import { getAuthHeaders } from '../../utils/http.js'
+import { isOfflineMode } from '../../utils/offline.js'
 import { getClaudeCodeUserAgent } from '../../utils/userAgent.js'
 import { isOAuthTokenExpired } from '../oauth/client.js'
 
@@ -31,6 +32,7 @@ export type Utilization = {
 }
 
 export async function fetchUtilization(): Promise<Utilization | null> {
+  if (isOfflineMode()) return null
   if (!isClaudeAISubscriber() || !hasProfileScope()) {
     return {}
   }

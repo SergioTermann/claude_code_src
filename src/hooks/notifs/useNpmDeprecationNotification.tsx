@@ -7,7 +7,11 @@ export function useNpmDeprecationNotification() {
   useStartupNotification(_temp);
 }
 async function _temp() {
-  if (isInBundledMode() || isEnvTruthy(process.env.DISABLE_INSTALLATION_CHECKS)) {
+  if (
+    process.env.WINDRISE === '1' ||
+    isInBundledMode() ||
+    isEnvTruthy(process.env.DISABLE_INSTALLATION_CHECKS)
+  ) {
     return null;
   }
   const installationType = await getCurrentInstallationType();

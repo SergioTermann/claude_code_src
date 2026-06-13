@@ -3,6 +3,7 @@ import type {
   BetaWebSearchTool20250305,
 } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import { getAPIProvider } from 'src/utils/model/providers.js'
+import { isOfflineMode } from 'src/utils/offline.js'
 import type { PermissionResult } from 'src/utils/permissions/PermissionResult.js'
 import { z } from 'zod/v4'
 import { getFeatureValue_CACHED_MAY_BE_STALE } from '../../services/analytics/growthbook.js'
@@ -166,6 +167,10 @@ export const WebSearchTool = buildTool({
     return summary ? `Searching for ${summary}` : 'Searching the web'
   },
   isEnabled() {
+    if (isOfflineMode()) {
+      return false
+    }
+
     const provider = getAPIProvider()
     const model = getMainLoopModel()
 

@@ -3,6 +3,7 @@ import { getOauthConfig } from '../../constants/oauth.js'
 import { getGlobalConfig, saveGlobalConfig } from '../../utils/config.js'
 import { getAuthHeaders } from '../../utils/http.js'
 import { logError } from '../../utils/log.js'
+import { isOfflineMode } from '../../utils/offline.js'
 import { getClaudeCodeUserAgent } from '../../utils/userAgent.js'
 
 /**
@@ -11,6 +12,7 @@ import { getClaudeCodeUserAgent } from '../../utils/userAgent.js'
  */
 export async function fetchAndStoreClaudeCodeFirstTokenDate(): Promise<void> {
   try {
+    if (isOfflineMode()) return
     const config = getGlobalConfig()
 
     if (config.claudeCodeFirstTokenDate !== undefined) {

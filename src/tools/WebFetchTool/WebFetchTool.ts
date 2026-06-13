@@ -3,6 +3,11 @@ import { buildTool, type ToolDef } from '../../Tool.js'
 import type { PermissionUpdate } from '../../types/permissions.js'
 import { formatFileSize } from '../../utils/format.js'
 import { lazySchema } from '../../utils/lazySchema.js'
+import {
+  assertOnlineOrLoopbackUrl,
+  isLoopbackUrl,
+  isOfflineMode,
+} from '../../utils/offline.js'
 import type { PermissionDecision } from '../../utils/permissions/PermissionResult.js'
 import { getRuleByContentsForTool } from '../../utils/permissions/permissions.js'
 import { isPreapprovedHost } from './preapproved.js'
@@ -98,6 +103,9 @@ export const WebFetchTool = buildTool({
   isReadOnly() {
     return true
   },
+  isEnabled() {
+    return true
+  },
   toAutoClassifierInput(input) {
     return input.prompt ? `${input.url}: ${input.prompt}` : input.url
   },
@@ -109,6 +117,16 @@ export const WebFetchTool = buildTool({
     try {
       const { url } = input as { url: string }
       const parsedUrl = new URL(url)
+      if (isOfflineMode() && !isLoopbackUrl(url)) {
+        return {
+          behavior: 'deny',
+          message: `${WebFetchTool.name} can only access localhost URLs in offline/LM Studio mode.`,
+          decisionReason: {
+            type: 'other',
+            reason: 'Offline mode',
+          },
+        }
+      }
       if (isPreapprovedHost(parsedUrl.hostname, parsedUrl.pathname)) {
         return {
           behavior: 'allow',
@@ -209,6 +227,7 @@ ${DESCRIPTION}`
     { url, prompt },
     { abortController, options: { isNonInteractiveSession } },
   ) {
+    assertOnlineOrLoopbackUrl(WebFetchTool.name, url)
     const start = Date.now()
 
     const response = await getURLMarkdownContent(url, abortController)

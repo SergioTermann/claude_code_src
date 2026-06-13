@@ -16,6 +16,7 @@ import { getCwd } from '../../utils/cwd.js'
 import { logForDebugging } from '../../utils/debug.js'
 import { errorMessage } from '../../utils/errors.js'
 import { logError } from '../../utils/log.js'
+import { assertOnlineFeature } from '../../utils/offline.js'
 import { sleep } from '../../utils/sleep.js'
 import {
   type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
@@ -133,6 +134,7 @@ export async function downloadFile(
   fileId: string,
   config: FilesApiConfig,
 ): Promise<Buffer> {
+  assertOnlineFeature('Files API')
   const baseUrl = config.baseUrl || getDefaultApiBaseUrl()
   const url = `${baseUrl}/v1/files/${fileId}/content`
 
@@ -381,6 +383,7 @@ export async function uploadFile(
   config: FilesApiConfig,
   opts?: { signal?: AbortSignal },
 ): Promise<UploadResult> {
+  assertOnlineFeature('Files API')
   const baseUrl = config.baseUrl || getDefaultApiBaseUrl()
   const url = `${baseUrl}/v1/files`
 
@@ -618,6 +621,7 @@ export async function listFilesCreatedAfter(
   afterCreatedAt: string,
   config: FilesApiConfig,
 ): Promise<FileMetadata[]> {
+  assertOnlineFeature('Files API')
   const baseUrl = config.baseUrl || getDefaultApiBaseUrl()
   const headers = {
     Authorization: `Bearer ${config.oauthToken}`,
