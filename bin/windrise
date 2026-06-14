@@ -16,6 +16,7 @@ export LMSTUDIO_CODER_MODEL="${LMSTUDIO_CODER_MODEL:-${LMSTUDIO_MODEL:-qwen3.5-9
 export LMSTUDIO_CHAT_MODEL="${LMSTUDIO_CHAT_MODEL:-$LMSTUDIO_CODER_MODEL}"
 export LMSTUDIO_ROUTER_MODEL="${LMSTUDIO_ROUTER_MODEL:-$LMSTUDIO_CODER_MODEL}"
 export LMSTUDIO_MODEL="${LMSTUDIO_MODEL:-$LMSTUDIO_CODER_MODEL}"
+export LMSTUDIO_FORCE_CHAT="${LMSTUDIO_FORCE_CHAT:-1}"
 export LMSTUDIO_BASE_URL="${LMSTUDIO_BASE_URL:-http://127.0.0.1:1234}"
 export DISABLE_INSTALLATION_CHECKS="${DISABLE_INSTALLATION_CHECKS:-1}"
 export WINDRISE=1
@@ -27,6 +28,7 @@ windrise 用法:
   windrise ask                     启动普通回车对话模式，按需检索
   windrise 303804                  单次对话/检索
   windrise "303804是什么故障"       自动检索知识库并总结
+  windrise "llmwiki 303804"        明确检索知识库并总结
   windrise "变桨24V开关怎么处理"   自动检索知识库并总结
   windrise "检索 303804"           检索知识库并总结
   windrise search 偏航 电机        直接检索多个关键词
@@ -39,6 +41,10 @@ windrise 用法:
   windrise doctor                  检查本地 LM Studio / LLMWiki 状态
   windrise chat                    启动完整交互模式
   windrise help                    显示帮助
+
+关闭自动 LLMWiki 检索:
+  WINDRISE_DISABLE_AUTO_LLMWIKI=1 windrise ask
+  WINDRISE_DISABLE_AUTO_LLMWIKI=1 windrise "普通问题"
 EOF
 }
 
@@ -115,6 +121,9 @@ is_web_query() {
 
 is_knowledge_query() {
   local prompt="$*"
+  if [[ "${WINDRISE_DISABLE_AUTO_LLMWIKI:-}" == "1" ]] && ! is_explicit_llmwiki_query "$prompt"; then
+    return 1
+  fi
   if is_principle_query "$prompt" && ! has_fault_knowledge_signal "$prompt"; then
     return 1
   fi
@@ -133,6 +142,11 @@ is_knowledge_query() {
     return 0
   fi
   return 1
+}
+
+is_explicit_llmwiki_query() {
+  local prompt="$*"
+  printf '%s' "$prompt" | grep -Eiq '^[[:space:]]*/?(llmwiki|wiki)([[:space:]]|$)'
 }
 
 is_principle_query() {

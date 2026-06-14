@@ -26,6 +26,7 @@ const ROUTER_MODEL =
   process.env.WINDRISE_ROUTER_MODEL ||
   CODER_MODEL
 const ENABLE_NETWORK = process.env.WINDRISE_ENABLE_NETWORK !== '0'
+const DISABLE_AUTO_LLMWIKI = process.env.WINDRISE_DISABLE_AUTO_LLMWIKI === '1'
 const LOCAL_BASE_URL = (
   process.env.LMSTUDIO_BASE_URL || 'http://127.0.0.1:1234'
 ).replace(/\/$/, '')
@@ -44,8 +45,9 @@ if (!isLoopbackUrl(LOCAL_BASE_URL)) {
 const history = [
   {
     role: 'system',
-    content:
-      '你是 Windrise，一个面向风机故障码、本地知识库和工程问题的中文助手。正常对话时简洁回答。不要假装已经检索本地知识库；当用户询问故障码或明显的风机故障/报警/处理问题时，程序会自动检索 LLMWiki。',
+    content: DISABLE_AUTO_LLMWIKI
+      ? '你是 Windrise，一个面向风机故障码、本地知识库和工程问题的中文助手。正常对话时简洁回答。不要假装已经检索本地知识库；只有用户明确使用 llmwiki 或 /llmwiki 命令时，才使用本地知识库。'
+      : '你是 Windrise，一个面向风机故障码、本地知识库和工程问题的中文助手。正常对话时简洁回答。不要假装已经检索本地知识库；当用户询问故障码或明显的风机故障/报警/处理问题时，程序会自动检索 LLMWiki。',
   },
 ]
 
@@ -55,7 +57,7 @@ function printBanner() {
 │ ⌁⌁⌁ 对话模式 · 按需检索风机故障码知识库      │
 ╰────────────────────────────────────────────╯
 直接输入问题后按回车即可对话。
-故障码、风机报警、处理建议类问题会自动检索；也可以说：检索 303804。
+${DISABLE_AUTO_LLMWIKI ? '自动 LLMWiki 检索已关闭；需要知识库时请输入：llmwiki 303804。' : '故障码、风机报警、处理建议类问题会自动检索；也可以说：检索 303804。'}
 输入 help 查看命令，输入 exit 退出。`)
 }
 
@@ -65,6 +67,7 @@ function printHelp() {
   查询 <内容>       同上
   搜索 <内容>       同上
   查 <内容>         同上
+  llmwiki <内容>    明确从 LLMWiki 知识库检索并总结
   read <路径>       读取 LLMWiki 文件
   tree [路径]       查看目录树
   clear             清空对话上下文
@@ -77,6 +80,18 @@ function printHelp() {
 }
 
 function getRetrievalRequest(text) {
+  const explicitLlmWiki = parseExplicitLlmWikiRequest(text)
+  if (explicitLlmWiki !== undefined) {
+    return {
+      shouldRetrieve: true,
+      query: explicitLlmWiki,
+    }
+  }
+
+  if (DISABLE_AUTO_LLMWIKI) {
+    return { shouldRetrieve: false, query: '' }
+  }
+
   if (shouldRetrieve(text)) {
     return {
       shouldRetrieve: true,
@@ -92,6 +107,12 @@ function getRetrievalRequest(text) {
   }
 
   return { shouldRetrieve: false, query: '' }
+}
+
+function parseExplicitLlmWikiRequest(text) {
+  const match = text.match(/^\/?(?:llmwiki|wiki)\b\s*(.*)$/i)
+  if (!match) return undefined
+  return match[1]?.trim() || ''
 }
 
 function trimTrigger(text) {
@@ -216,6 +237,14 @@ async function searchKnowledge(query) {
 }
 
 async function askLocalModel(messages, routeText) {
+  let answer = ''
+  for await (const chunk of streamLocalModel(messages, routeText)) {
+    answer += chunk
+  }
+  return answer.trim()
+}
+
+async function* streamLocalModel(messages, routeText) {
   const selectedModel = await selectResponseModel(routeText, messages)
   const response = await fetch(`${LOCAL_BASE_URL}/v1/chat/completions`, {
     method: 'POST',
@@ -226,7 +255,7 @@ async function askLocalModel(messages, routeText) {
     body: JSON.stringify({
       model: selectedModel,
       messages,
-      stream: false,
+      stream: true,
       temperature: 0.3,
     }),
     signal: AbortSignal.timeout(120_000),
@@ -235,13 +264,64 @@ async function askLocalModel(messages, routeText) {
   if (!response.ok) {
     throw new Error(`${response.status} ${response.statusText}`)
   }
+  if (!response.body) return
 
-  const data = await response.json()
-  return data?.choices?.[0]?.message?.content?.trim() || ''
+  yield* parseChatCompletionStream(response.body)
+}
+
+async function* parseChatCompletionStream(body) {
+  const reader = body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const parts = buffer.split(/\r?\n\r?\n/)
+      buffer = parts.pop() || ''
+      for (const part of parts) {
+        const chunk = parseChatCompletionStreamPart(part)
+        if (chunk !== undefined) yield chunk
+      }
+    }
+    buffer += decoder.decode()
+    if (buffer.trim()) {
+      const chunk = parseChatCompletionStreamPart(buffer)
+      if (chunk !== undefined) yield chunk
+    }
+  } finally {
+    reader.releaseLock()
+  }
+}
+
+function parseChatCompletionStreamPart(part) {
+  const payload = part
+    .split(/\r?\n/)
+    .filter(line => line.startsWith('data:'))
+    .map(line => line.slice('data:'.length).trimStart())
+    .join('\n')
+    .trim()
+  if (!payload || payload === '[DONE]') return undefined
+  const data = JSON.parse(payload)
+  return data?.choices?.map(choice => choice?.delta?.content || '').join('') || ''
+}
+
+async function printStreamedWindriseAnswer(messages, routeText) {
+  output.write('Windrise: ')
+  let answer = ''
+  for await (const chunk of streamLocalModel(messages, routeText)) {
+    answer += chunk
+    output.write(chunk)
+  }
+  output.write('\n')
+  return answer.trim()
 }
 
 async function selectResponseModel(routeText, messages) {
-  if (process.env.WINDRISE_MODEL_ROUTER === '0') {
+  if (process.env.LMSTUDIO_FORCE_CHAT === '1') return CHAT_MODEL
+  if (process.env.LMSTUDIO_FORCE_CODER === '1') return CODER_MODEL
+  if (process.env.WINDRISE_MODEL_ROUTER !== '1') {
     return fallbackRouteModel(routeText)
   }
 
@@ -648,7 +728,7 @@ async function answerWithWeb(text) {
 
 ${webContext}`
 
-  const answer = await askLocalModel([
+  const answer = await printStreamedWindriseAnswer([
     {
       role: 'system',
       content:
@@ -656,7 +736,7 @@ ${webContext}`
     },
     { role: 'user', content: prompt },
   ], `联网资料总结：${text}`)
-  console.log(`Windrise: ${answer || webContext}`)
+  if (!answer) console.log(`Windrise: ${webContext}`)
 }
 
 function isLoopbackUrl(value) {
@@ -677,7 +757,7 @@ function isLoopbackUrl(value) {
 async function answerNormally(text) {
   const messages = [...history, { role: 'user', content: text }]
   try {
-    const answer = await askLocalModel(messages, text)
+    const answer = await printStreamedWindriseAnswer(messages, text)
     if (!answer) {
       console.log('Windrise: 没有收到模型回复。')
       return
@@ -731,7 +811,7 @@ async function answerWithRetrieval(text) {
 ${hits}`
 
   try {
-    const answer = await askLocalModel([
+    const answer = await printStreamedWindriseAnswer([
       {
         role: 'system',
         content:
@@ -739,7 +819,9 @@ ${hits}`
       },
       { role: 'user', content: prompt },
     ], `故障知识库总结：${query}`)
-    console.log(`Windrise: ${ensureSourceLine(answer || hits, hits)}`)
+    const sourceLine = answer ? missingSourceLine(answer, hits) : ''
+    if (sourceLine) console.log(sourceLine)
+    if (!answer) console.log(`Windrise: ${hits}`)
   } catch {
     console.log(`Windrise: 本地模型暂时不可用，先给你原始检索结果：\n\n${hits}`)
   }
@@ -760,6 +842,14 @@ function ensureSourceLine(answer, hits) {
   const firstSupplement = hits.match(/^- (.+:\d+)$/m)?.[1]
   if (firstSupplement) return `${answer}\n\n来源：${firstSupplement}`
   return answer
+}
+
+function missingSourceLine(answer, hits) {
+  if (/来源[:：]/.test(answer)) return ''
+  const sourceLine = hits.match(/^来源[:：]\s*(.+)$/m)?.[1]
+  if (sourceLine) return `来源：${sourceLine}`
+  const firstSupplement = hits.match(/^- (.+:\d+)$/m)?.[1]
+  return firstSupplement ? `来源：${firstSupplement}` : ''
 }
 
 async function handleLine(line) {

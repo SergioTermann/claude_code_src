@@ -76,10 +76,22 @@ type OpenAIChatResponse = {
   }
 }
 
+type OpenAIChatStreamChunk = {
+  choices?: Array<{
+    delta?: {
+      content?: string | null
+    }
+  }>
+  usage?: {
+    prompt_tokens?: number
+    completion_tokens?: number
+  }
+}
+
 type OpenAIChatRequest = {
   model: string
   messages: OpenAIMessage[]
-  stream: false
+  stream: boolean
   tools?: LmStudioTool[]
   response_format?: {
     type: 'json_object' | 'json_schema'
@@ -152,6 +164,65 @@ export function createLmStudioAnthropicClient(): unknown {
 }
 
 async function* streamBufferedLmStudioAsAnthropic(
+  params: BetaMessageStreamParams,
+  options?: RequestOptions,
+): AsyncGenerator<BetaRawMessageStreamEvent> {
+  const signal = options?.signal ?? AbortSignal.timeout(options?.timeout ?? 120_000)
+  const messages = await toLmStudioMessages(params)
+  if (!shouldUseLmStudioStreaming(params, messages)) {
+    yield* streamBufferedLmStudioMessageAsAnthropic(params, options)
+    return
+  }
+
+  const chunks = streamLmStudioChatCompletions(params, messages, signal)
+  let text = ''
+
+  yield {
+    type: 'message_start',
+    message: {
+      id: randomUUID(),
+      type: 'message',
+      role: 'assistant',
+      model: resolveModel(params.model),
+      content: [],
+      stop_reason: null,
+      stop_sequence: null,
+      usage: emptyUsage(),
+    },
+  } as BetaRawMessageStreamEvent
+
+  yield {
+    type: 'content_block_start',
+    index: 0,
+    content_block: { type: 'text', text: '' },
+  } as BetaRawMessageStreamEvent
+
+  for await (const chunk of chunks) {
+    if (!chunk) continue
+    text += chunk
+    yield {
+      type: 'content_block_delta',
+      index: 0,
+      delta: { type: 'text_delta', text: chunk },
+    } as BetaRawMessageStreamEvent
+  }
+
+  yield {
+    type: 'content_block_stop',
+    index: 0,
+  } as BetaRawMessageStreamEvent
+  yield {
+    type: 'message_delta',
+    delta: {
+      stop_reason: 'end_turn',
+      stop_sequence: null,
+    },
+    usage: { output_tokens: estimateTokens(text) },
+  } as unknown as BetaRawMessageStreamEvent
+  yield { type: 'message_stop' } as BetaRawMessageStreamEvent
+}
+
+async function* streamBufferedLmStudioMessageAsAnthropic(
   params: BetaMessageStreamParams,
   options?: RequestOptions,
 ): AsyncGenerator<BetaRawMessageStreamEvent> {
@@ -432,6 +503,119 @@ async function callLmStudioChatCompletions(
   return openAIResponseToLmStudioResponse(data, body.model)
 }
 
+function shouldUseLmStudioStreaming(
+  params: BetaMessageStreamParams,
+  messages: LmStudioMessage[],
+): boolean {
+  if (process.env.LMSTUDIO_STREAM === '0') return false
+  if (shouldSendLmStudioTools(params, messages)) return false
+  if (
+    toLmStudioFormat(
+      (params as BetaMessageStreamParams & { output_config?: unknown })
+        .output_config,
+    )
+  ) {
+    return false
+  }
+  return true
+}
+
+async function* streamLmStudioChatCompletions(
+  params: BetaMessageStreamParams,
+  messages: LmStudioMessage[],
+  signal: AbortSignal,
+): AsyncGenerator<string> {
+  const route = await selectLmStudioModel(params, messages, signal)
+  const body: OpenAIChatRequest = {
+    model: route.model,
+    messages: toOpenAIMessages(messages),
+    stream: true,
+  }
+
+  const explicitMaxTokens = process.env.LMSTUDIO_MAX_TOKENS
+    ? parseInt(process.env.LMSTUDIO_MAX_TOKENS, 10)
+    : process.env.LMSTUDIO_NUM_PREDICT
+      ? parseInt(process.env.LMSTUDIO_NUM_PREDICT, 10)
+      : undefined
+  if (Number.isFinite(explicitMaxTokens)) {
+    body.max_tokens = explicitMaxTokens
+  } else if (process.env.WINDRISE === '1') {
+    body.max_tokens = 2048
+  } else if (params.max_tokens !== undefined) {
+    body.max_tokens = params.max_tokens
+  }
+  if (params.temperature !== undefined) {
+    body.temperature = params.temperature
+  } else if (process.env.WINDRISE === '1') {
+    body.temperature = 0.3
+  }
+  if (process.env.WINDRISE !== '1' && params.stop_sequences?.length) {
+    body.stop = params.stop_sequences
+  }
+
+  const baseUrl = getLmStudioBaseUrl()
+  assertOnlineOrLoopbackUrl('LmStudio provider', baseUrl)
+  const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${process.env.LMSTUDIO_API_KEY || 'lm-studio'}`,
+    },
+    body: JSON.stringify(body),
+    signal,
+  })
+
+  if (!response.ok) {
+    throw new Error(
+      `LM Studio streaming request failed: ${response.status} ${await response.text()}`,
+    )
+  }
+  if (!response.body) return
+
+  yield* parseOpenAIChatSse(response.body)
+}
+
+async function* parseOpenAIChatSse(
+  body: ReadableStream<Uint8Array>,
+): AsyncGenerator<string> {
+  const reader = body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const parts = buffer.split(/\r?\n\r?\n/)
+      buffer = parts.pop() ?? ''
+      for (const part of parts) {
+        const delta = parseOpenAIChatSsePart(part)
+        if (delta === undefined) continue
+        yield delta
+      }
+    }
+    buffer += decoder.decode()
+    if (buffer.trim()) {
+      const delta = parseOpenAIChatSsePart(buffer)
+      if (delta !== undefined) yield delta
+    }
+  } finally {
+    reader.releaseLock()
+  }
+}
+
+function parseOpenAIChatSsePart(part: string): string | undefined {
+  const payload = part
+    .split(/\r?\n/)
+    .filter(line => line.startsWith('data:'))
+    .map(line => line.slice('data:'.length).trimStart())
+    .join('\n')
+    .trim()
+  if (!payload || payload === '[DONE]') return undefined
+  const chunk = JSON.parse(payload) as OpenAIChatStreamChunk
+  return chunk.choices?.map(choice => choice.delta?.content ?? '').join('') ?? ''
+}
+
 function toOpenAIMessages(messages: LmStudioMessage[]): OpenAIMessage[] {
   return messages.map(message => ({
     role: message.role,
@@ -555,11 +739,15 @@ function stripClaudeSystemReminders(value: string): string {
 }
 
 function getWindriseSystemPrompt(): string {
+  const llmWikiInstruction =
+    process.env.WINDRISE_DISABLE_AUTO_LLMWIKI === '1'
+      ? '不要自动检索 LLMWiki；只有用户明确使用 /llmwiki 命令或上下文已经包含 LLMWiki 检索结果时，才基于 LLMWiki 回答。'
+      : '当用户明确输入 /llmwiki、询问故障码/报警码、或问题明显涉及具体风机故障、报警、复位、处理、排查时，根据本地 LLMWiki 检索上下文回答。'
   return [
     '你是 Windrise，本地中文对话助手，由本机模型服务提供推理。',
     '默认使用中文完整回答，回答应自然、完整，不要只输出半句话、单个词或不完整英文。',
     '不要自称 Claude，不要提 Anthropic 或 Claude Code。',
-    '当用户明确输入 /llmwiki、询问故障码/报警码、或问题明显涉及具体风机故障、报警、复位、处理、排查时，根据本地 LLMWiki 检索上下文回答。',
+    llmWikiInstruction,
     '当用户咨询工作原理、机理、组成、作用、控制逻辑、运行逻辑等概念问题，且没有明确故障码或现场处置意图时，按普通原理咨询回答，不要自动检索。',
     '如果上下文中包含 LLMWiki 检索结果，必须基于检索结果回答，保留关键故障码、名称、原因、处理方法和来源路径；不要编造检索结果中没有的信息。',
   ].join('\n')
@@ -877,6 +1065,18 @@ type WindriseRetrievalRequest = {
 }
 
 function getWindriseRetrievalRequest(text: string): WindriseRetrievalRequest {
+  const explicitLlmWikiQuery = parseExplicitWindriseLlmWikiRequest(text)
+  if (explicitLlmWikiQuery !== undefined) {
+    return {
+      shouldRetrieve: true,
+      query: explicitLlmWikiQuery,
+    }
+  }
+
+  if (process.env.WINDRISE_DISABLE_AUTO_LLMWIKI === '1') {
+    return { shouldRetrieve: false, query: '' }
+  }
+
   if (shouldWindriseRetrieve(text)) {
     return {
       shouldRetrieve: true,
@@ -892,6 +1092,12 @@ function getWindriseRetrievalRequest(text: string): WindriseRetrievalRequest {
   }
 
   return { shouldRetrieve: false, query: '' }
+}
+
+function parseExplicitWindriseLlmWikiRequest(text: string): string | undefined {
+  const match = text.match(/^\/?(?:llmwiki|wiki)\b\s*(.*)$/i)
+  if (!match) return undefined
+  return match[1]?.trim() || ''
 }
 
 function shouldWindriseRetrieve(text: string): boolean {
@@ -1012,8 +1218,22 @@ async function selectLmStudioModel(
     }
   }
 
-  if (process.env.WINDRISE !== '1' || process.env.WINDRISE_MODEL_ROUTER === '0') {
-    const model = resolveModel(params.model)
+  if (process.env.LMSTUDIO_FORCE_CHAT === '1') {
+    return { model: getLmStudioChatModel(), decision: 'chat' }
+  }
+  if (process.env.LMSTUDIO_FORCE_CODER === '1') {
+    return { model: getLmStudioCoderModel(params.model), decision: 'coder' }
+  }
+  if (process.env.WINDRISE !== '1' || process.env.WINDRISE_MODEL_ROUTER !== '1') {
+    const model = process.env.WINDRISE === '1'
+      ? fallbackLmStudioModelRoute(
+          [...messages]
+            .reverse()
+            .find(message => message.role === 'user')
+            ?.content ?? '',
+          params.model,
+        ).model
+      : resolveModel(params.model)
     return { model, decision: model === getLmStudioChatModel() ? 'chat' : 'coder' }
   }
 

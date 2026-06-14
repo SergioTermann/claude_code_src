@@ -48,6 +48,7 @@ function helpText(): string {
     '  LMSTUDIO_BASE_URL    LM Studio server URL',
     '  LMSTUDIO_MODEL       LM Studio model name',
     '  WINDRISE_ENABLE_NETWORK  Enable web search/fetch in Windrise',
+    '  WINDRISE_DISABLE_AUTO_LLMWIKI  Disable automatic LLMWiki retrieval',
     '  LLMWIKI_PROJECT      LLMWiki project root or text knowledge directory',
     '  LLMWIKI_DIR          Path to a .llm-wiki directory',
   ].join('\n')
@@ -92,6 +93,7 @@ async function renderDoctor(): Promise<string> {
     `${providerName} URL: ${baseUrl}`,
     `${providerName} model: ${model}`,
     `Windrise network: ${process.env.WINDRISE_ENABLE_NETWORK === '0' ? 'disabled' : 'enabled'}`,
+    `Windrise auto LLMWiki: ${process.env.WINDRISE_DISABLE_AUTO_LLMWIKI === '1' ? 'disabled' : 'enabled'}`,
     '',
   ]
 

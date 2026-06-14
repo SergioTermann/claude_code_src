@@ -1,0 +1,77 @@
+id,type,label,count
+action:3d0ce16d77ca,action,当前系统用于在本地环境中回答风机故障码、故障处理、设备原理以及风场与风机型号对应关系等问题,1
+action:2c09cde580bc,action,- 需要将内置结果与文件夹中的标准资料进行抽样比对，确认当前问题点,1
+action:10920aa35251,action,- 离线 smoke 测试：`scripts/smoke-llmwiki.mjs`,1
+action:82ac7f7e6213,action,- LM Studio smoke 测试：`scripts/smoke-lmstudio.mjs`,1
+action:fc9719ebf480,action,| 问题类型 | 示例 | 处理方式 |,1
+action:2d68244b25f5,action,| 故障处理咨询 | `303804 怎么处理` | 走故障资料检索并输出处理建议 |,1
+action:2ec7bec25c21,action,建议新增或扩展 smoke 测试，自动解析标准化文件，并与内置表进行全量比对,1
+action:95ee730d4aa7,action,测试项建议包括：,1
+action:a869bd183af5,action,建议补充以下测试用例：,1
+action:01e8975b427d,action,| `故障码1100007怎么处理` | 故障码检索 |,1
+action:aa3a76da77b2,action,| P1 | 增加风场机型全量一致性测试 | 防止后续维护时改坏映射 |,1
+action:7afac30dbc06,action,| P1 | 增加意图分流测试 | 防止原理问题误走故障码检索 |,1
+action:930c8db1b6b2,action,通过 10 组抽样和 26 条全量机械比对可以确认：内置表中的机型对应关系本身是正确的，没有发现风场对应错误机型的问题,1
+action:59b2778992dc,action,下一步建议优先修正 `windFarmModels.json` 中的主场站名，把用户常用说法放入 `aliases`，并增加自动化全量比对测试,1
+corpus:31311cd153bf,corpus,技术报告_本地风机知识助手检索与映射验证.md,1
+document:31311cd153bf,document,技术报告_本地风机知识助手检索与映射验证.md,19
+fault_name:6c7a9593b1a2,fault_name,- 故障,2
+fault_name:db8ea41251d8,fault_name,text 风机故障码/00 表达式规则涉及的要配置的标准化-型号和故障,2
+fault_name:0c8e96103bfb,fault_name,当前系统用于在本地环境中回答风机故障,1
+fault_name:c0c64d5d7cba,fault_name,- 用户问题并不总是故障,1
+fault_name:79ec728f39d3,fault_name,风机故障码/00 表达式规则涉及的要配置的标准化-型号和故障,1
+fault_name:e2b66a2a8002,fault_name,风机故障,1
+fault_name:ab427a0be836,fault_name,更适合用于故障,1
+fault_name:947b90b1ec32,fault_name,1100007 是什么故障,1
+fault_name:75901c775e55,fault_name,优先走故障,1
+fault_name:aa81319b2e8a,fault_name,走故障,1
+fault_name:05ccdcf1bf08,fault_name,不强制进入故障,1
+fault_name:6f9f63b490c6,fault_name,原理问题被误当成故障,1
+fault_name:9635ada4cd66,fault_name,已修复长数字故障,1
+fault_name:2dc8ec5e9708,fault_name,导致命中华锐资料中的故障,1
+fault_name:16e461a9a6c2,fault_name,- 用户输入完整长故障,1
+fault_name:d0652671be71,fault_name,优先按完整故障,1
+fault_name:5b125d1d8c64,fault_name,- 不自动把完整故障,1
+fault_name:f1421803093b,fault_name,- 输出故障,1
+fault_name:be2b94d2dd8a,fault_name,的用途是故障,1
+fault_name:671a522d7f22,fault_name,其中的场站字段服务于故障,1
+fault_name:d3ff40e82e94,fault_name,例如某些故障,1
+fault_name:1dc63f0e83ba,fault_name,- 完整故障,1
+fault_name:2f600d444bb4,fault_name,- 不允许自动把长故障,1
+fault_name:de5de86f13db,fault_name,1100007是什么故障,1
+fault_name:6d5262547ac3,fault_name,变流器为什么会报过压,1
+fault_name:28a242426736,fault_name,保持长故障,1
+fault_name:dd72e4a882ae,fault_name,防止原理问题误走故障,1
+fault_name:5d429e096760,fault_name,提升复杂故障,1
+model:2886ba7866ff,model,SE8715,4
+model:657dc1fd8dc7,model,S1500,3
+model:941324798ffc,model,WD88-1500A,3
+model:8cfa666aef1a,model,GW82-1500,2
+model:449ba0a185cf,model,S2000,1
+model:d4d2394f953f,model,WD140-2500,1
+model:00d53f3a1f21,model,WD147-3000,1
+model:c7575de92fea,model,FD77-1500-III,1
+model:bb2b8ddc14d4,model,HW82/1500,1
+model:9677518059dd,model,SE8215-L3,1
+section:386fe7c9dd14,section,1. 背景,1
+section:d1543d722661,section,2. 当前数据与代码范围,1
+section:a67813ec0b95,section,3.1 本地模型链路,1
+section:cdcff74bcc94,section,3.2 问题意图识别,1
+section:51a9161a69ef,section,3.3 长数字故障码处理,1
+section:1bd5be0cd31a,section,3.4 内置风场机型映射,1
+section:23be38179fac,section,4. 10 组数据比对结果,1
+section:18f62a5f9a18,section,5. 全量比对结果,1
+section:e8769b2dfae5,section,6.1 主场站名不统一,1
+section:13c99c7ccbaa,section,6.2 别名和主名称职责需要区分,1
+section:5086539d1c9c,section,6.3 `fault-index.jsonl` 不适合作为机型映射标准,1
+section:8f021c9b9006,section,6.4 故障码检索仍需保持完整码优先,1
+section:185a4ba773b0,section,7.1 规范 `windFarmModels.json`,1
+section:edb1c4a01905,section,7.2 输出结果统一使用标准场站名,1
+section:55077b114f42,section,7.3 增加全量一致性测试,1
+section:ad73e3816873,section,7.4 加强意图分流测试,1
+section:58dad2f9da61,section,8. 建议优先级,1
+section:adbb79569930,section,9. 结论,1
+term:cb8ea1925439,term,风场,10
+term:41eef008cb28,term,风机,5
+term:ea8e44e6472f,term,GSC,2
+term:3f5ad413e2f2,term,变流器,1
