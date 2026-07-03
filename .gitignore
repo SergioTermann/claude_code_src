@@ -37,3 +37,6 @@ hantech_app-main/local.properties
 hantech_app-main/**/*.iml
 hantech_app-main/.idea/
 hantech_app-main/captures/
+
+# 参考快照(旧项目副本,124M),保留磁盘但不入库
+reference/

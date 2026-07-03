@@ -172,17 +172,10 @@ VLLM_API_KEY = os.getenv(
     os.getenv('LLM_API_KEY', os.getenv('OPENAI_API_KEY', ''))
 ).strip()
 
-# ========== Dify API 配置（可选） ==========
-# 配置 DIFY_API_URL + DIFY_API_KEY 后，/api/chat 优先走 Dify；未配置则走本地 LM Studio。
-DIFY_API_URL = os.getenv('DIFY_API_URL', '').strip()
-DIFY_API_KEY = os.getenv('DIFY_API_KEY', '').strip()
-DIFY_APP_TYPE = os.getenv('DIFY_APP_TYPE', 'chat').strip().lower() or 'chat'
-DIFY_ENABLED = bool(DIFY_API_URL and DIFY_API_KEY)
-DIFY_REQUIRED = os.getenv('DIFY_REQUIRED', '1') != '0'
 LOCAL_KNOWLEDGE_DISABLED = True
 
 # ========== Windrise 本地问答配置（可选） ==========
-# 开启后 /api/chat 仍保持 Dify 兼容返回格式，但回答由 bin/windrise 生成。
+# 开启后 /api/chat 仍保持 SSE 兼容返回格式，但回答由 bin/windrise 生成。
 WINDRISE_ENABLED = os.getenv('WINDRISE_ENABLED', '0') != '0'
 
 
@@ -232,7 +225,7 @@ DEFAULT_EMBEDDING_MODEL = resolve_project_local_path(
     os.path.join('offline_models', 'Qwen3-Embedding-0.6B')
 )
 
-# ========== 本地知识检索兼容配置（已关闭，知识检索由 Dify 负责） ==========
+# ========== 本地知识检索兼容配置（已关闭，知识检索由后端服务负责） ==========
 DEFAULT_RAG_KB_DIR = 'wind_power_wiki'
 LANGCHAIN_KB_DIR = resolve_project_local_path(
     os.getenv('RAG_KB_DIR', DEFAULT_RAG_KB_DIR),
@@ -496,7 +489,7 @@ def detect_wind_farm_from_history(history):
             return farm_id
     return None
 
-# ========== 系统提示词（从 Dify 工作流迁移）==========
+# ========== 系统提示词（内置）==========
 
 CLASSIFICATION_PROMPT = """你是意图识别助手，判断用户输入属于以下哪个级别。只返回一个数字（1、2或3），不要有其他内容。
 
@@ -882,34 +875,6 @@ def get_request_kwargs_for_url(url, **kwargs):
     return request_kwargs
 
 
-def get_dify_request_kwargs(url, **kwargs):
-    request_kwargs = dict(kwargs)
-    headers = dict(request_kwargs.get('headers') or {})
-    headers.setdefault('Authorization', f'Bearer {DIFY_API_KEY}')
-    headers.setdefault('Content-Type', 'application/json')
-    request_kwargs['headers'] = headers
-    if should_bypass_proxy(url):
-        request_kwargs.setdefault('proxies', {'http': None, 'https': None})
-    return request_kwargs
-
-
-def normalize_dify_api_url(base_url, app_type='chat'):
-    parsed = urlparse((base_url or '').strip())
-    path = parsed.path.rstrip('/')
-    app_type = (app_type or 'chat').lower()
-    if app_type == 'workflow':
-        if not path:
-            path = '/v1/workflows/run'
-        elif path.endswith('/v1'):
-            path += '/workflows/run'
-    else:
-        if not path:
-            path = '/v1/chat-messages'
-        elif path.endswith('/v1'):
-            path += '/chat-messages'
-    return urlunparse(parsed._replace(path=path, params='', query='', fragment=''))
-
-
 def normalize_chat_completions_url(url):
     parsed = urlparse((url or '').strip())
     path = parsed.path.rstrip('/')
@@ -925,7 +890,6 @@ def normalize_chat_completions_url(url):
 
 
 VLLM_API_URL = normalize_chat_completions_url(VLLM_API_URL)
-DIFY_API_URL = normalize_dify_api_url(DIFY_API_URL, DIFY_APP_TYPE) if DIFY_API_URL else ''
 
 
 def build_embeddings_url(base_url):
@@ -2793,7 +2757,7 @@ def build_langchain_index(force_rebuild=False):
     langchain_loaded_files = 0
     langchain_loaded_chunks = 0
     langchain_last_build_at = None
-    finish_langchain_progress('本地知识库已关闭，知识检索由 Dify 负责。')
+    finish_langchain_progress('本地知识库已关闭，知识检索由后端服务负责。')
     return True
 
 
@@ -2816,7 +2780,7 @@ def get_langchain_status():
         'wiki_dir': '',
         'wiki_pages': 0,
         'wiki_links': 0,
-        'retrieval_mode': 'dify',
+        'retrieval_mode': 'local',
         'progress': get_langchain_progress_status(),
         'background_rebuild': background_rebuild,
         'index_initialized': True,
@@ -4044,7 +4008,7 @@ def build_guided_diagnosis_instruction_v2(query, history, level):
 
 
 def retrieve_from_langchain(query, top_k=3, history=None, wind_farm_models=None):
-    """本地知识检索已关闭，知识库检索交给 Dify 工作流处理。"""
+    """本地知识检索已关闭，知识库检索由后端服务处理。"""
     return {
         'matched': False,
         'chunks': [],
@@ -4690,14 +4654,10 @@ def health():
     return jsonify({
         'status': 'ok',
         'message': f'{LLM_PROVIDER_NAME} Web Server is running',
-        'dify_enabled': DIFY_ENABLED,
-        'dify_required': DIFY_REQUIRED,
-        'dify_app_type': DIFY_APP_TYPE,
-        'dify_url': mask_url_for_log(DIFY_API_URL),
         'knowledge_ready': status['knowledge_ready'],
         'knowledge_files': status['knowledge_files'],
         'knowledge_chunks': status['knowledge_chunks'],
-        'retrieval_mode': 'dify',
+        'retrieval_mode': 'local',
         'progress': status['progress'],
         'timestamp': datetime.now().isoformat(),
     })
@@ -4726,14 +4686,14 @@ def rebuild_langchain_rag():
     success = False
     status = get_langchain_status()
     status['success'] = success
-    status['message'] = '本地知识库已关闭，知识检索由 Dify 负责'
+    status['message'] = '本地知识库已关闭，知识检索由后端服务负责'
     return jsonify(status)
 
 
 @app.route('/api/rag/fault-code/<fault_code>', methods=['GET'])
 @login_required
 def lookup_rag_fault_code(fault_code):
-    """兼容旧接口：故障码知识检索由 Dify 负责。"""
+    """兼容旧接口：故障码知识检索由后端服务负责。"""
     normalized_code = normalize_text(fault_code).upper().replace(' ', '')
     return jsonify({
         'success': True,
@@ -4743,7 +4703,7 @@ def lookup_rag_fault_code(fault_code):
         'documents': [],
         'sources': [],
         'count': 0,
-        'message': '本地知识库已关闭，知识检索由 Dify 负责',
+        'message': '本地知识库已关闭，知识检索由后端服务负责',
     })
 
 
@@ -4758,7 +4718,7 @@ def search_local_knowledge_api():
         'matched': False,
         'raw_count': 0,
         'results': [],
-        'message': '本地知识库已关闭，知识检索由 Dify 负责',
+        'message': '本地知识库已关闭，知识检索由后端服务负责',
     })
 
 
@@ -4766,7 +4726,7 @@ def search_local_knowledge_api():
 @login_required
 def get_local_knowledge_page_api(page_ref):
     """兼容旧接口：本地 Wiki 页面已关闭。"""
-    return jsonify({'success': False, 'error': '本地知识库已关闭，知识检索由 Dify 负责'}), 410
+    return jsonify({'success': False, 'error': '本地知识库已关闭，知识检索由后端服务负责'}), 410
 
 
 @app.route('/api/wiki/graph', methods=['GET'])
@@ -4777,7 +4737,7 @@ def get_local_knowledge_graph_api():
         'success': True,
         'nodes': [],
         'edges': [],
-        'message': '本地知识库已关闭，知识检索由 Dify 负责',
+        'message': '本地知识库已关闭，知识检索由后端服务负责',
     })
 
 
@@ -4791,32 +4751,32 @@ def list_knowledge_base_files_api():
         'files': [],
         'directories': [],
         'file_count': 0,
-        'message': '本地知识库已关闭，请在 Dify 中维护知识库',
+        'message': '本地知识库已关闭，请在后端维护知识库',
     })
 
 
 @app.route('/api/admin/knowledge-base/file', methods=['GET'])
 @admin_required
 def get_knowledge_base_file_api():
-    return jsonify({'success': False, 'error': '本地知识库已关闭，请在 Dify 中维护知识库'}), 410
+    return jsonify({'success': False, 'error': '本地知识库已关闭，请在后端维护知识库'}), 410
 
 
 @app.route('/api/admin/knowledge-base/file', methods=['POST'])
 @admin_required
 def save_knowledge_base_file_api():
-    return jsonify({'success': False, 'error': '本地知识库已关闭，请在 Dify 中维护知识库'}), 410
+    return jsonify({'success': False, 'error': '本地知识库已关闭，请在后端维护知识库'}), 410
 
 
 @app.route('/api/admin/knowledge-base/upload', methods=['POST'])
 @admin_required
 def upload_knowledge_base_files_api():
-    return jsonify({'success': False, 'error': '本地知识库已关闭，请在 Dify 中维护知识库'}), 410
+    return jsonify({'success': False, 'error': '本地知识库已关闭，请在后端维护知识库'}), 410
 
 
 @app.route('/api/admin/knowledge-base/file', methods=['DELETE'])
 @admin_required
 def delete_knowledge_base_file_api():
-    return jsonify({'success': False, 'error': '本地知识库已关闭，请在 Dify 中维护知识库'}), 410
+    return jsonify({'success': False, 'error': '本地知识库已关闭，请在后端维护知识库'}), 410
 
 
 @app.route('/api/admin/prompt-qa', methods=['GET'])
@@ -5723,167 +5683,6 @@ def save_to_file():
     except Exception as e:
         print(f"❌ 下载文件错误: {e}")
         return jsonify({'error': '下载失败'}), 500
-
-
-def extract_dify_workflow_answer(result):
-    data = result.get('data') if isinstance(result, dict) else {}
-    outputs = data.get('outputs') if isinstance(data, dict) else {}
-    if isinstance(outputs, dict):
-        for key in ('answer', 'text', 'result', 'output'):
-            value = outputs.get(key)
-            if value:
-                return str(value)
-        if outputs:
-            return json.dumps(outputs, ensure_ascii=False)
-    answer = result.get('answer') if isinstance(result, dict) else ''
-    return str(answer or '')
-
-
-def log_dify_error(response, app_type, response_mode, conversation_id):
-    body = ''
-    try:
-        body = response.text or ''
-    except Exception:
-        body = '<无法读取响应正文>'
-    body = body.replace('\n', ' ')[:1000]
-    print(
-        f"❌ Dify 响应异常: status={response.status_code} "
-        f"app_type={app_type} mode={response_mode} "
-        f"url={mask_url_for_log(DIFY_API_URL)} "
-        f"conversation_id={mask_identifier(conversation_id, prefix=4, suffix=4)} "
-        f"body={body}"
-    )
-
-
-def is_dify_missing_conversation(response):
-    if response.status_code != 404:
-        return False
-    try:
-        body = response.text or ''
-    except Exception:
-        return False
-    return 'Conversation Not Exists' in body
-
-
-def call_dify_app(query, conversation_id, user_id, is_streaming):
-    response_mode = 'streaming' if is_streaming else 'blocking'
-    app_type = DIFY_APP_TYPE.lower()
-    print(
-        f"[Dify] 调用 Dify: app_type={app_type} mode={response_mode} "
-        f"url={mask_url_for_log(DIFY_API_URL)} "
-        f"conversation_id={mask_identifier(conversation_id, prefix=4, suffix=4)}"
-    )
-
-    if app_type == 'workflow':
-        payload = {
-            'inputs': {
-                'query': query,
-                'question': query,
-            },
-            'response_mode': 'blocking',
-            'user': user_id,
-        }
-    else:
-        payload = {
-            'inputs': {},
-            'query': query,
-            'response_mode': response_mode,
-            'user': user_id,
-        }
-        if conversation_id:
-            payload['conversation_id'] = conversation_id
-
-    if is_streaming and app_type != 'workflow':
-        dify_response = http_session.post(
-            DIFY_API_URL,
-            json=payload,
-            stream=True,
-            timeout=300,
-            **get_dify_request_kwargs(DIFY_API_URL)
-        )
-        if conversation_id and is_dify_missing_conversation(dify_response):
-            log_dify_error(dify_response, app_type, response_mode, conversation_id)
-            print("[Dify] conversation_id 不存在，已自动改为新会话重试")
-            try:
-                dify_response.close()
-            except Exception:
-                pass
-            retry_payload = dict(payload)
-            retry_payload.pop('conversation_id', None)
-            dify_response = http_session.post(
-                DIFY_API_URL,
-                json=retry_payload,
-                stream=True,
-                timeout=300,
-                **get_dify_request_kwargs(DIFY_API_URL)
-            )
-        if dify_response.status_code != 200:
-            log_dify_error(dify_response, app_type, response_mode, conversation_id)
-            error_event = {
-                'event': 'error',
-                'message': f'Dify 服务响应异常，状态码 {dify_response.status_code}，请查看服务端日志',
-                'conversation_id': conversation_id,
-            }
-            return Response(
-                f"data: {json.dumps(error_event, ensure_ascii=False)}\n\n",
-                content_type='text/event-stream; charset=utf-8'
-            )
-
-        def relay_dify_sse():
-            for raw_line in dify_response.iter_lines(decode_unicode=False):
-                if not raw_line:
-                    continue
-                line = raw_line.decode('utf-8', errors='replace')
-                if not line:
-                    continue
-                yield f"{line}\n\n"
-
-        return Response(
-            stream_with_context(relay_dify_sse()),
-            content_type='text/event-stream; charset=utf-8',
-            headers={
-                'Cache-Control': 'no-cache',
-                'X-Accel-Buffering': 'no',
-            }
-        )
-
-    dify_response = http_session.post(
-        DIFY_API_URL,
-        json=payload,
-        timeout=300,
-        **get_dify_request_kwargs(DIFY_API_URL)
-    )
-    if conversation_id and app_type == 'chat' and is_dify_missing_conversation(dify_response):
-        log_dify_error(dify_response, app_type, response_mode, conversation_id)
-        print("[Dify] conversation_id 不存在，已自动改为新会话重试")
-        retry_payload = dict(payload)
-        retry_payload.pop('conversation_id', None)
-        dify_response = http_session.post(
-            DIFY_API_URL,
-            json=retry_payload,
-            timeout=300,
-            **get_dify_request_kwargs(DIFY_API_URL)
-        )
-    if dify_response.status_code != 200:
-        log_dify_error(dify_response, app_type, response_mode, conversation_id)
-        return jsonify({
-            'error': f'Dify 服务响应异常，状态码 {dify_response.status_code}，请查看服务端日志'
-        }), 502
-
-    result = dify_response.json()
-    if app_type == 'workflow':
-        answer = extract_dify_workflow_answer(result)
-        return jsonify({
-            'answer': answer or 'Dify 工作流未返回可展示内容',
-            'conversation_id': conversation_id,
-        })
-
-    answer = result.get('answer', '')
-    returned_conversation_id = normalize_user_id(result.get('conversation_id')) or conversation_id
-    return jsonify({
-        'answer': answer,
-        'conversation_id': returned_conversation_id,
-    })
 
 
 def strip_ansi_control(text):
@@ -7546,7 +7345,7 @@ def call_windrise_app(query, conversation_id, user_id, app_session_id, is_stream
 @app.route('/api/chat', methods=['POST'])
 @login_required
 def chat_proxy():
-    """代理接口 - 优先调用 Dify；未配置 Dify 时调用 OpenAI 兼容 LLM。"""
+    """代理接口 - 调用 OpenAI 兼容 LLM（SiliconFlow）。"""
     try:
         data = request.get_json(silent=True) or {}
         is_streaming = data.get('response_mode') == 'streaming'
@@ -7554,7 +7353,7 @@ def chat_proxy():
         user_id = normalize_user_id(current_user.get_id())
 
         # 以当前登录用户和服务端会话为准管理 conversation_id。
-        allow_new_conversation_id = not (DIFY_ENABLED and DIFY_APP_TYPE.lower() == 'chat')
+        allow_new_conversation_id = True
         app_session_id, conversation_id = resolve_chat_context_from_session(
             data,
             user_id,
@@ -7568,15 +7367,6 @@ def chat_proxy():
 
         if WINDRISE_ENABLED:
             return call_windrise_app(original_query, conversation_id, user_id, app_session_id, is_streaming, windrise_mode)
-        if DIFY_ENABLED:
-            return call_dify_app(original_query, conversation_id, user_id, is_streaming)
-        if DIFY_REQUIRED:
-            print("[Dify] Dify 未启用：请配置 DIFY_API_URL 和 DIFY_API_KEY")
-            return jsonify({
-                'error': 'Dify 未配置或未启用，请检查 DIFY_API_URL 和 DIFY_API_KEY',
-                'dify_enabled': False,
-            }), 503
-
         # Step 0.5: 检测风场号并查找机型
         history = get_conversation_history(conversation_id, user_id)
 
@@ -7700,7 +7490,7 @@ def chat_proxy():
                 return Response(error_event, content_type='text/event-stream; charset=utf-8')
 
             def generate_sse():
-                """将 OpenAI SSE 格式转换为 Dify 兼容格式"""
+                """将 OpenAI SSE 格式转换为前端兼容格式"""
                 raw_text = ''
                 emitted_text = ''
                 pending_text = ''
@@ -7841,7 +7631,7 @@ def chat_proxy():
 
             print(f"✅ 非流式回复完成: answer_length={len(answer)}")
 
-            # 返回 Dify 兼容格式
+            # 返回前端兼容格式
             dify_response = {
                 "answer": answer,
                 "conversation_id": conversation_id
@@ -7858,10 +7648,6 @@ def chat_proxy():
         return {'error': '请求超时，请稍后重试'}, 504
     except requests.exceptions.ConnectionError as e:
         print(f"❌ 连接错误: {type(e).__name__}")
-        if DIFY_ENABLED:
-            return {
-                'error': f'无法连接到 Dify 服务，请检查地址是否可访问：{mask_url_for_log(DIFY_API_URL)}'
-            }, 503
         return {'error': '无法连接到模型服务，请检查服务是否启动'}, 503
     except requests.exceptions.RequestException as e:
         print(f"❌ 请求错误: {type(e).__name__}")
@@ -8158,7 +7944,7 @@ def get_local_ip():
         s.close()
         return local_ip
     except Exception:
-        return "10.46.161.210"
+        return "127.0.0.1"
 
 
 if __name__ == '__main__':
@@ -8186,13 +7972,8 @@ if __name__ == '__main__':
             f"context={WINDRISE_MEMORY_CONTEXT_MESSAGES}, "
             f"item_chars={WINDRISE_MEMORY_ITEM_CHARS}"
         )
-    print(f"🔗 Dify 接入: {'enabled' if DIFY_ENABLED else 'disabled'}")
-    if DIFY_ENABLED:
-        print(f"🔗 Dify 地址: {DIFY_API_URL} ({DIFY_APP_TYPE})")
     print(f"🤖 {LLM_PROVIDER_NAME} 地址: {VLLM_API_URL}")
     print(f"🔑 API Key 已配置: {'yes' if bool(VLLM_API_KEY) else 'no'}")
-    print("📚 本地知识库: disabled（知识检索由 Dify 负责）")
-    print("🔎 检索模式: dify")
     print(f"📡 服务访问地址:   http://{HOST}:{PORT}")
     print(f"🌐 局域网访问地址: http://{local_ip}:{PORT}")
     print("=" * 60)
