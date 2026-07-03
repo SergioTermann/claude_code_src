@@ -84,6 +84,9 @@ def text(s, x, y, w, h, runs, size=18, color=INK, bold=False, align=PP_ALIGN.LEF
             r.font.color.rgb = opt.get('color', color)
             fn = opt.get('font', font)
             r.font.name = fn; _set_cjk(r, fn)
+            if opt.get('sub') or opt.get('sup'):
+                rpr = r._r.get_or_add_rPr()
+                rpr.set('baseline', '-25000' if opt.get('sub') else '30000')
     return tb
 
 
@@ -158,9 +161,34 @@ for lid, t, d, c in layers:
     text(s, 5.5, y + 0.11, 6.7, 0.6, d, size=12.5, color=INK2, anchor=MSO_ANCHOR.MIDDLE, spacing=1.05)
     y += 0.9
 
+# ============================================================ 3 PRINCIPLE INNOVATIONS
+s = slide()
+eyebrow(s, 0.9, 0.7, "03 · 原理层创新 · 不止工程，更在原理")
+text(s, 0.9, 1.1, 11.5, 0.9, "六层能力背后，是四条原理级创新",
+     size=28, color=INK, bold=True)
+principles = [
+    ("信息论消歧", "检索后启发式补救  →  检索前信息论主动门控",
+     "把同码异义形式化为含义分布熵 H(c)，用单一可解释标量在检索前量化消歧风险并主动决策。"),
+    ("故障机理因果化", "“故障码是什么”  →  “为什么发生、该验证哪个量”",
+     "机理原型→失效模式→传播路径→可观测量→验证试验→控制屏障，把标签升级为可推理的因果链。"),
+    ("反事实可证伪诊断", "凭经验换件试错  →  可证伪的根因判定",
+     "机理竞争时给区分证据与反事实试验，把排障纳入证伪逻辑，而非逐个替换零件的试错。"),
+    ("可采纳性形式保证", "检索可能放大歧义  →  候选集合恒不放大",
+     "范围约束下可证 A(q,s) ⊆ F(c) 恒成立：消歧只缩小候选、绝不引入新的歧义来源。"),
+]
+px0, py0, pw, ph, pgx, pgy = 0.9, 2.15, 5.65, 2.05, 0.2, 0.18
+for i, (t, tr, d) in enumerate(principles):
+    col, row = i % 2, i // 2
+    x = px0 + col * (pw + pgx); y = py0 + row * (ph + pgy)
+    rect(s, x, y, pw, ph, fill=CARD, line=LINE, radius=True)
+    rect(s, x, y, 0.06, ph, fill=TEAL)
+    text(s, x + 0.3, y + 0.2, pw - 0.55, 0.4, t, size=17, color=INK, bold=True)
+    text(s, x + 0.3, y + 0.66, pw - 0.55, 0.55, tr, size=12, color=TEAL, bold=True, spacing=1.1)
+    text(s, x + 0.3, y + 1.28, pw - 0.55, 0.7, d, size=12, color=INK2, spacing=1.18)
+
 # ============================================================ 4 MECHANISM GRAPH
 s = slide()
-eyebrow(s, 0.9, 0.7, "03 · 机理增强知识图谱")
+eyebrow(s, 0.9, 0.7, "04 · 机理增强知识图谱")
 text(s, 0.9, 1.1, 11.5, 0.9, "把'故障码是什么'升级为'为什么发生、如何验证'",
      size=28, color=INK, bold=True)
 text(s, 0.9, 2.0, 6.2, 3.6,
@@ -187,17 +215,24 @@ for i, (n, k) in enumerate(gm):
 # ============================================================ 5 AEG CONCEPT
 s = slide()
 rect(s, 0, 0, 13.333, 0.1, fill=TEAL)
-eyebrow(s, 0.9, 0.7, "04 · 创新亮点 · 歧义熵门控 AEG")
+eyebrow(s, 0.9, 0.7, "05 · 创新亮点 · 歧义熵门控 AEG")
 text(s, 0.9, 1.1, 11.5, 1.0, "用信息论在检索前主动预测消歧风险",
      size=30, color=INK, bold=True)
 # formula box
 rect(s, 0.9, 2.25, 11.5, 1.15, fill=CARD2, line=TEAL, line_w=1.2, radius=True)
-text(s, 1.3, 2.42, 10.7, 0.5, "H(c) = − Σ pᵢ · log₂ pᵢ", size=26, color=TEAL, bold=True, font=MONO)
-text(s, 1.3, 2.95, 10.7, 0.4, "pᵢ = 故障码 c 映射到第 i 种含义的概率；H=0 单义直接答，H 越大越该在检索前追问机型。",
+text(s, 1.3, 2.42, 10.7, 0.5,
+     [("H(c) = − Σ ", {}),
+      ("p", {}), ("i", {'sub': True, 'size': 17}),
+      (" · log", {}), ("2", {'sub': True, 'size': 17}),
+      (" p", {}), ("i", {'sub': True, 'size': 17})],
+     size=26, color=TEAL, bold=True, font=MONO)
+text(s, 1.3, 2.95, 10.7, 0.4,
+     [("p", {'font': MONO}), ("i", {'sub': True, 'size': 9, 'font': MONO}),
+      (" = 故障码 c 映射到第 i 种含义的概率；H=0 单义直接答，H 越大越该在检索前追问机型。", {})],
      size=13.5, color=INK2)
 cols = [
     ("被动 → 主动", "现有做法检索后发现歧义才提示；AEG 在检索之前用一个标量预测风险，主动决定是否追问。"),
-    ("可量化 · 可设阈值", "阈值 τ 直接对应'追问成本 ↔ 误命中'的帕累托工作点，单一可解释度量便于审核。"),
+    ("可量化 · 可设阈值", "阈值 τ 直接对应'追问成本与误命中'的帕累托工作点，单一可解释度量便于审核。"),
     ("零训练 · 零 LLM 调用", "熵由知识库含义分布闭式算出，无需训练模型、无需调用大模型，适合本地/离线部署。"),
 ]
 cx = 0.9
@@ -210,12 +245,12 @@ for t, d in cols:
 
 # ============================================================ 6 AEG EMPIRICAL
 s = slide()
-eyebrow(s, 0.9, 0.7, "05 · AEG 有效性 · 留一法真实实测")
+eyebrow(s, 0.9, 0.7, "06 · AEG 有效性 · 留一法真实实测")
 text(s, 0.9, 1.1, 11.5, 0.9, "11,476 条真实故障记录，实测而非理论期望",
      size=28, color=INK, bold=True)
 kpis = [("51.7%", "留一实测基线误命中", AMBER),
-        ("0.92", "熵↔误命中 Spearman", TEAL),
-        ("0.72", "熵↔增益 相关(独立验证)", TEAL),
+        ("0.92", "熵·误命中 Spearman", TEAL),
+        ("0.72", "熵·增益 相关(独立验证)", TEAL),
         ("→ 0", "门控 62% 查询后误命中", GREEN)]
 cx = 0.9
 for n, k, c in kpis:
@@ -242,8 +277,8 @@ text(s, 0.9, 6.75, 11.5, 0.4,
 
 # ============================================================ 7 COMPARISON
 s = slide()
-eyebrow(s, 0.9, 0.7, "06 · 相比流行方法的优势")
-text(s, 0.9, 1.1, 11.5, 0.9, "赢在工程适用性与可解释性，而非模型能力",
+eyebrow(s, 0.9, 0.7, "07 · 相比流行方法的优势")
+text(s, 0.9, 1.1, 11.5, 0.9, "赢在原理与介入时机：检索前的信息论消歧",
      size=28, color=INK, bold=True)
 rows = [
     ("方法", "需训练", "需LLM", "时机", "面对不确定"),
@@ -281,13 +316,13 @@ for ri, row in enumerate(rows):
         r.font.color.rgb = INK if ri == 0 else (TEAL if is_aeg else INK2)
         r.font.name = CJK; _set_cjk(r, CJK)
 text(s, 0.9, 6.65, 11.5, 0.5,
-     "定位：AEG 是更便宜、更透明、更早介入的消歧决策层——零成本信息论标量，在检索前量化'该不该打扰用户'。",
+     "原理定位：把消歧从检索后的启发式补救，提前为检索前的信息论门控——用零成本熵标量主动决定'该不该问机型'，而非事后纠错或被动拒答。",
      size=12.5, color=INK2, bold=True)
 
 # ============================================================ 8 VALUE / CLOSE
 s = slide()
 rect(s, 0, 0, 13.333, 0.14, fill=TEAL)
-eyebrow(s, 0.9, 1.2, "07 · 部署与价值")
+eyebrow(s, 0.9, 1.2, "08 · 部署与价值")
 text(s, 0.9, 1.65, 11.5, 1.0, "能安全上线的本地化风电诊断底座", size=32, color=INK, bold=True)
 vals = [
     ("数据不出内网", "本地/内网模型 + 离线嵌入(hash/本地)，风场资料与检修经验不外发。"),
