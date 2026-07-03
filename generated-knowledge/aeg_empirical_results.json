@@ -1,0 +1,69 @@
+{
+  "records": 11476,
+  "unique_codes": 4463,
+  "eval_nomodel": 8747,
+  "abstain_nomodel": 2729,
+  "abstain_rate": 0.2378,
+  "baseline_miss_empirical": 0.5174,
+  "miss_withmodel_empirical": 0.3558,
+  "pearson_H_miss": 0.8557,
+  "spearman_H_miss": 0.9219,
+  "pearson_H_gain": 0.6975,
+  "spearman_H_gain": 0.7239,
+  "buckets": {
+    "H=0": {
+      "codes": 825,
+      "weight": 0.3781,
+      "miss": 0.0,
+      "gain": 0.0
+    },
+    "0<H≤1": {
+      "codes": 332,
+      "weight": 0.1392,
+      "miss": 0.6084,
+      "gain": 0.2718
+    },
+    "1<H≤2": {
+      "codes": 314,
+      "weight": 0.1779,
+      "miss": 0.8798,
+      "gain": 0.5948
+    },
+    "H>2": {
+      "codes": 263,
+      "weight": 0.3048,
+      "miss": 0.9062,
+      "gain": 0.8446
+    }
+  },
+  "tradeoff": [
+    {
+      "budget": 0.05,
+      "aeg": 0.4693,
+      "freq": 0.4746,
+      "random": 0.4889
+    },
+    {
+      "budget": 0.1,
+      "aeg": 0.4243,
+      "freq": 0.4309,
+      "random": 0.4636
+    },
+    {
+      "budget": 0.2,
+      "aeg": 0.3345,
+      "freq": 0.3406,
+      "random": 0.4129
+    },
+    {
+      "budget": 0.3,
+      "aeg": 0.2443,
+      "freq": 0.2499,
+      "random": 0.3572
+    }
+  ],
+  "optimal": {
+    "ask_rate": 0.6219,
+    "residual_miss": 0.0
+  }
+}
