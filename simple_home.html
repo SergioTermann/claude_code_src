@@ -5336,7 +5336,9 @@
         }
 
         function renderMarkdown(text) {
-            if (window.marked?.parse) return marked.parse(text);
+            // 先转义 HTML 再交给 marked：markdown 语法(#/**/`)照常渲染，
+            // 但 LLM/知识库文本里的原始 HTML 标签被转义为纯文本，杜绝 XSS。
+            if (window.marked?.parse) return marked.parse(escapeHtml(text));
             return escapeHtml(text).replace(/\n/g, '<br>');
         }
 
