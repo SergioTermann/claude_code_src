@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#334155"/>
+    </marker>
+    <style>
+      .title{font:700 34px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#0f172a}
+      .sub{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#475569}
+      .stepNo{font:700 18px Arial,sans-serif;fill:#fff}
+      .stepTitle{font:700 21px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#0f172a}
+      .stepText{font:400 16px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#334155}
+      .card{fill:#fff;stroke:#cbd5e1;stroke-width:2;rx:14}
+      .line{stroke:#334155;stroke-width:2.4;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+
+  <rect width="1400" height="860" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">图2 资料接入至知识构建的方法流程图</text>
+  <text x="72" y="104" class="sub">从多源风电资料中抽取字段、统一名称、构建关系，并生成知识库与质量统计。</text>
+
+  <g transform="translate(80,165)">
+    <rect width="240" height="135" class="card"/>
+    <circle cx="35" cy="35" r="22" fill="#2563eb"/><text x="27" y="42" class="stepNo">S1</text>
+    <text x="70" y="38" class="stepTitle">接收资料</text>
+    <text x="35" y="78" class="stepText">故障码表、手册、</text>
+    <text x="35" y="103" class="stepText">检修记录、技术报告</text>
+  </g>
+  <path d="M320 232 H420" class="line"/>
+
+  <g transform="translate(420,165)">
+    <rect width="240" height="135" class="card"/>
+    <circle cx="35" cy="35" r="22" fill="#0f766e"/><text x="27" y="42" class="stepNo">S2</text>
+    <text x="70" y="38" class="stepTitle">抽取字段</text>
+    <text x="35" y="78" class="stepText">故障码、机型、系统、</text>
+    <text x="35" y="103" class="stepText">部件、原因、处理建议</text>
+  </g>
+  <path d="M660 232 H760" class="line"/>
+
+  <g transform="translate(760,165)">
+    <rect width="240" height="135" class="card"/>
+    <circle cx="35" cy="35" r="22" fill="#d97706"/><text x="27" y="42" class="stepNo">S3</text>
+    <text x="70" y="38" class="stepTitle">标准化处理</text>
+    <text x="35" y="78" class="stepText">统一风场和机型名称</text>
+    <text x="35" y="103" class="stepText">保留别名和原始来源</text>
+  </g>
+  <path d="M1000 232 H1100" class="line"/>
+
+  <g transform="translate(1100,165)">
+    <rect width="240" height="135" class="card"/>
+    <circle cx="35" cy="35" r="22" fill="#7c3aed"/><text x="27" y="42" class="stepNo">S4</text>
+    <text x="70" y="38" class="stepTitle">构建领域关系</text>
+    <text x="35" y="78" class="stepText">建立风场、机型、</text>
+    <text x="35" y="103" class="stepText">故障和来源对应关系</text>
+  </g>
+
+  <path d="M1220 300 V390 H220 V450" class="line"/>
+
+  <g transform="translate(80,450)">
+    <rect width="300" height="150" class="card"/>
+    <circle cx="35" cy="35" r="22" fill="#dc2626"/><text x="27" y="42" class="stepNo">S5</text>
+    <text x="70" y="38" class="stepTitle">生成知识库</text>
+    <text x="35" y="82" class="stepText">结构化索引、知识页、</text>
+    <text x="35" y="108" class="stepText">图谱文件和质量报告</text>
+  </g>
+  <path d="M380 525 H520" class="line"/>
+
+  <g transform="translate(520,450)">
+    <rect width="300" height="150" class="card"/>
+    <circle cx="35" cy="35" r="22" fill="#0891b2"/><text x="27" y="42" class="stepNo">S6</text>
+    <text x="70" y="38" class="stepTitle">挂接故障机理</text>
+    <text x="35" y="82" class="stepText">按系统、部件、表现、</text>
+    <text x="35" y="108" class="stepText">原因和处理建议归纳</text>
+  </g>
+  <path d="M820 525 H960" class="line"/>
+
+  <g transform="translate(960,450)">
+    <rect width="300" height="150" class="card"/>
+    <circle cx="35" cy="35" r="22" fill="#16a34a"/><text x="27" y="42" class="stepNo">S7</text>
+    <text x="70" y="38" class="stepTitle">供问答检索使用</text>
+    <text x="35" y="82" class="stepText">限定范围、召回证据、</text>
+    <text x="35" y="108" class="stepText">支撑现场回答</text>
+  </g>
+
+  <rect x="120" y="720" width="1160" height="60" rx="12" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+  <text x="150" y="756" class="sub">输出结果：可检索知识库、可阅读知识页、领域关系图谱、故障机理知识、质量统计报告。</text>
+</svg>

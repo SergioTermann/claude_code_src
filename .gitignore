@@ -1,0 +1,39 @@
+# --- 依赖 / 构建产物 ---
+node_modules/
+dist/
+offline-dist/
+.claude-code-packed/
+npm-debug.log*
+*.zip
+*.tgz
+
+# --- 系统 / 编辑器 ---
+.DS_Store
+
+# --- 密钥（禁止入库；.env.example 模板可保留） ---
+.env
+*.env
+!*.env.example
+
+# --- 本地数据库（含用户数据，禁止入库） ---
+*.db
+*.db-shm
+*.db-wal
+
+# --- Python 缓存 ---
+__pycache__/
+*.pyc
+*.pyo
+
+# --- 打包归档 ---
+*.tar.gz
+
+# --- Android 构建产物 (hantech_app-main) ---
+*.apk
+*.dex
+hantech_app-main/**/build/
+hantech_app-main/.gradle/
+hantech_app-main/local.properties
+hantech_app-main/**/*.iml
+hantech_app-main/.idea/
+hantech_app-main/captures/

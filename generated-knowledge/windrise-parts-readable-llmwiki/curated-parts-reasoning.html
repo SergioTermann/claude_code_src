@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>风电部件故障推理流程</title>
+  <style>
+    body{margin:0;background:#f6f7f9;color:#202938;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+    .app{height:100vh;display:grid;grid-template-rows:auto 1fr}
+    header{background:#fff;border-bottom:1px solid #d8dee8;padding:14px 18px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+    h1{font-size:20px;margin:0}.meta{font-size:12px;color:#667085;margin-top:4px}
+    .ask{display:flex;gap:8px;align-items:center}.ask input{width:430px;height:36px;border:1px solid #d8dee8;border-radius:6px;padding:0 10px}.ask button{height:36px;border:1px solid #1d4ed8;background:#2563eb;color:#fff;border-radius:6px;padding:0 12px;cursor:pointer}
+    main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr)390px}
+    svg{width:100%;height:100%;display:block}
+    aside{background:#fff;border-left:1px solid #d8dee8;padding:14px;overflow:auto}
+    .status{border:1px solid #d8dee8;background:#f8fafc;border-radius:6px;padding:8px;color:#475467;font-size:12px;line-height:1.45;margin-bottom:10px}
+    .treeRoot,.treeNode{border:1px solid #d8dee8;border-radius:6px;background:#fff;padding:8px;cursor:pointer;transition:opacity .22s ease,transform .22s ease,border-color .16s ease,background .16s ease}
+    .treeRoot{border-color:#111827;background:#f8fafc}.treeNode.active{border-color:#111827;background:#f8fafc}.treeRoot:hover,.treeNode:hover{border-color:#2563eb}
+    .treeRoot b,.treeNode b{display:block;font-size:13px;line-height:1.35}.treeRoot span,.treeNode span{display:block;color:#667085;font-size:12px;line-height:1.35;margin-top:3px}
+    .branch{position:relative;margin:12px 0 0 12px;padding-left:14px;border-left:2px solid #d8dee8}.branchLabel{display:inline-block;margin:0 0 7px -6px;background:#fff;color:#475467;font-size:12px;font-weight:700}
+    .item{position:relative;margin-bottom:8px}.item:before{content:"";position:absolute;left:-14px;top:18px;width:12px;border-top:2px solid #d8dee8}
+    .children{margin:7px 0 0 16px;padding-left:12px;border-left:1px dashed #a8b3c5}
+    .reveal{opacity:0;transform:translateY(8px)}.reveal.show{opacity:1;transform:translateY(0)}.pulse{animation:pulse .55s ease}@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(37,99,235,.28)}100%{box-shadow:0 0 0 10px rgba(37,99,235,0)}}
+    .node circle{stroke:#fff;stroke-width:2px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}.node.active circle{stroke:#111827;stroke-width:3px}.node text{font-size:12px;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+    .edge{stroke:#a8b3c5;stroke-opacity:.65}.edge.active{stroke:#111827;stroke-width:3;stroke-opacity:1}
+    @media(max-width:980px){header{grid-template-columns:1fr}.ask{display:grid}.ask input{width:100%}main{grid-template-columns:1fr;grid-template-rows:minmax(420px,1fr)390px}aside{border-left:0;border-top:1px solid #d8dee8}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>风电部件故障推理流程</h1>
+      <div class="meta">清洗版案例图谱 · 动态展示原因、诊断、处理、表现链路</div>
+    </div>
+    <div class="ask">
+      <input id="question" value="偏航液压系统压力异常是什么原因导致，怎么诊断和处理？">
+      <button id="run">开始推理</button>
+    </div>
+  </header>
+  <main>
+    <svg id="graph"></svg>
+    <aside>
+      <div id="status" class="status">点击“开始推理”后，右侧会按树状流程逐步展开，左侧图谱同步高亮当前节点。</div>
+      <div id="tree"></div>
+    </aside>
+  </main>
+</div>
+<script>
+const colors={fault_case:"#cf3f4a",component:"#2f6fed",causal_factor:"#c05621",symptom:"#dc2626",diagnostic_signal:"#057a85",action:"#27864f",diagnostic_step:"#7657c8",temporary_action:"#b7791f",prevention:"#0f766e",evidence:"#64748b"};
+const svg=document.getElementById("graph"),question=document.getElementById("question"),statusBox=document.getElementById("status"),treeHost=document.getElementById("tree");
+let graph,nodes,edges,by,active=null,timer=null;
+fetch("curated-parts-graph.json").then(r=>r.json()).then(data=>{graph=data;nodes=data.nodes.map((n,i)=>({...n,i}));edges=data.edges;by=new Map(nodes.map(n=>[n.id,n]));draw();});
+function layout(){const rect=svg.getBoundingClientRect(),w=Math.max(rect.width,760),h=Math.max(rect.height,520);svg.setAttribute("viewBox",`0 0 ${w} ${h}`);const center={x:w/2,y:h/2};const cases=nodes.filter(n=>n.type==="fault_case");cases.forEach((n,i)=>{const a=2*Math.PI*i/cases.length-Math.PI/2;n.x=center.x+Math.cos(a)*90;n.y=center.y+Math.sin(a)*90});const others=nodes.filter(n=>n.type!=="fault_case");others.forEach((n,i)=>{const a=2*Math.PI*i/others.length+.25;n.x=center.x+Math.cos(a)*245;n.y=center.y+Math.sin(a)*210});for(let i=0;i<90;i++){for(const e of edges){const s=by.get(e.source),t=by.get(e.target);const dx=t.x-s.x,dy=t.y-s.y,d=Math.max(1,Math.hypot(dx,dy)),f=(d-170)*.0028;s.x+=dx/d*f;s.y+=dy/d*f;t.x-=dx/d*f;t.y-=dy/d*f;}}}
+function draw(){layout();svg.replaceChildren();for(const e of edges){const s=by.get(e.source),t=by.get(e.target);const line=document.createElementNS("http://www.w3.org/2000/svg","line");line.setAttribute("class","edge"+(active&&(e.source===active||e.target===active)?" active":""));line.setAttribute("x1",s.x);line.setAttribute("y1",s.y);line.setAttribute("x2",t.x);line.setAttribute("y2",t.y);svg.append(line)}for(const n of nodes){const group=document.createElementNS("http://www.w3.org/2000/svg","g");group.setAttribute("class","node"+(n.id===active?" active":""));group.setAttribute("transform",`translate(${n.x},${n.y})`);group.onclick=()=>select(n.id);const circle=document.createElementNS("http://www.w3.org/2000/svg","circle");circle.setAttribute("r",n.type==="fault_case"?20:14);circle.setAttribute("fill",colors[n.type]||"#64748b");const text=document.createElementNS("http://www.w3.org/2000/svg","text");text.setAttribute("x",22);text.setAttribute("y",4);text.textContent=n.label.length>24?n.label.slice(0,23)+"...":n.label;group.append(circle,text);svg.append(group)}}
+function run(){if(timer)clearInterval(timer);const q=question.value.trim();const seed=findSeed(q);if(!seed){statusBox.textContent="没有匹配到故障案例。可尝试输入：IGBT、偏航液压、主轴轴承、发电机绕组温度";return}const tree=buildTree(seed);treeHost.innerHTML=renderTree(tree);const reveals=[...treeHost.querySelectorAll(".reveal")];for(const el of treeHost.querySelectorAll("[data-id]"))el.onclick=e=>{e.stopPropagation();select(el.dataset.id)};let index=0;const step=()=>{if(index>=reveals.length){statusBox.textContent=`已完成 · 当前节点：${tree.current.label}`;select(tree.current.id);clearInterval(timer);timer=null;return}const el=reveals[index],node=by.get(el.dataset.id);el.classList.add("show","pulse");treeHost.querySelectorAll(".treeNode.active").forEach(n=>n.classList.remove("active"));if(el.classList.contains("treeNode"))el.classList.add("active");if(node){statusBox.textContent=`推理中 ${index+1}/${reveals.length} · 当前节点：${node.label}`;select(node.id)}setTimeout(()=>el.classList.remove("pulse"),650);index++};statusBox.textContent=`开始推理 · 命中：${seed.label}`;step();timer=setInterval(step,620)}
+function findSeed(q){const tokens=q.toLowerCase().split(/[^a-z0-9\u4e00-\u9fa5]+/).filter(x=>x.length>=2);const aliases=[["偏航","case:yaw_hydraulic_pressure"],["液压","case:yaw_hydraulic_pressure"],["igbt","case:converter_igbt"],["变流","case:converter_igbt"],["主轴","case:main_shaft_bearing_wear"],["轴承","case:main_shaft_bearing_wear"],["绕组","case:generator_winding_temp_jump"],["温度","case:generator_winding_temp_jump"]];for(const [key,id] of aliases)if(q.toLowerCase().includes(key))return by.get(id);let best=null,score=0;for(const n of nodes.filter(n=>n.type==="fault_case")){let s=0;for(const t of tokens)if(n.label.toLowerCase().includes(t))s+=t.length;if(s>score){score=s;best=n}}return best}
+function buildTree(seed){const branches=[branch(seed,"原因链",["CAN_TRIGGER","LEADS_TO"],"in"),branch(seed,"排查步骤",["HAS_DIAGNOSTIC_STEP"],"out"),branch(seed,"诊断证据",["DIAGNOSED_BY","SUPPORTED_BY"],"out"),branch(seed,"临时措施",["TEMPORARILY_MITIGATED_BY"],"out"),branch(seed,"永久处理",["MITIGATED_BY"],"out"),branch(seed,"预防复发",["PREVENTED_BY"],"out"),branch(seed,"故障表现",["MANIFESTS_AS"],"out")].filter(b=>b.items.length);const flat=[];for(const b of branches)for(const i of b.items){flat.push(i);for(const c of i.children)flat.push(c)}return{root:seed,branches,current:(flat.at(-1)?.node||seed)}}
+function branch(seed,title,types,direction){const rel=edges.filter(e=>types.includes(e.type)&&((direction==="in"&&e.target===seed.id)||(direction==="out"&&e.source===seed.id)||(e.source===seed.id||e.target===seed.id))).slice(0,5);return{title,items:rel.map(e=>{const node=by.get(e.source===seed.id?e.target:e.source);return{edge:e,node,children:children(node,e.type)}}).filter(i=>i.node)}}
+function children(node,parentType){const map={CAN_TRIGGER:["LEADS_TO","MANIFESTS_AS"],LEADS_TO:["MANIFESTS_AS","DIAGNOSED_BY"],HAS_DIAGNOSTIC_STEP:["RESULTS_IN","CONFIRMS"],DIAGNOSED_BY:["RESULTS_IN"],SUPPORTED_BY:[],TEMPORARILY_MITIGATED_BY:[],MITIGATED_BY:[],PREVENTED_BY:[],MANIFESTS_AS:["DIAGNOSED_BY"]};const types=map[parentType]||["DIAGNOSED_BY","MITIGATED_BY","MANIFESTS_AS","RESULTS_IN","CONFIRMS"];return edges.filter(e=>(e.source===node.id||e.target===node.id)&&types.includes(e.type)).slice(0,4).map(e=>({edge:e,node:by.get(e.source===node.id?e.target:e.source),children:[]})).filter(i=>i.node)}
+function renderTree(t){return`<div class="treeRoot reveal" data-id="${esc(t.root.id)}"><b>${esc(t.root.label)}</b><span>命中的故障案例</span></div>`+t.branches.map(b=>`<div class="branch"><div class="branchLabel">${esc(b.title)}</div>${b.items.map(i=>renderItem(i,t.current.id)).join("")}</div>`).join("")}
+function renderItem(i,current){return`<div class="item"><div class="treeNode reveal ${i.node.id===current?"active":""}" data-id="${esc(i.node.id)}"><b>${esc(i.node.label)}</b><span>${esc(i.edge.type)} · ${esc(i.node.type)}</span></div>${i.children.length?`<div class="children">${i.children.map(c=>renderItem(c,current)).join("")}</div>`:""}</div>`}
+function select(id){active=id;draw()}
+function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+document.getElementById("run").onclick=run;question.addEventListener("keydown",e=>{if(e.key==="Enter")run()});window.addEventListener("resize",()=>{if(nodes)draw()});
+</script>
+</body>
+</html>

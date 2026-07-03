@@ -1,0 +1,47 @@
+{
+  "updatedAt": 1782908781401,
+  "turns": [
+    {
+      "user": "变流器报直流母线过压，伴随网侧电压波动和一次并网接触器跳开。请给出排查顺序和复位前确认项。",
+      "assistant": "最可能判断：先按电网、箱变或并网保护异常处理。\n现场验证：先核对三相电压频率和断路器/接触器反馈，判断是外部电网还是并网执行回路。\n合格标准：电压频率越限时先按电网侧处理；电压频率正常但反馈不一致时，优先查断路器、接触器和反馈回路。\n做完反馈：三相电压频率、断路器反馈、伴随保护记录。"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "userName": "",
+    "favoriteColor": "",
+    "faultCodes": [],
+    "systems": [],
+    "components": [
+      "直流母线",
+      "箱变",
+      "断路器"
+    ],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  },
+  "summary": "相关部件：直流母线、箱变、断路器；当前排查主线：电网、箱变或并网保护异常；用户说“变流器报直流母线过压，伴随网侧电压波动和一次并网接触器跳开。请给出排查顺序和复位前确认项”，Windrise建议“先按电网、箱变或并网保护异常处理”",
+  "lastReasoningRoute": {
+    "case": {
+      "id": "case:llmwiki_converter-dc-link-grid-disturbance",
+      "label": "变流器直流母线或电网电压扰动"
+    },
+    "system_domain": {
+      "id": "domain:converter_electrical",
+      "label": "变流器与电气系统",
+      "signals": [],
+      "first_actions": []
+    },
+    "subsystem": {
+      "id": "subdomain:converter_power_module",
+      "label": "变流器功率模块与直流母线",
+      "signals": [
+        "直流母线电压",
+        "IGBT温度/驱动状态",
+        "网侧/机侧电流"
+      ],
+      "first_actions": []
+    }
+  }
+}

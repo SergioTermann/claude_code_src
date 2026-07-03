@@ -1,0 +1,26 @@
+{
+  "updatedAt": 1782298216741,
+  "turns": [
+    {
+      "user": "你好",
+      "assistant": "你好！我是 Windrise，很高兴见到你。有什么我可以帮你的吗？"
+    },
+    {
+      "user": "你是什么模型",
+      "assistant": "我是 Windrise，本地中文助手；当前通过 LM Studio 使用 qwen/qwen3.5-9b。"
+    },
+    {
+      "user": "中国的首都是哪",
+      "assistant": "中国的首都是"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "faultCodes": [],
+    "systems": [],
+    "components": [],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  }
+}

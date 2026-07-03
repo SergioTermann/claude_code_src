@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.windrise.simple.web</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/node</string>
+    <string>scripts/doc-knowledge-server.mjs</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/Users/zinger/windrise</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>DOC_KNOWLEDGE_PORT</key>
+    <string>8766</string>
+    <key>DOC_KNOWLEDGE_HOST</key>
+    <string>0.0.0.0</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/tmp/windrise-simple-8766.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/windrise-simple-8766.err.log</string>
+</dict>
+</plist>

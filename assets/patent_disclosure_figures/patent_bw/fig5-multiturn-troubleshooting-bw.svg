@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#111"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .text{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .small{font:400 15px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .box{fill:#fff;stroke:#111;stroke-width:2}
+      .line{stroke:#111;stroke-width:2;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="860" fill="#fff"/>
+  <text x="70" y="70" class="title">图5 多轮现场排查交互流程图</text>
+
+  <rect x="90" y="165" width="310" height="90" class="box"/>
+  <text x="125" y="202" class="text">410 用户提出故障</text>
+  <text x="125" y="232" class="small">输入故障码或现场现象</text>
+  <path d="M400 210 H520" class="line"/>
+
+  <rect x="520" y="145" width="360" height="130" class="box"/>
+  <text x="555" y="188" class="text">420 限定范围并召回证据</text>
+  <text x="555" y="220" class="small">结合机型、风场和上下文</text>
+  <text x="555" y="248" class="small">召回故障条目、机理、来源资料</text>
+  <path d="M880 210 H1010" class="line"/>
+
+  <rect x="1010" y="145" width="310" height="130" class="box"/>
+  <text x="1045" y="188" class="text">430 输出单步排查</text>
+  <text x="1045" y="220" class="small">最可能判断 / 现场验证</text>
+  <text x="1045" y="248" class="small">合格标准 / 做完反馈</text>
+
+  <path d="M1165 275 V355" class="line"/>
+  <rect x="1000" y="355" width="330" height="90" class="box"/>
+  <text x="1035" y="392" class="text">440 用户反馈验证结果</text>
+  <text x="1035" y="422" class="small">动作一次、压力上不来、正常等</text>
+
+  <path d="M1000 400 H820" class="line"/>
+  <rect x="500" y="340" width="320" height="120" class="box"/>
+  <text x="535" y="380" class="text">450 排查状态记忆</text>
+  <text x="535" y="412" class="small">故障对象、验证动作、</text>
+  <text x="535" y="440" class="small">用户反馈、下一步待验证项</text>
+
+  <path d="M500 400 H320 V545" class="line"/>
+  <rect x="100" y="545" width="450" height="120" class="box"/>
+  <text x="135" y="588" class="text">460 继续生成下一步动作</text>
+  <text x="135" y="620" class="small">结合上一轮场景，不重新开始</text>
+  <text x="135" y="648" class="small">根据反馈调整判断方向</text>
+
+  <path d="M550 605 H705" class="line"/>
+  <rect x="705" y="545" width="300" height="120" class="box"/>
+  <text x="740" y="588" class="text">470 继续反馈</text>
+  <text x="740" y="620" class="small">正常 / 异常 / 已处理</text>
+
+  <path d="M855 545 V460" class="line"/>
+</svg>

@@ -1,0 +1,28 @@
+{
+  "updatedAt": 1782301045488,
+  "turns": [
+    {
+      "user": "你好",
+      "assistant": "你好！有什么我可以帮你的吗？"
+    },
+    {
+      "user": "今天是星期几",
+      "assistant": "今天是2026年6月24日，星期三。"
+    },
+    {
+      "user": "我刚才问了什么",
+      "assistant": "你刚才问的是“今天是星期几”。"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "faultCodes": [
+      "2026"
+    ],
+    "systems": [],
+    "components": [],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  }
+}

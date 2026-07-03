@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#111"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .text{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .small{font:400 15px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .box{fill:#fff;stroke:#111;stroke-width:2}
+      .line{stroke:#111;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .dash{stroke:#111;stroke-width:2;fill:none;stroke-dasharray:8 6;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="860" fill="#fff"/>
+  <text x="70" y="70" class="title">图1 系统总体结构图</text>
+
+  <rect x="70" y="165" width="245" height="135" class="box"/>
+  <text x="95" y="208" class="text">100 本地风电资料</text>
+  <text x="95" y="242" class="small">故障码表、手册、检修记录</text>
+
+  <rect x="400" y="135" width="250" height="190" class="box"/>
+  <text x="425" y="180" class="text">110 资料处理部分</text>
+  <text x="425" y="215" class="small">文本抽取、字段识别</text>
+  <text x="425" y="245" class="small">名称标准化、来源记录</text>
+
+  <rect x="750" y="105" width="270" height="145" class="box"/>
+  <text x="775" y="150" class="text">120 领域知识构建</text>
+  <text x="775" y="185" class="small">建立风场、机型、故障码</text>
+  <text x="775" y="215" class="small">与原因、处理、来源关系</text>
+
+  <rect x="750" y="330" width="270" height="145" class="box"/>
+  <text x="775" y="375" class="text">130 故障机理归纳</text>
+  <text x="775" y="410" class="small">将故障条目挂接到</text>
+  <text x="775" y="440" class="small">现场机理模板</text>
+
+  <rect x="1110" y="170" width="230" height="165" class="box"/>
+  <text x="1135" y="215" class="text">140 检索增强问答</text>
+  <text x="1135" y="250" class="small">限定范围、召回证据</text>
+  <text x="1135" y="280" class="small">生成现场答案</text>
+
+  <rect x="400" y="575" width="250" height="135" class="box"/>
+  <text x="425" y="620" class="text">150 证据回溯</text>
+  <text x="425" y="655" class="small">答案结论回到原始资料</text>
+
+  <rect x="750" y="575" width="270" height="135" class="box"/>
+  <text x="775" y="620" class="text">160 多轮排查</text>
+  <text x="775" y="655" class="small">保存验证动作和用户反馈</text>
+
+  <rect x="1110" y="575" width="230" height="135" class="box"/>
+  <text x="1135" y="620" class="text">170 本地/内网部署</text>
+  <text x="1135" y="655" class="small">资料不出公网</text>
+
+  <path d="M315 232 H400" class="line"/>
+  <path d="M650 210 C700 195 710 180 750 178" class="line"/>
+  <path d="M650 260 C705 310 715 390 750 402" class="line"/>
+  <path d="M1020 178 H1110" class="line"/>
+  <path d="M1020 402 C1080 370 1090 270 1110 252" class="line"/>
+  <path d="M1225 335 V575" class="line"/>
+  <path d="M1110 645 H1020" class="dash"/>
+  <path d="M750 645 H650" class="dash"/>
+  <path d="M525 575 V325" class="dash"/>
+</svg>

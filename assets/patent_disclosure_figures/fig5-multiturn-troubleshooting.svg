@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#334155"/>
+    </marker>
+    <style>
+      .title{font:700 34px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#0f172a}
+      .sub{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#475569}
+      .head{font:700 22px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#0f172a}
+      .txt{font:400 16px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#334155}
+      .bubbleUser{fill:#dbeafe;stroke:#2563eb;stroke-width:2;rx:18}
+      .bubbleSys{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:18}
+      .memory{fill:#fff7ed;stroke:#f97316;stroke-width:2;rx:14}
+      .line{stroke:#334155;stroke-width:2.4;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="860" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">图5 多轮现场排查交互流程图</text>
+  <text x="72" y="104" class="sub">系统保存故障对象、验证动作和用户反馈，使短反馈也能继续推进下一步排查。</text>
+
+  <rect x="80" y="165" width="320" height="85" class="bubbleUser"/>
+  <text x="115" y="200" class="head">用户提出故障</text>
+  <text x="115" y="228" class="txt">如：303804 怎么处理？</text>
+  <path d="M400 207 H520" class="line"/>
+
+  <rect x="520" y="150" width="360" height="115" class="bubbleSys"/>
+  <text x="555" y="190" class="head">系统限定范围并召回证据</text>
+  <text x="555" y="220" class="txt">根据故障码、机型、风场和上下文</text>
+  <text x="555" y="246" class="txt">召回故障条目、机理和来源资料</text>
+  <path d="M880 207 H1010" class="line"/>
+
+  <rect x="1010" y="150" width="310" height="115" class="bubbleSys"/>
+  <text x="1045" y="190" class="head">输出单步排查</text>
+  <text x="1045" y="220" class="txt">最可能判断 / 现场验证</text>
+  <text x="1045" y="246" class="txt">合格标准 / 做完反馈</text>
+
+  <path d="M1165 265 V355" class="line"/>
+  <rect x="1000" y="355" width="330" height="85" class="bubbleUser"/>
+  <text x="1035" y="390" class="head">用户反馈验证结果</text>
+  <text x="1035" y="418" class="txt">如：动作一次 / 压力上不来</text>
+
+  <path d="M1000 397 H820" class="line"/>
+  <rect x="500" y="337" width="320" height="120" class="memory"/>
+  <text x="535" y="375" class="head">排查状态记忆</text>
+  <text x="535" y="407" class="txt">故障对象、已验证动作、</text>
+  <text x="535" y="433" class="txt">用户反馈、下一步待验证项</text>
+
+  <path d="M500 397 H320 V545" class="line"/>
+  <rect x="95" y="545" width="450" height="120" class="bubbleSys"/>
+  <text x="130" y="585" class="head">继续生成下一步动作</text>
+  <text x="130" y="615" class="txt">结合上一轮场景，不重新开始检索</text>
+  <text x="130" y="641" class="txt">按反馈结果调整判断方向</text>
+
+  <path d="M545 605 H705" class="line"/>
+  <rect x="705" y="545" width="300" height="120" class="bubbleUser"/>
+  <text x="740" y="585" class="head">继续反馈</text>
+  <text x="740" y="615" class="txt">正常 / 异常 / 已处理</text>
+  <text x="740" y="641" class="txt">或上传补充资料</text>
+
+  <path d="M855 545 V457" class="line"/>
+
+  <rect x="130" y="755" width="1140" height="58" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>
+  <text x="160" y="790" class="sub">目的：把现场排查从“一次性长答案”改为“每轮一个验证动作、反馈后继续”的闭环过程。</text>
+</svg>

@@ -1,0 +1,568 @@
+**
+(bare_jrnl_new_sample4.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-02-24> (IEEEtran.cls
+Document Class: IEEEtran 2015/08/26 V1.8b by Michael Shell
+-- See the "IEEEtran_HOWTO" manual for usage information.
+-- http://www.michaelshell.org/tex/ieeetran/
+\@IEEEtrantmpdimenA=\dimen138
+\@IEEEtrantmpdimenB=\dimen139
+\@IEEEtrantmpdimenC=\dimen140
+\@IEEEtrantmpcountA=\count181
+\@IEEEtrantmpcountB=\count182
+\@IEEEtrantmpcountC=\count183
+\@IEEEtrantmptoksA=\toks16
+LaTeX Font Info:    Trying to load font information for TU+ptm on input line 50
+3.
+LaTeX Font Info:    No file TUptm.fd. on input line 503.
+
+LaTeX Font Warning: Font shape `TU/ptm/m/n' undefined
+(Font)              using `TU/lmr/m/n' instead on input line 503.
+
+-- Using 8.5in x 11in (letter) paper.
+-- Using DVI output.
+\@IEEEnormalsizeunitybaselineskip=\dimen141
+-- This is a 10 point document.
+\CLASSINFOnormalsizebaselineskip=\dimen142
+\CLASSINFOnormalsizeunitybaselineskip=\dimen143
+\IEEEnormaljot=\dimen144
+
+LaTeX Font Warning: Font shape `TU/ptm/bx/n' undefined
+(Font)              using `TU/ptm/m/n' instead on input line 1090.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/m/it' undefined
+(Font)              using `TU/ptm/m/n' instead on input line 1090.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/bx/it' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 1090.
+
+\IEEEquantizedlength=\dimen145
+\IEEEquantizedlengthdiff=\dimen146
+\IEEEquantizedtextheightdiff=\dimen147
+\IEEEilabelindentA=\dimen148
+\IEEEilabelindentB=\dimen149
+\IEEEilabelindent=\dimen150
+\IEEEelabelindent=\dimen151
+\IEEEdlabelindent=\dimen152
+\IEEElabelindent=\dimen153
+\IEEEiednormlabelsep=\dimen154
+\IEEEiedmathlabelsep=\dimen155
+\IEEEiedtopsep=\skip47
+\c@section=\count184
+\c@subsection=\count185
+\c@subsubsection=\count186
+\c@paragraph=\count187
+\c@IEEEsubequation=\count188
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\c@figure=\count189
+\c@table=\count190
+\@IEEEeqnnumcols=\count191
+\@IEEEeqncolcnt=\count192
+\@IEEEsubeqnnumrollback=\count193
+\@IEEEquantizeheightA=\dimen156
+\@IEEEquantizeheightB=\dimen157
+\@IEEEquantizeheightC=\dimen158
+\@IEEEquantizeprevdepth=\dimen159
+\@IEEEquantizemultiple=\count194
+\@IEEEquantizeboxA=\box50
+\@IEEEtmpitemindent=\dimen160
+\IEEEPARstartletwidth=\dimen161
+\c@IEEEbiography=\count195
+\@IEEEtranrubishbin=\box51
+) (amsmath.sty
+Package: amsmath 2021/10/15 v2.17l AMS math features
+\@mathmargin=\skip50
+
+For additional information on amsmath, use the `?' option.
+(amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
+ (amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks17
+\ex@=\dimen162
+)) (amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen163
+) (amsopn.sty
+Package: amsopn 2021/08/26 v2.02 operator names
+)
+\inf@bad=\count196
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count197
+\leftroot@=\count198
+LaTeX Info: Redefining \overline on input line 399.
+\classnum@=\count199
+\DOTSCASE@=\count266
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box52
+\strutbox@=\box53
+\big@size=\dimen164
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count267
+\c@MaxMatrixCols=\count268
+\dotsspace@=\muskip16
+\c@parentequation=\count269
+\dspbrk@lvl=\count270
+\tag@help=\toks18
+\row@=\count271
+\column@=\count272
+\maxfields@=\count273
+\andhelp@=\toks19
+\eqnshift@=\dimen165
+\alignsep@=\dimen166
+\tagshift@=\dimen167
+\tagwidth@=\dimen168
+\totwidth@=\dimen169
+\lineht@=\dimen170
+\@envbody=\toks20
+\multlinegap=\skip51
+\multlinetaggap=\skip52
+\mathdisplay@stack=\toks21
+LaTeX Info: Redefining \[ on input line 2938.
+LaTeX Info: Redefining \] on input line 2939.
+) (amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+) (array.sty
+Package: array 2021/10/04 v2.5f Tabular extension package (FMi)
+\col@sep=\dimen171
+\ar@mcellbox=\box54
+\extrarowheight=\dimen172
+\NC@list=\toks22
+\extratabsurround=\skip53
+\backup@length=\skip54
+\ar@cellbox=\box55
+) (subfig.sty
+Package: subfig 2005/06/28 ver: 1.3 subfig package
+ (keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks23
+) (caption3.sty
+Package: caption3 2022/03/17 v2.3b caption3 kernel (AR)
+\caption@tempdima=\dimen173
+\captionmargin=\dimen174
+\caption@leftmargin=\dimen175
+\caption@rightmargin=\dimen176
+\caption@width=\dimen177
+\caption@indent=\dimen178
+\caption@parindent=\dimen179
+\caption@hangindent=\dimen180
+Package caption Info: Unknown document class (or package),
+(caption)             standard defaults will be used.
+Package caption Info: \@makecaption = \long macro:#1#2->\ifx \@captype \@IEEEta
+blestring \footnotesize \bgroup \par \centering \@IEEEtabletopskipstrut {\norma
+lfont \footnotesize #1}\\{\normalfont \footnotesize \scshape #2}\par \addvspace
+ {0.5\baselineskip }\egroup \@IEEEtablecaptionsepspace \else \@IEEEfigurecaptio
+nsepspace \setbox \@tempboxa \hbox {\normalfont \footnotesize {#1.}\nobreakspac
+e \nobreakspace #2}\ifdim \wd \@tempboxa >\hsize \setbox \@tempboxa \hbox {\nor
+malfont \footnotesize {#1.}\nobreakspace \nobreakspace }\parbox [t]{\hsize }{\n
+ormalfont \footnotesize \noindent \unhbox \@tempboxa #2}\else \ifCLASSOPTIONcon
+ference \hbox to\hsize {\normalfont \footnotesize \hfil \box \@tempboxa \hfil }
+\else \hbox to\hsize {\normalfont \footnotesize \box \@tempboxa \hfil }\fi \fi 
+\fi  on input line 1176.
+)
+\c@KVtest=\count274
+\sf@farskip=\skip55
+\sf@captopadj=\dimen181
+\sf@capskip=\skip56
+\sf@nearskip=\skip57
+\c@subfigure=\count275
+\c@subfigure@save=\count276
+\c@lofdepth=\count277
+\c@subtable=\count278
+\c@subtable@save=\count279
+\c@lotdepth=\count280
+\sf@top=\skip58
+\sf@bottom=\skip59
+) (textcomp.sty
+Package: textcomp 2020/02/02 v2.0n Standard LaTeX package
+) (stfloats.sty
+Package: stfloats 2017/03/27 v3.3 Improve float mechanism and baselineskip sett
+ings
+\@dblbotnum=\count281
+\c@dblbotnumber=\count282
+)
+(url.sty
+\Urlmuskip=\muskip17
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+) (graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+ (graphics.sty
+Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
+ (trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+) (graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: xetex.def on input line 107.
+ (xetex.def
+File: xetex.def 2021/03/18 v5.0k Graphics/color driver for xetex
+))
+\Gin@req@height=\dimen182
+\Gin@req@width=\dimen183
+)
+(cite.sty
+LaTeX Info: Redefining \cite on input line 302.
+LaTeX Info: Redefining \nocite on input line 332.
+Package: cite 2015/02/27  v 5.5
+) (booktabs.sty
+Package: booktabs 2020/01/12 v1.61803398 Publication quality tables
+\heavyrulewidth=\dimen184
+\lightrulewidth=\dimen185
+\cmidrulewidth=\dimen186
+\belowrulesep=\dimen187
+\belowbottomsep=\dimen188
+\aboverulesep=\dimen189
+\abovetopsep=\dimen190
+\cmidrulesep=\dimen191
+\cmidrulekern=\dimen192
+\defaultaddspace=\dimen193
+\@cmidla=\count283
+\@cmidlb=\count284
+\@aboverulesep=\dimen194
+\@belowrulesep=\dimen195
+\@thisruleclass=\count285
+\@lastruleclass=\count286
+\@thisrulewidth=\dimen196
+) (multirow.sty
+Package: multirow 2021/03/15 v2.8 Span multiple rows of a table
+\multirow@colwidth=\skip60
+\multirow@cntb=\count287
+\multirow@dima=\skip61
+\bigstrutjot=\dimen197
+) (l3backend-xetex.def
+File: l3backend-xetex.def 2022-02-07 L3 backend support: XeTeX
+\c__kernel_sys_dvipdfmx_version_int=\count288
+\l__color_backend_stack_int=\count289
+\g__color_backend_stack_int=\count290
+\g__graphics_track_int=\count291
+\l__pdf_internal_box=\box56
+\g__pdf_backend_object_int=\count292
+\g__pdf_backend_annotation_int=\count293
+\g__pdf_backend_link_int=\count294
+)
+
+LaTeX Warning: Unused global option(s):
+    [lettersize].
+
+(bare_jrnl_new_sample4.aux)
+\openout1 = `bare_jrnl_new_sample4.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
+LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
+7.
+ (ts1cmr.fd
+File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 17.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/it' undefined
+(Font)              using `TU/ptm/bx/it' instead on input line 17.
+
+-- Lines per column: 58 (exact).
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: subfig package v1.3 is loaded.
+Package caption Info: End \AtBeginDocument code.
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 31.
+
+
+Underfull \hbox (badness 6078) in paragraph at lines 31--33
+[]\TU/ptm/bx/it/9 Abstract—Wind turbine operations and maintenance
+ []
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 35.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/m/sc' undefined
+(Font)              using `TU/ptm/m/n' instead on input line 39.
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 40.
+
+
+Underfull \hbox (badness 1371) in paragraph at lines 42--43
+\TU/ptm/bx/it/10 scope can therefore return plausible but wrong re-
+ []
+
+[1
+
+
+]
+LaTeX Font Info:    Trying to load font information for U+msa on input line 65.
+
+ (umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 65.
+
+ (umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) [2]
+File: figures//fig_system_architecture.pdf Graphic file (type pdf)
+<use figures//fig_system_architecture.pdf>
+File: figures//fig_knowledge_build_flow.pdf Graphic file (type pdf)
+<use figures//fig_knowledge_build_flow.pdf>
+ [3] [4]
+File: figures//fig_knowledge_scale.pdf Graphic file (type pdf)
+<use figures//fig_knowledge_scale.pdf>
+ [5]
+Underfull \hbox (badness 1418) in paragraph at lines 201--202
+[]\TU/ptm/m/sc/10 Table II[] reports the structural evaluation of the
+ []
+
+
+Underfull \hbox (badness 1442) in paragraph at lines 201--202
+\TU/ptm/m/sc/10 mechanism-enhanced reasoning graph. A mechanism-
+ []
+
+
+Underfull \hbox (badness 5667) in paragraph at lines 227--228
+\TU/ptm/m/sc/10 action profile, whose completeness is 72.7%, the
+ []
+
+File: figures//fig_nature_mechanism_overview.pdf Graphic file (type pdf)
+<use figures//fig_nature_mechanism_overview.pdf>
+File: figures//fig_nature_graph_composition.pdf Graphic file (type pdf)
+<use figures//fig_nature_graph_composition.pdf>
+File: figures//fig_nature_case_quality.pdf Graphic file (type pdf)
+<use figures//fig_nature_case_quality.pdf>
+File: figures//fig_experiment_ablation_matrix.pdf Graphic file (type pdf)
+<use figures//fig_experiment_ablation_matrix.pdf>
+
+Underfull \vbox (badness 3209) has occurred while \output is active []
+
+ [6]
+Underfull \hbox (badness 10000) in paragraph at lines 279--279
+[]|\TU/ptm/m/sc/8 Converter IGBT-
+ []
+
+
+Underfull \hbox (badness 2608) in paragraph at lines 284--284
+[]|\TU/ptm/m/sc/8 Yaw hydraulic pres-
+ []
+
+
+Underfull \hbox (badness 2932) in paragraph at lines 287--288
+[]|\TU/ptm/m/sc/8 Clean plunger holes and
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 287--288
+\TU/ptm/m/sc/8 damping buffer; adjust
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 287--288
+\TU/ptm/m/sc/8 improved buffer; update
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 289--289
+[]|\TU/ptm/m/sc/8 Main-shaft bearing
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 290--290
+[]|\TU/ptm/m/sc/8 High-altitude temperature variation,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 290--290
+\TU/ptm/m/sc/8 turbulent load, lubrication
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 290--290
+\TU/ptm/m/sc/8 contamination, coaxiality deviation,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 292--293
+[]|\TU/ptm/m/sc/8 Stop turbine; replace
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 292--293
+\TU/ptm/m/sc/8 chamber; repair shaft
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 294--294
+[]|\TU/ptm/m/sc/8 Generator winding
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 297--298
+[]|\TU/ptm/m/sc/8 Check Pt100 resistance;
+ []
+
+
+Underfull \hbox (badness 2894) in paragraph at lines 297--298
+\TU/ptm/m/sc/8 swap acquisition channel;
+ []
+
+[7] [8]
+Underfull \hbox (badness 2573) in paragraph at lines 346--347
+[]\TU/ptm/m/sc/10 Another limitation is evaluation granularity. The
+ []
+
+(bare_jrnl_new_sample4.bbl
+Underfull \hbox (badness 2512) in paragraph at lines 55--58
+[]\TU/ptm/m/sc/8 Y. Li, Y. Wang, M. Li, X. Li, and J. Feng, “LLM-
+ []
+
+[9]
+Underfull \hbox (badness 3514) in paragraph at lines 114--116
+[]\TU/ptm/m/sc/8 S.-Q. Yan, J.-C. Gu, Y. Zhu, and Z.-H. Ling, “Cor-
+ []
+
+
+Underfull \hbox (badness 6094) in paragraph at lines 114--116
+\TU/ptm/m/sc/8 rective retrieval augmented generation,” arXiv preprint
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 144--146
+[]\TU/ptm/m/sc/8 OpenAI, “Gpt-4 technical report,” arXiv preprint
+ []
+
+
+Underfull \hbox (badness 2096) in paragraph at lines 153--155
+[]\TU/ptm/m/sc/8 Qwen Team, “Qwen2.5 technical report,” arXiv preprint
+ []
+
+
+Underfull \hbox (badness 3525) in paragraph at lines 157--159
+\TU/ptm/m/sc/8 ity in llms via reinforcement learning,” arXiv preprint
+ []
+
+)
+File: figures//bio_yehong_dong.pdf Graphic file (type pdf)
+<use figures//bio_yehong_dong.pdf>
+File: figures//bio_yehong_dong.pdf Graphic file (type pdf)
+<use figures//bio_yehong_dong.pdf>
+
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 357.
+
+File: figures//bio_shuai_hao.pdf Graphic file (type pdf)
+<use figures//bio_shuai_hao.pdf>
+File: figures//bio_shuai_hao.pdf Graphic file (type pdf)
+<use figures//bio_shuai_hao.pdf>
+
+LaTeX Font Warning: Font shape `TU/ptm/b/n' undefined
+(Font)              using `TU/ptm/bx/n' instead on input line 361.
+
+[10] (bare_jrnl_new_sample4.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+Output written on bare_jrnl_new_sample4.xdv (10 pages, 456912 bytes).

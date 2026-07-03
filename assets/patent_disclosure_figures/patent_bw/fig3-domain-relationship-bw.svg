@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#111"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .node{fill:#fff;stroke:#111;stroke-width:2}
+      .text{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111;text-anchor:middle}
+      .small{font:400 14px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111;text-anchor:middle}
+      .line{stroke:#111;stroke-width:2;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="860" fill="#fff"/>
+  <text x="70" y="70" class="title">图3 领域知识关系示意图</text>
+
+  <circle cx="700" cy="410" r="80" class="node"/><text x="700" y="405" class="text">230 故障码</text><text x="700" y="432" class="text">报警信息</text>
+  <circle cx="250" cy="210" r="70" class="node"/><text x="250" y="218" class="text">210 风场</text>
+  <circle cx="470" cy="210" r="70" class="node"/><text x="470" y="218" class="text">220 机型</text>
+  <circle cx="700" cy="170" r="70" class="node"/><text x="700" y="178" class="text">225 品牌</text>
+  <circle cx="950" cy="220" r="70" class="node"/><text x="950" y="228" class="text">240 系统</text>
+  <circle cx="1160" cy="350" r="70" class="node"/><text x="1160" y="358" class="text">250 部件</text>
+  <circle cx="250" cy="615" r="70" class="node"/><text x="250" y="623" class="text">280 来源资料</text>
+  <circle cx="470" cy="670" r="70" class="node"/><text x="470" y="678" class="text">270 复位方式</text>
+  <circle cx="950" cy="670" r="70" class="node"/><text x="950" y="678" class="text">260 可能原因</text>
+  <circle cx="1160" cy="545" r="70" class="node"/><text x="1160" y="553" class="text">265 处理建议</text>
+
+  <path d="M320 210 H400" class="line"/><text x="360" y="190" class="small">对应</text>
+  <path d="M540 198 C590 185 620 175 630 172" class="line"/><text x="590" y="160" class="small">归属</text>
+  <path d="M640 360 C585 300 535 245 515 230" class="line"/><text x="575" y="305" class="small">适用</text>
+  <path d="M760 360 C820 300 880 245 900 235" class="line"/><text x="840" y="305" class="small">所属</text>
+  <path d="M780 405 C925 390 1040 360 1095 352" class="line"/><text x="965" y="370" class="small">涉及</text>
+  <path d="M760 475 C825 555 885 620 915 645" class="line"/><text x="835" y="590" class="small">原因</text>
+  <path d="M780 445 C910 490 1040 525 1095 540" class="line"/><text x="950" y="510" class="small">处理</text>
+  <path d="M640 475 C585 550 525 625 505 650" class="line"/><text x="565" y="590" class="small">复位</text>
+  <path d="M620 445 C500 500 365 575 315 605" class="line"/><text x="450" y="545" class="small">来源</text>
+</svg>

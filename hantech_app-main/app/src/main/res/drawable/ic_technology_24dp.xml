@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 技术图标 24dp -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- 外圈 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.5"
+        android:pathData="M12,2 A10,10 0,1,1 12,22 A10,10 0,1,1 12,2 Z" />
+
+    <!-- 中心芯片 -->
+    <path
+        android:fillColor="#3FAA69"
+        android:pathData="M8,8 L16,8 L16,16 L8,16 Z" />
+
+    <!-- 芯片线路 - 上 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M10,8 L10,5" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M12,8 L12,5" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M14,8 L14,5" />
+
+    <!-- 芯片线路 - 下 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M10,16 L10,19" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M12,16 L12,19" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M14,16 L14,19" />
+
+    <!-- 芯片线路 - 左 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M8,10 L5,10" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M8,12 L5,12" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M8,14 L5,14" />
+
+    <!-- 芯片线路 - 右 -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M16,10 L19,10" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M16,12 L19,12" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#3FAA69"
+        android:strokeWidth="1.2"
+        android:pathData="M16,14 L19,14" />
+
+    <!-- 中心亮点 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,12 A1,1 0,1,1 12,10 A1,1 0,1,1 12,12 Z" />
+
+</vector>
+

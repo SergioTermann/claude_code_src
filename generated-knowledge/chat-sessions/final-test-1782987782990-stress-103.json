@@ -1,0 +1,24 @@
+{
+  "updatedAt": 1782987782990,
+  "turns": [
+    {
+      "user": "谢谢复位前怎么确认？",
+      "assistant": "不客气。"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "userName": "",
+    "favoriteColor": "",
+    "vendors": [],
+    "models": [],
+    "faultCodes": [],
+    "systems": [],
+    "components": [],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  },
+  "summary": "用户说“谢谢复位前怎么确认”，Windrise建议“不客气”",
+  "lastReasoningRoute": null
+}

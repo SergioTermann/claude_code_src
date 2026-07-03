@@ -1,0 +1,18 @@
+{
+  "updatedAt": 1782298917736,
+  "turns": [
+    {
+      "user": "1+1等于几",
+      "assistant": "我在。你可以继续说，我会结合前面的对话往下接。"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "faultCodes": [],
+    "systems": [],
+    "components": [],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  }
+}

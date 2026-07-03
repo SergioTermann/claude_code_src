@@ -1,0 +1,1165 @@
+{
+  "title": "风电部件故障处理报告清洗版知识图谱",
+  "generatedAt": "2026-06-18T02:48:08.653Z",
+  "scope": {
+    "includedDocuments": [
+      "2MW风电机组变流器IGBT板卡故障的分析及解决方案_林延填.pdf",
+      "砀山风电场15#风电机组偏航液压系统压力异常故障处理全流程解析_孙士雪.pdf",
+      "风电机组主轴的检修维护及故障分析与应对策略_卢祥林.pdf",
+      "风电机组发电机绕组端温度高故障分析及处理_张新旺.pdf"
+    ],
+    "excludedDocuments": [
+      {
+        "name": "风力机叶片故障分析及运维管理.pdf",
+        "reason": "扫描型 PDF，无可抽取文本层；OCR 语言包未完成安装。"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "case:converter_igbt",
+      "type": "fault_case",
+      "label": "变流器IGBT板卡故障"
+    },
+    {
+      "id": "case:yaw_hydraulic_pressure",
+      "type": "fault_case",
+      "label": "偏航液压系统压力异常"
+    },
+    {
+      "id": "case:main_shaft_bearing_wear",
+      "type": "fault_case",
+      "label": "主轴轴承复合磨损故障"
+    },
+    {
+      "id": "case:generator_winding_temp_jump",
+      "type": "fault_case",
+      "label": "发电机绕组端温度高/跳变"
+    },
+    {
+      "id": "component:igbt_driver",
+      "type": "component",
+      "label": "IGBT驱动板"
+    },
+    {
+      "id": "component:yaw_damper",
+      "type": "component",
+      "label": "偏航回路阻尼缓冲器"
+    },
+    {
+      "id": "component:main_shaft_bearing",
+      "type": "component",
+      "label": "主轴轴承"
+    },
+    {
+      "id": "component:pt100_chain",
+      "type": "component",
+      "label": "Pt100温度测量链路"
+    },
+    {
+      "id": "cause:grid_voltage_fluctuation",
+      "type": "causal_factor",
+      "label": "电网电压波动"
+    },
+    {
+      "id": "cause:dust_salt_moisture",
+      "type": "causal_factor",
+      "label": "粉尘盐雾潮湿"
+    },
+    {
+      "id": "cause:poor_heat_dissipation",
+      "type": "causal_factor",
+      "label": "塔底散热不足"
+    },
+    {
+      "id": "cause:hidden_damper_blocked",
+      "type": "causal_factor",
+      "label": "隐蔽阻尼缓冲器堵塞"
+    },
+    {
+      "id": "cause:lubrication_contamination",
+      "type": "causal_factor",
+      "label": "润滑污染"
+    },
+    {
+      "id": "cause:turbulence_load",
+      "type": "causal_factor",
+      "label": "强湍流载荷"
+    },
+    {
+      "id": "cause:alignment_deviation",
+      "type": "causal_factor",
+      "label": "同轴度偏差"
+    },
+    {
+      "id": "cause:emi",
+      "type": "causal_factor",
+      "label": "电磁干扰"
+    },
+    {
+      "id": "cause:shield_grounding_bad",
+      "type": "causal_factor",
+      "label": "屏蔽层未良好接地"
+    },
+    {
+      "id": "symptom:converter_high_temp",
+      "type": "symptom",
+      "label": "变流器高温停机"
+    },
+    {
+      "id": "symptom:inu_isu_fault",
+      "type": "symptom",
+      "label": "INU/ISU模块故障"
+    },
+    {
+      "id": "symptom:yaw_pressure_slow",
+      "type": "symptom",
+      "label": "偏航回路压力恢复缓慢"
+    },
+    {
+      "id": "symptom:bearing_wear",
+      "type": "symptom",
+      "label": "内圈剥落和外圈剥落"
+    },
+    {
+      "id": "symptom:winding_temp_jump",
+      "type": "symptom",
+      "label": "绕组温度70-135摄氏度跳变"
+    },
+    {
+      "id": "signal:pressure_drop",
+      "type": "diagnostic_signal",
+      "label": "151bar降至27bar，150bar恢复约300s"
+    },
+    {
+      "id": "signal:vibration_bfpi",
+      "type": "diagnostic_signal",
+      "label": "BPFI增强、峭度8.7、振动4.8mm/s"
+    },
+    {
+      "id": "signal:temp_load_related",
+      "type": "diagnostic_signal",
+      "label": "并网后温度波动随负荷增大"
+    },
+    {
+      "id": "action:replace_igbt",
+      "type": "action",
+      "label": "更换IGBT驱动板并改善散热防潮"
+    },
+    {
+      "id": "action:replace_damper",
+      "type": "action",
+      "label": "清理并更换改进型φ5mm缓冲器"
+    },
+    {
+      "id": "action:replace_bearing",
+      "type": "action",
+      "label": "停机更换轴承并改造润滑密封"
+    },
+    {
+      "id": "action:rewire_signal",
+      "type": "action",
+      "label": "重新敷设屏蔽信号电缆并规范接地"
+    },
+    {
+      "id": "signal:isu_sc",
+      "type": "diagnostic_signal",
+      "label": "ISU SC / INU SC故障报文"
+    },
+    {
+      "id": "signal:k8_not_closed",
+      "type": "diagnostic_signal",
+      "label": "K8接触器无法吸合"
+    },
+    {
+      "id": "step:converter_fault_log",
+      "type": "diagnostic_step",
+      "label": "读取变流器内部故障记录和子故障报文"
+    },
+    {
+      "id": "step:converter_k8_check",
+      "type": "diagnostic_step",
+      "label": "检查K8接触器吸合状态和散热风扇联动"
+    },
+    {
+      "id": "step:converter_environment_check",
+      "type": "diagnostic_step",
+      "label": "检查塔底散热、防潮和通风滤网状态"
+    },
+    {
+      "id": "signal:converter_temp_drop_15",
+      "type": "evidence",
+      "label": "改造后运行温度下降约15摄氏度"
+    },
+    {
+      "id": "action:clean_filter",
+      "type": "action",
+      "label": "定期清理或更换变流器通风滤网"
+    },
+    {
+      "id": "action:humid_protection",
+      "type": "action",
+      "label": "潮湿天气防潮巡检并开启除湿"
+    },
+    {
+      "id": "action:upgrade_converter_cooling",
+      "type": "action",
+      "label": "增设引流外罩、工业风扇和散热管道"
+    },
+    {
+      "id": "action:monitor_igbt_temp",
+      "type": "action",
+      "label": "加强IGBT板卡温度监控并调整风扇温控参数"
+    },
+    {
+      "id": "step:yaw_main_loop_test",
+      "type": "diagnostic_step",
+      "label": "主回路压力和液压泵电流测试"
+    },
+    {
+      "id": "step:yaw_valve_swap",
+      "type": "diagnostic_step",
+      "label": "电磁换向阀15.2与15.1调换排查"
+    },
+    {
+      "id": "step:yaw_check_cutoff",
+      "type": "diagnostic_step",
+      "label": "检查截止阀10.2"
+    },
+    {
+      "id": "step:yaw_check_checkvalve",
+      "type": "diagnostic_step",
+      "label": "检查单向阀9.3"
+    },
+    {
+      "id": "step:yaw_check_throttle",
+      "type": "diagnostic_step",
+      "label": "检查定差节流阀22.1"
+    },
+    {
+      "id": "step:yaw_hidden_damper",
+      "type": "diagnostic_step",
+      "label": "咨询厂家并检查图纸未标注阻尼缓冲器"
+    },
+    {
+      "id": "signal:yaw_main_normal",
+      "type": "diagnostic_signal",
+      "label": "主回路压力280±10bar、液压泵电流5.2A"
+    },
+    {
+      "id": "signal:yaw_after_clean_11s",
+      "type": "evidence",
+      "label": "清理后偏航回路压力11s升至约153bar"
+    },
+    {
+      "id": "action:yaw_temp_adjust",
+      "type": "temporary_action",
+      "label": "临时调整缓冲器开度恢复压力"
+    },
+    {
+      "id": "action:update_hydraulic_drawing",
+      "type": "prevention",
+      "label": "更新液压图纸并标注隐蔽缓冲器"
+    },
+    {
+      "id": "action:quarterly_damper_maintenance",
+      "type": "prevention",
+      "label": "缓冲器纳入季度检查、清洁和性能测试"
+    },
+    {
+      "id": "signal:bearing_inner_outer_damage",
+      "type": "diagnostic_signal",
+      "label": "内圈剥落3.2mm×1.5mm、外圈剥落15%"
+    },
+    {
+      "id": "signal:bearing_lube_1200ppm",
+      "type": "diagnostic_signal",
+      "label": "润滑脂金属磨屑1200ppm、允许≤150ppm"
+    },
+    {
+      "id": "signal:bearing_alignment_015",
+      "type": "diagnostic_signal",
+      "label": "同轴度偏差0.15mm、标准≤0.05mm"
+    },
+    {
+      "id": "signal:bearing_d4",
+      "type": "evidence",
+      "label": "ISO 15243评估为D4严重损伤阶段"
+    },
+    {
+      "id": "action:shaft_emergency_stop",
+      "type": "temporary_action",
+      "label": "立即停机隔离并排空污染润滑脂"
+    },
+    {
+      "id": "action:shaft_clean_cavity",
+      "type": "action",
+      "label": "专用清洗剂三次循环清洗轴承腔体"
+    },
+    {
+      "id": "action:shaft_polish",
+      "type": "action",
+      "label": "主轴轴颈抛光修复至Ra0.8μm以内"
+    },
+    {
+      "id": "action:shaft_upgrade_seal",
+      "type": "action",
+      "label": "单唇口密封升级为迷宫式+磁性流体复合密封"
+    },
+    {
+      "id": "action:shaft_online_monitor",
+      "type": "prevention",
+      "label": "加装振动在线监测和油液颗粒趋势监测"
+    },
+    {
+      "id": "action:shaft_one_machine_file",
+      "type": "prevention",
+      "label": "建立关键部件一机一档全生命周期数据库"
+    },
+    {
+      "id": "signal:pt100_resistance",
+      "type": "diagnostic_step",
+      "label": "用Pt100公式校核传感器阻值，偏差超过1Ω更换"
+    },
+    {
+      "id": "step:plc_channel_swap",
+      "type": "diagnostic_step",
+      "label": "与正常传感器倒换PLC模块通道"
+    },
+    {
+      "id": "step:check_grounding",
+      "type": "diagnostic_step",
+      "label": "检查屏蔽层和接线端子接地"
+    },
+    {
+      "id": "step:replace_signal_cable",
+      "type": "diagnostic_step",
+      "label": "更换发电机接线盒至机舱柜屏蔽信号电缆"
+    },
+    {
+      "id": "signal:temp_70_135",
+      "type": "diagnostic_signal",
+      "label": "1V相温度70-135摄氏度跳变"
+    },
+    {
+      "id": "signal:standby_stable_grid_jump",
+      "type": "diagnostic_signal",
+      "label": "停机稳定，并网后随负荷增大波动"
+    },
+    {
+      "id": "signal:plc_normal",
+      "type": "evidence",
+      "label": "通道倒换后判断PLC模块正常"
+    },
+    {
+      "id": "action:ground_shield",
+      "type": "action",
+      "label": "屏蔽层两端按工艺接地并接通接地端子与导轨"
+    },
+    {
+      "id": "action:use_spare_sensor",
+      "type": "action",
+      "label": "2V相切换备用温度传感器"
+    },
+    {
+      "id": "action:emi_four_measures",
+      "type": "prevention",
+      "label": "按屏蔽、滤波、布线、接地四项原则治理模拟量干扰"
+    },
+    {
+      "id": "failure:filter_cap_burn",
+      "type": "intermediate_failure",
+      "label": "IGBT驱动板内部滤波电容烧坏"
+    },
+    {
+      "id": "failure:driver_short_bad_contact",
+      "type": "intermediate_failure",
+      "label": "驱动板短路或接触不良"
+    },
+    {
+      "id": "failure:converter_heat_accumulation",
+      "type": "intermediate_failure",
+      "label": "塔底热气聚集和环境温度升高"
+    },
+    {
+      "id": "failure:k8_contact_oxidation",
+      "type": "intermediate_failure",
+      "label": "K8接触器触点氧化或机构卡涩"
+    },
+    {
+      "id": "symptom:converter_trip",
+      "type": "symptom",
+      "label": "变流器跳闸/总故障/转子侧故障触发"
+    },
+    {
+      "id": "validation:converter_prefill_zero_speed_ok",
+      "type": "validation",
+      "label": "预充电实验和零速实验正常"
+    },
+    {
+      "id": "validation:converter_fault_reduce",
+      "type": "validation",
+      "label": "改造后一段时间IGBT故障次数下降"
+    },
+    {
+      "id": "failure:yaw_flow_restricted",
+      "type": "intermediate_failure",
+      "label": "偏航回路液压油流量受限"
+    },
+    {
+      "id": "failure:yaw_pressure_build_slow",
+      "type": "intermediate_failure",
+      "label": "偏航回路建压缓慢"
+    },
+    {
+      "id": "symptom:yaw_underpressure_alarm",
+      "type": "symptom",
+      "label": "液压站持续欠压报警"
+    },
+    {
+      "id": "validation:yaw_pressure_153_11s",
+      "type": "validation",
+      "label": "清理后11s升至153bar且无新增告警"
+    },
+    {
+      "id": "failure:drawing_missing_damper",
+      "type": "management_factor",
+      "label": "液压图纸未标注隐蔽阻尼缓冲器"
+    },
+    {
+      "id": "failure:seal_failure",
+      "type": "intermediate_failure",
+      "label": "密封结构失效导致污染物侵入"
+    },
+    {
+      "id": "failure:grease_degradation",
+      "type": "intermediate_failure",
+      "label": "润滑脂劣化和油膜厚度不足"
+    },
+    {
+      "id": "failure:metal_contact",
+      "type": "intermediate_failure",
+      "label": "金属直接接触形成三体磨损"
+    },
+    {
+      "id": "failure:micro_pitting",
+      "type": "intermediate_failure",
+      "label": "微观点蚀扩展"
+    },
+    {
+      "id": "failure:macro_spalling",
+      "type": "intermediate_failure",
+      "label": "宏观剥落和二次损伤"
+    },
+    {
+      "id": "symptom:periodic_impact",
+      "type": "symptom",
+      "label": "周期性冲击振动和高频共振"
+    },
+    {
+      "id": "risk:cage_fracture",
+      "type": "risk",
+      "label": "继续运行可能导致保持架断裂风险升高"
+    },
+    {
+      "id": "validation:shaft_mtbf_improved",
+      "type": "validation",
+      "label": "MTBF从1800h延长至3500h"
+    },
+    {
+      "id": "failure:shield_no_ground",
+      "type": "intermediate_failure",
+      "label": "温度信号电缆屏蔽层两端未接地"
+    },
+    {
+      "id": "failure:junction_ground_open",
+      "type": "intermediate_failure",
+      "label": "接线盒接地端子与导轨未接通"
+    },
+    {
+      "id": "failure:analog_signal_coupled",
+      "type": "intermediate_failure",
+      "label": "模拟量测温信号被电磁耦合"
+    },
+    {
+      "id": "failure:measurement_distortion",
+      "type": "intermediate_failure",
+      "label": "温度示值误差和测量失真"
+    },
+    {
+      "id": "symptom:false_high_temp_alarm",
+      "type": "symptom",
+      "label": "误报发电机绕组温度高故障"
+    },
+    {
+      "id": "validation:temp_stable_after_spare",
+      "type": "validation",
+      "label": "切换备用传感器后温度稳定"
+    },
+    {
+      "id": "cause:main_loop_fault",
+      "type": "excluded_cause",
+      "label": "主回路故障"
+    },
+    {
+      "id": "cause:directional_valve_fault",
+      "type": "excluded_cause",
+      "label": "电磁换向阀故障"
+    },
+    {
+      "id": "cause:cutoff_valve_blocked",
+      "type": "excluded_cause",
+      "label": "截止阀堵塞"
+    },
+    {
+      "id": "cause:check_valve_blocked",
+      "type": "excluded_cause",
+      "label": "单向阀堵塞"
+    },
+    {
+      "id": "cause:throttle_valve_blocked",
+      "type": "excluded_cause",
+      "label": "定差节流阀堵塞"
+    },
+    {
+      "id": "cause:plc_module_fault",
+      "type": "excluded_cause",
+      "label": "PLC温度采集模块故障"
+    }
+  ],
+  "edges": [
+    {
+      "source": "case:converter_igbt",
+      "type": "INVOLVES_COMPONENT",
+      "target": "component:igbt_driver"
+    },
+    {
+      "source": "cause:grid_voltage_fluctuation",
+      "type": "CAN_TRIGGER",
+      "target": "case:converter_igbt"
+    },
+    {
+      "source": "cause:dust_salt_moisture",
+      "type": "CAN_TRIGGER",
+      "target": "case:converter_igbt"
+    },
+    {
+      "source": "cause:poor_heat_dissipation",
+      "type": "LEADS_TO",
+      "target": "symptom:converter_high_temp"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "MANIFESTS_AS",
+      "target": "symptom:inu_isu_fault"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "MITIGATED_BY",
+      "target": "action:replace_igbt"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "INVOLVES_COMPONENT",
+      "target": "component:yaw_damper"
+    },
+    {
+      "source": "cause:hidden_damper_blocked",
+      "type": "CAN_TRIGGER",
+      "target": "case:yaw_hydraulic_pressure"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "MANIFESTS_AS",
+      "target": "symptom:yaw_pressure_slow"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:pressure_drop"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "MITIGATED_BY",
+      "target": "action:replace_damper"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "INVOLVES_COMPONENT",
+      "target": "component:main_shaft_bearing"
+    },
+    {
+      "source": "cause:lubrication_contamination",
+      "type": "CAN_TRIGGER",
+      "target": "case:main_shaft_bearing_wear"
+    },
+    {
+      "source": "cause:turbulence_load",
+      "type": "CAN_TRIGGER",
+      "target": "case:main_shaft_bearing_wear"
+    },
+    {
+      "source": "cause:alignment_deviation",
+      "type": "CAN_TRIGGER",
+      "target": "case:main_shaft_bearing_wear"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "MANIFESTS_AS",
+      "target": "symptom:bearing_wear"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:vibration_bfpi"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "MITIGATED_BY",
+      "target": "action:replace_bearing"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "INVOLVES_COMPONENT",
+      "target": "component:pt100_chain"
+    },
+    {
+      "source": "cause:emi",
+      "type": "CAN_TRIGGER",
+      "target": "case:generator_winding_temp_jump"
+    },
+    {
+      "source": "cause:shield_grounding_bad",
+      "type": "CAN_TRIGGER",
+      "target": "case:generator_winding_temp_jump"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "MANIFESTS_AS",
+      "target": "symptom:winding_temp_jump"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:temp_load_related"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "MITIGATED_BY",
+      "target": "action:rewire_signal"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:isu_sc",
+      "evidence": "查看变流器内部故障信息记录"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:k8_not_closed",
+      "evidence": "散热风扇启动但K8接触器无法吸合"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "SUPPORTED_BY",
+      "target": "signal:converter_temp_drop_15",
+      "evidence": "改造后效果验证"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:converter_fault_log"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:converter_k8_check"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:converter_environment_check"
+    },
+    {
+      "source": "step:converter_fault_log",
+      "type": "CONFIRMS",
+      "target": "signal:isu_sc"
+    },
+    {
+      "source": "step:converter_k8_check",
+      "type": "CONFIRMS",
+      "target": "signal:k8_not_closed"
+    },
+    {
+      "source": "step:converter_environment_check",
+      "type": "CONFIRMS",
+      "target": "cause:poor_heat_dissipation"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "MITIGATED_BY",
+      "target": "action:clean_filter"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "MITIGATED_BY",
+      "target": "action:humid_protection"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "MITIGATED_BY",
+      "target": "action:upgrade_converter_cooling"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "MITIGATED_BY",
+      "target": "action:monitor_igbt_temp"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "PREVENTED_BY",
+      "target": "action:clean_filter"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "PREVENTED_BY",
+      "target": "action:humid_protection"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "PREVENTED_BY",
+      "target": "action:monitor_igbt_temp"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:yaw_main_loop_test"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:yaw_valve_swap"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:yaw_check_cutoff"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:yaw_check_checkvalve"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:yaw_check_throttle"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:yaw_hidden_damper"
+    },
+    {
+      "source": "step:yaw_main_loop_test",
+      "type": "RESULTS_IN",
+      "target": "signal:yaw_main_normal"
+    },
+    {
+      "source": "step:yaw_hidden_damper",
+      "type": "CONFIRMS",
+      "target": "cause:hidden_damper_blocked"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "SUPPORTED_BY",
+      "target": "signal:yaw_after_clean_11s"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "TEMPORARILY_MITIGATED_BY",
+      "target": "action:yaw_temp_adjust"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "PREVENTED_BY",
+      "target": "action:update_hydraulic_drawing"
+    },
+    {
+      "source": "case:yaw_hydraulic_pressure",
+      "type": "PREVENTED_BY",
+      "target": "action:quarterly_damper_maintenance"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:bearing_inner_outer_damage"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:bearing_lube_1200ppm"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:bearing_alignment_015"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "SUPPORTED_BY",
+      "target": "signal:bearing_d4"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "TEMPORARILY_MITIGATED_BY",
+      "target": "action:shaft_emergency_stop"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "MITIGATED_BY",
+      "target": "action:shaft_clean_cavity"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "MITIGATED_BY",
+      "target": "action:shaft_polish"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "MITIGATED_BY",
+      "target": "action:shaft_upgrade_seal"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "PREVENTED_BY",
+      "target": "action:shaft_online_monitor"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "PREVENTED_BY",
+      "target": "action:shaft_one_machine_file"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "signal:pt100_resistance"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:plc_channel_swap"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:check_grounding"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "HAS_DIAGNOSTIC_STEP",
+      "target": "step:replace_signal_cable"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:temp_70_135"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "DIAGNOSED_BY",
+      "target": "signal:standby_stable_grid_jump"
+    },
+    {
+      "source": "step:plc_channel_swap",
+      "type": "RESULTS_IN",
+      "target": "signal:plc_normal"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "MITIGATED_BY",
+      "target": "action:ground_shield"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "MITIGATED_BY",
+      "target": "action:use_spare_sensor"
+    },
+    {
+      "source": "case:generator_winding_temp_jump",
+      "type": "PREVENTED_BY",
+      "target": "action:emi_four_measures"
+    },
+    {
+      "source": "cause:grid_voltage_fluctuation",
+      "type": "LEADS_TO",
+      "target": "failure:filter_cap_burn",
+      "evidence": "电网电压不稳定导致滤波电容烧坏"
+    },
+    {
+      "source": "failure:filter_cap_burn",
+      "type": "LEADS_TO",
+      "target": "case:converter_igbt"
+    },
+    {
+      "source": "cause:dust_salt_moisture",
+      "type": "LEADS_TO",
+      "target": "failure:driver_short_bad_contact",
+      "evidence": "煤粉尘、潮湿、高盐雾导致短路或接触不良"
+    },
+    {
+      "source": "failure:driver_short_bad_contact",
+      "type": "LEADS_TO",
+      "target": "case:converter_igbt"
+    },
+    {
+      "source": "cause:poor_heat_dissipation",
+      "type": "LEADS_TO",
+      "target": "failure:converter_heat_accumulation",
+      "evidence": "散热风量不足、热气聚集"
+    },
+    {
+      "source": "failure:converter_heat_accumulation",
+      "type": "LEADS_TO",
+      "target": "symptom:converter_high_temp"
+    },
+    {
+      "source": "failure:k8_contact_oxidation",
+      "type": "LEADS_TO",
+      "target": "symptom:converter_high_temp",
+      "evidence": "K8无法吸合影响散热控制"
+    },
+    {
+      "source": "case:converter_igbt",
+      "type": "MANIFESTS_AS",
+      "target": "symptom:converter_trip"
+    },
+    {
+      "source": "action:replace_igbt",
+      "type": "VERIFIED_BY",
+      "target": "validation:converter_prefill_zero_speed_ok"
+    },
+    {
+      "source": "action:upgrade_converter_cooling",
+      "type": "VERIFIED_BY",
+      "target": "signal:converter_temp_drop_15"
+    },
+    {
+      "source": "action:upgrade_converter_cooling",
+      "type": "VERIFIED_BY",
+      "target": "validation:converter_fault_reduce"
+    },
+    {
+      "source": "action:clean_filter",
+      "type": "PREVENTS",
+      "target": "failure:converter_heat_accumulation"
+    },
+    {
+      "source": "action:humid_protection",
+      "type": "PREVENTS",
+      "target": "failure:driver_short_bad_contact"
+    },
+    {
+      "source": "action:monitor_igbt_temp",
+      "type": "PREVENTS",
+      "target": "symptom:converter_high_temp"
+    },
+    {
+      "source": "failure:drawing_missing_damper",
+      "type": "LEADS_TO",
+      "target": "step:yaw_hidden_damper",
+      "evidence": "图纸缺失导致常规排查未覆盖隐蔽元件"
+    },
+    {
+      "source": "cause:hidden_damper_blocked",
+      "type": "LEADS_TO",
+      "target": "failure:yaw_flow_restricted"
+    },
+    {
+      "source": "failure:yaw_flow_restricted",
+      "type": "LEADS_TO",
+      "target": "failure:yaw_pressure_build_slow"
+    },
+    {
+      "source": "failure:yaw_pressure_build_slow",
+      "type": "MANIFESTS_AS",
+      "target": "symptom:yaw_pressure_slow"
+    },
+    {
+      "source": "failure:yaw_pressure_build_slow",
+      "type": "MANIFESTS_AS",
+      "target": "symptom:yaw_underpressure_alarm"
+    },
+    {
+      "source": "step:yaw_main_loop_test",
+      "type": "EXCLUDES",
+      "target": "cause:main_loop_fault"
+    },
+    {
+      "source": "step:yaw_valve_swap",
+      "type": "EXCLUDES",
+      "target": "cause:directional_valve_fault"
+    },
+    {
+      "source": "step:yaw_check_cutoff",
+      "type": "EXCLUDES",
+      "target": "cause:cutoff_valve_blocked"
+    },
+    {
+      "source": "step:yaw_check_checkvalve",
+      "type": "EXCLUDES",
+      "target": "cause:check_valve_blocked"
+    },
+    {
+      "source": "step:yaw_check_throttle",
+      "type": "EXCLUDES",
+      "target": "cause:throttle_valve_blocked"
+    },
+    {
+      "source": "action:yaw_temp_adjust",
+      "type": "VERIFIED_BY",
+      "target": "validation:yaw_pressure_153_11s"
+    },
+    {
+      "source": "action:replace_damper",
+      "type": "PREVENTS",
+      "target": "failure:yaw_flow_restricted"
+    },
+    {
+      "source": "action:update_hydraulic_drawing",
+      "type": "PREVENTS",
+      "target": "failure:drawing_missing_damper"
+    },
+    {
+      "source": "cause:turbulence_load",
+      "type": "LEADS_TO",
+      "target": "failure:micro_pitting"
+    },
+    {
+      "source": "cause:alignment_deviation",
+      "type": "LEADS_TO",
+      "target": "failure:metal_contact"
+    },
+    {
+      "source": "cause:lubrication_contamination",
+      "type": "LEADS_TO",
+      "target": "failure:grease_degradation"
+    },
+    {
+      "source": "failure:seal_failure",
+      "type": "LEADS_TO",
+      "target": "failure:grease_degradation"
+    },
+    {
+      "source": "failure:grease_degradation",
+      "type": "LEADS_TO",
+      "target": "failure:metal_contact"
+    },
+    {
+      "source": "failure:metal_contact",
+      "type": "LEADS_TO",
+      "target": "failure:micro_pitting"
+    },
+    {
+      "source": "failure:micro_pitting",
+      "type": "LEADS_TO",
+      "target": "failure:macro_spalling"
+    },
+    {
+      "source": "failure:macro_spalling",
+      "type": "LEADS_TO",
+      "target": "case:main_shaft_bearing_wear"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "MANIFESTS_AS",
+      "target": "symptom:periodic_impact"
+    },
+    {
+      "source": "case:main_shaft_bearing_wear",
+      "type": "CAN_ESCALATE_TO",
+      "target": "risk:cage_fracture"
+    },
+    {
+      "source": "action:shaft_emergency_stop",
+      "type": "PREVENTS",
+      "target": "risk:cage_fracture"
+    },
+    {
+      "source": "action:shaft_upgrade_seal",
+      "type": "PREVENTS",
+      "target": "failure:seal_failure"
+    },
+    {
+      "source": "action:shaft_online_monitor",
+      "type": "DIAGNOSES_EARLY",
+      "target": "failure:micro_pitting"
+    },
+    {
+      "source": "action:shaft_online_monitor",
+      "type": "VERIFIED_BY",
+      "target": "validation:shaft_mtbf_improved"
+    },
+    {
+      "source": "cause:shield_grounding_bad",
+      "type": "LEADS_TO",
+      "target": "failure:shield_no_ground"
+    },
+    {
+      "source": "failure:shield_no_ground",
+      "type": "LEADS_TO",
+      "target": "failure:analog_signal_coupled"
+    },
+    {
+      "source": "failure:junction_ground_open",
+      "type": "LEADS_TO",
+      "target": "failure:analog_signal_coupled"
+    },
+    {
+      "source": "cause:emi",
+      "type": "LEADS_TO",
+      "target": "failure:analog_signal_coupled"
+    },
+    {
+      "source": "failure:analog_signal_coupled",
+      "type": "LEADS_TO",
+      "target": "failure:measurement_distortion"
+    },
+    {
+      "source": "failure:measurement_distortion",
+      "type": "LEADS_TO",
+      "target": "symptom:winding_temp_jump"
+    },
+    {
+      "source": "symptom:winding_temp_jump",
+      "type": "CAN_TRIGGER",
+      "target": "symptom:false_high_temp_alarm"
+    },
+    {
+      "source": "step:plc_channel_swap",
+      "type": "EXCLUDES",
+      "target": "cause:plc_module_fault"
+    },
+    {
+      "source": "step:replace_signal_cable",
+      "type": "CONFIRMS",
+      "target": "failure:analog_signal_coupled"
+    },
+    {
+      "source": "action:ground_shield",
+      "type": "PREVENTS",
+      "target": "failure:shield_no_ground"
+    },
+    {
+      "source": "action:use_spare_sensor",
+      "type": "VERIFIED_BY",
+      "target": "validation:temp_stable_after_spare"
+    },
+    {
+      "source": "action:emi_four_measures",
+      "type": "PREVENTS",
+      "target": "failure:analog_signal_coupled"
+    }
+  ]
+}

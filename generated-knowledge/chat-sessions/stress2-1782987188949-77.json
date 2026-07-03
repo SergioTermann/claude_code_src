@@ -1,0 +1,24 @@
+{
+  "updatedAt": 1782987189942,
+  "turns": [
+    {
+      "user": "谢谢请直接回答。",
+      "assistant": "不客气，随时为您效劳。"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "userName": "",
+    "favoriteColor": "",
+    "vendors": [],
+    "models": [],
+    "faultCodes": [],
+    "systems": [],
+    "components": [],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  },
+  "summary": "用户说“谢谢请直接回答”，Windrise建议“不客气，随时为您效劳”",
+  "lastReasoningRoute": null
+}

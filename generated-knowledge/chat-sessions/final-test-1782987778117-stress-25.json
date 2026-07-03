@@ -1,0 +1,24 @@
+{
+  "updatedAt": 1782987778202,
+  "turns": [
+    {
+      "user": "谢谢按现场步骤说。",
+      "assistant": "不客气。"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "userName": "",
+    "favoriteColor": "",
+    "vendors": [],
+    "models": [],
+    "faultCodes": [],
+    "systems": [],
+    "components": [],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  },
+  "summary": "用户说“谢谢按现场步骤说”，Windrise建议“不客气”",
+  "lastReasoningRoute": null
+}

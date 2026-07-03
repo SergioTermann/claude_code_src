@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    tools:context=".ui.workorder.WorkOrderFragment">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:padding="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="6dp"
+                android:paddingBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="对话生成工单"
+                            android:textColor="@color/ops_ink"
+                            android:textSize="25sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:lineSpacingExtra="2dp"
+                            android:text="工人只需描述现场现象，系统自动补全结构化工单"
+                            android:textColor="@color/ops_muted"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                style="@style/WorkOrderSectionTitle"
+                android:text="现场一句话" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/work_order_panel_background"
+                android:elevation="0dp"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:lineSpacingExtra="3dp"
+                    android:text="直接说机位、报警、现象或照片备注即可，不确定的场站、系统、优先级由助手先标记待确认。"
+                    android:textColor="@color/ops_muted"
+                    android:textSize="13sp" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:clipToPadding="false"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/quickStopFaultButton"
+                            style="@style/WorkOrderQuickAction"
+                            android:text="停机报警" />
+
+                        <TextView
+                            android:id="@+id/quickPitchPowerButton"
+                            style="@style/WorkOrderQuickAction"
+                            android:text="变桨 24V" />
+
+                        <TextView
+                            android:id="@+id/quickInspectionButton"
+                            style="@style/WorkOrderQuickAction"
+                            android:text="巡检缺陷" />
+
+                        <TextView
+                            android:id="@+id/quickPreventiveButton"
+                            style="@style/WorkOrderQuickAction"
+                            android:text="计划检修" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <EditText
+                    android:id="@+id/sceneInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="128dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@android:color/transparent"
+                    android:gravity="top"
+                    android:hint="例：3号风机变桨系统报 24V 电源故障，SCADA 显示停机，现场需抢修"
+                    android:imeOptions="actionSend"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:padding="4dp"
+                    android:textColor="#212121"
+                    android:textColorHint="#8A8A8A"
+                    android:textSize="15sp" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/generateButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/work_order_button_background"
+                android:text="一键生成工单"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                style="@style/WorkOrderSectionTitle"
+                android:text="可选模板" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/templateCorrectiveCard"
+                        style="@style/WorkOrderTemplateCard">
+
+                        <LinearLayout style="@style/WorkOrderTemplateCardContent">
+
+                            <TextView
+                                style="@style/WorkOrderTemplateTitle"
+                                android:text="故障抢修" />
+
+                            <TextView
+                                style="@style/WorkOrderTemplateDesc"
+                                android:text="停机、报警、异常复位失败" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/templateDefectCard"
+                        style="@style/WorkOrderTemplateCard">
+
+                        <LinearLayout style="@style/WorkOrderTemplateCardContent">
+
+                            <TextView
+                                style="@style/WorkOrderTemplateTitle"
+                                android:text="巡检消缺" />
+
+                            <TextView
+                                style="@style/WorkOrderTemplateDesc"
+                                android:text="现场巡检发现隐患或缺陷" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/templatePreventiveCard"
+                        style="@style/WorkOrderTemplateCard">
+
+                        <LinearLayout style="@style/WorkOrderTemplateCardContent">
+
+                            <TextView
+                                style="@style/WorkOrderTemplateTitle"
+                                android:text="预防检修" />
+
+                            <TextView
+                                style="@style/WorkOrderTemplateDesc"
+                                android:text="计划维护、润滑、紧固、更换" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
+            </HorizontalScrollView>
+
+            <Button
+                android:id="@+id/optionalFieldsToggleButton"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/input_background"
+                android:text="展开补充字段"
+                android:textColor="@color/ops_ink"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/basicInfoPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/work_order_panel_background"
+                android:elevation="0dp"
+                android:orientation="vertical"
+                android:padding="0dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="0dp">
+
+                    <TextView
+                        style="@style/WorkOrderFieldLabel"
+                        android:text="风场/场站" />
+
+                    <Spinner
+                        android:id="@+id/windFarmSpinner"
+                        style="@style/WorkOrderSpinner" />
+
+                    <TextView
+                        style="@style/WorkOrderFieldLabel"
+                        android:text="风机型号" />
+
+                    <Spinner
+                        android:id="@+id/turbineModelSpinner"
+                        style="@style/WorkOrderSpinner" />
+
+                    <TextView
+                        style="@style/WorkOrderFieldLabel"
+                        android:text="机位号" />
+
+                    <EditText
+                        android:id="@+id/turbineInput"
+                        style="@style/WorkOrderEditText"
+                        android:hint="例如：3号、A12、08#" />
+
+                    <TextView
+                        style="@style/WorkOrderFieldLabel"
+                        android:text="系统/部件" />
+
+                    <Spinner
+                        android:id="@+id/systemSpinner"
+                        style="@style/WorkOrderSpinner"
+                        android:entries="@array/work_order_systems" />
+
+                    <TextView
+                        style="@style/WorkOrderFieldLabel"
+                        android:text="优先级" />
+
+                    <Spinner
+                        android:id="@+id/prioritySpinner"
+                        style="@style/WorkOrderSpinner"
+                        android:entries="@array/work_order_priorities" />
+
+                    <TextView
+                        style="@style/WorkOrderFieldLabel"
+                        android:text="维护类型" />
+
+                    <Spinner
+                        android:id="@+id/actionTypeSpinner"
+                        style="@style/WorkOrderSpinner"
+                        android:entries="@array/work_order_action_types" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/resultContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="18dp"
+                android:background="#FFFFFF"
+                android:elevation="1dp"
+                android:orientation="vertical"
+                android:padding="14dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="sans-serif-medium"
+                            android:text="工单预览"
+                            android:textColor="#1B5E20"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/downloadPdfButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:background="@drawable/work_order_button_background"
+                            android:minWidth="96dp"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:text="下载 PDF"
+                            android:textColor="#FFFFFF"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <Spinner
+                            android:id="@+id/forwardCoworkerSpinner"
+                            style="@style/WorkOrderSpinner"
+                            android:layout_width="0dp"
+                            android:layout_weight="1" />
+
+                        <Button
+                            android:id="@+id/forwardWorkOrderButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="42dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/input_background"
+                            android:minWidth="86dp"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="转发 PDF"
+                            android:textColor="@color/ops_ink"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/resultText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:lineSpacingExtra="4dp"
+                        android:textColor="#263238"
+                        android:textIsSelectable="true"
+                        android:textSize="14sp"
+                        tools:text="工单编号：WO-20260613-120000" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

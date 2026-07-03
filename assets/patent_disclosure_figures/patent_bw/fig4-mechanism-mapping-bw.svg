@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#111"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .text{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .small{font:400 15px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .box{fill:#fff;stroke:#111;stroke-width:2}
+      .line{stroke:#111;stroke-width:2;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="860" fill="#fff"/>
+  <text x="70" y="70" class="title">图4 故障机理归纳和故障条目挂接示意图</text>
+
+  <rect x="85" y="155" width="300" height="510" class="box"/>
+  <text x="125" y="205" class="text">310 本地故障条目</text>
+  <rect x="125" y="250" width="220" height="55" class="box"/><text x="235" y="285" class="small" text-anchor="middle">故障条目 A</text>
+  <rect x="125" y="335" width="220" height="55" class="box"/><text x="235" y="370" class="small" text-anchor="middle">故障条目 B</text>
+  <rect x="125" y="420" width="220" height="55" class="box"/><text x="235" y="455" class="small" text-anchor="middle">故障条目 C</text>
+  <rect x="125" y="505" width="220" height="55" class="box"/><text x="235" y="540" class="small" text-anchor="middle">故障条目 D</text>
+
+  <rect x="545" y="155" width="320" height="510" class="box"/>
+  <text x="585" y="205" class="text">320 故障机理模板</text>
+  <rect x="590" y="250" width="230" height="70" class="box"/><text x="705" y="280" class="small" text-anchor="middle">反馈链路异常</text><text x="705" y="304" class="small" text-anchor="middle">PLC / 开关 / 信号</text>
+  <rect x="590" y="360" width="230" height="70" class="box"/><text x="705" y="390" class="small" text-anchor="middle">执行机构异常</text><text x="705" y="414" class="small" text-anchor="middle">变桨 / 偏航 / 制动</text>
+  <rect x="590" y="470" width="230" height="70" class="box"/><text x="705" y="500" class="small" text-anchor="middle">电气电源异常</text><text x="705" y="524" class="small" text-anchor="middle">24V / 母线 / 电网</text>
+
+  <rect x="1030" y="210" width="300" height="390" class="box"/>
+  <text x="1070" y="260" class="text">330 问答使用</text>
+  <text x="1070" y="315" class="small">识别故障码和机型</text>
+  <text x="1070" y="355" class="small">找到对应机理模板</text>
+  <text x="1070" y="395" class="small">输出优先验证动作</text>
+  <text x="1070" y="435" class="small">给出合格标准</text>
+  <text x="1070" y="475" class="small">根据反馈继续排查</text>
+
+  <path d="M345 278 C430 275 505 275 590 285" class="line"/>
+  <path d="M345 362 C430 370 505 390 590 395" class="line"/>
+  <path d="M345 447 C430 435 505 395 590 395" class="line"/>
+  <path d="M345 532 C430 520 505 505 590 505" class="line"/>
+  <path d="M820 395 C900 400 960 410 1030 420" class="line"/>
+</svg>

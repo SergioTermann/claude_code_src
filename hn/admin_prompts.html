@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>提示问答 - 风起时域</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", Arial, sans-serif;
+      background: #f4f6f8;
+      color: #172033;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 24px;
+      background: #fff;
+      border-bottom: 1px solid #dbe3ec;
+    }
+    h1 { margin: 0; font-size: 18px; }
+    h2 { margin: 0 0 14px; font-size: 17px; }
+    main {
+      max-width: 1180px;
+      margin: 24px auto 36px;
+      padding: 0 18px;
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .button-link, button {
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 6px;
+      background: #1d4ed8;
+      color: #fff;
+      padding: 0 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .button-link.secondary, button.secondary { background: #475467; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .stat, .panel {
+      background: #fff;
+      border: 1px solid #dbe3ec;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .stat { padding: 14px 16px; }
+    .stat-label {
+      color: #667085;
+      font-size: 12px;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 18px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+    .stat:first-child .stat-value { font-size: 14px; }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    input {
+      width: 100%;
+      height: 42px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 0 12px;
+      background: #fff;
+      color: #172033;
+      font-size: 14px;
+    }
+    .section {
+      margin-bottom: 22px;
+    }
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid #e4e7ec;
+      background: #f8fafc;
+      border-radius: 8px 8px 0 0;
+    }
+    .section-title span {
+      color: #667085;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .qa-list {
+      padding: 8px;
+    }
+    .qa-card {
+      border: 1px solid #e4e7ec;
+      border-radius: 8px;
+      margin: 10px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .qa-card[hidden], .section[hidden] { display: none; }
+    .qa-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #f9fafb;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .qa-num {
+      min-width: 42px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      background: #e0e7ff;
+      color: #3730a3;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .qa-body {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 0;
+    }
+    .block {
+      padding: 14px 16px;
+      line-height: 1.72;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+    .block + .block {
+      border-left: 1px solid #eef2f7;
+    }
+    .block-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #667085;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .status {
+      min-height: 24px;
+      color: #166534;
+      margin-bottom: 14px;
+    }
+    .error {
+      color: #b42318;
+      background: #fff;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    @media (max-width: 760px) {
+      header { align-items: flex-start; flex-direction: column; }
+      .summary, .toolbar, .qa-body { grid-template-columns: 1fr; }
+      .block + .block {
+        border-left: 0;
+        border-top: 1px solid #eef2f7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>提示问答</h1>
+    <nav class="actions">
+      <a class="button-link secondary" href="/admin/users">用户管理</a>
+      <a class="button-link" href="/">返回智能助手</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="summary">
+      <div class="stat">
+        <div class="stat-label">来源</div>
+        <div class="stat-value" id="sourceName">加载中</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">问题数量</div>
+        <div class="stat-value" id="questionCount">-</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">分组数量</div>
+        <div class="stat-value" id="sectionCount">-</div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <input id="searchInput" type="search" placeholder="搜索问题或答案">
+      <button class="secondary" type="button" id="clearSearch">清空</button>
+    </div>
+
+    <div id="status" class="status">正在加载提示问答...</div>
+    <div id="content"></div>
+  </main>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const contentEl = document.getElementById('content');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+    let sections = [];
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[ch]));
+    }
+
+    function normalizeText(value) {
+      return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function parsePromptMarkdown(markdown) {
+      const lines = markdown.split(/\r?\n/);
+      const parsed = [];
+      let currentSection = null;
+      let currentQuestion = null;
+      let mode = null;
+
+      function ensureSection(title) {
+        currentSection = { title, items: [] };
+        parsed.push(currentSection);
+      }
+
+      for (const line of lines) {
+        const sectionMatch = line.match(/^##\s+(.+)$/);
+        if (sectionMatch && sectionMatch[1] !== '汇总') {
+          ensureSection(sectionMatch[1]);
+          currentQuestion = null;
+          mode = null;
+          continue;
+        }
+
+        const questionMatch = line.match(/^###\s+(\d+)\.\s+问题/);
+        if (questionMatch) {
+          if (!currentSection) ensureSection('问题串');
+          currentQuestion = {
+            number: Number(questionMatch[1]),
+            question: [],
+            answer: [],
+            searchable: '',
+          };
+          currentSection.items.push(currentQuestion);
+          mode = 'question';
+          continue;
+        }
+
+        if (!currentQuestion) continue;
+        if (line.trim() === '**大模型回复：**') {
+          mode = 'answer';
+          continue;
+        }
+        if (mode === 'question') currentQuestion.question.push(line);
+        if (mode === 'answer') currentQuestion.answer.push(line);
+      }
+
+      for (const section of parsed) {
+        section.items = section.items.map(item => {
+          const question = item.question.join('\n').trim();
+          const answer = item.answer.join('\n').trim();
+          return {
+            number: item.number,
+            question,
+            answer,
+            searchable: normalizeText(`${section.title} ${question} ${answer}`),
+          };
+        }).filter(item => item.question || item.answer);
+      }
+
+      return parsed.filter(section => section.items.length > 0);
+    }
+
+    function renderSections() {
+      contentEl.innerHTML = sections.map((section, sectionIndex) => `
+        <section class="panel section" data-section-index="${sectionIndex}">
+          <div class="section-title">
+            <h2>${escapeHtml(section.title)}</h2>
+            <span>${section.items.length} 题</span>
+          </div>
+          <div class="qa-list">
+            ${section.items.map(item => `
+              <article class="qa-card" data-search="${escapeHtml(item.searchable)}">
+                <div class="qa-head">
+                  <span class="qa-num">Q${escapeHtml(item.number)}</span>
+                  <button class="secondary" type="button" data-copy="${escapeHtml(item.number)}">复制提示</button>
+                </div>
+                <div class="qa-body">
+                  <div class="block">
+                    <span class="block-label">问题</span>${escapeHtml(item.question)}
+                  </div>
+                  <div class="block">
+                    <span class="block-label">答案提示</span>${escapeHtml(item.answer)}
+                  </div>
+                </div>
+              </article>
+            `).join('')}
+          </div>
+        </section>
+      `).join('');
+
+      contentEl.querySelectorAll('[data-copy]').forEach(button => {
+        button.addEventListener('click', async () => {
+          const number = Number(button.getAttribute('data-copy'));
+          const item = sections.flatMap(section => section.items).find(entry => entry.number === number);
+          if (!item) return;
+          const text = `问题：${item.question}\n\n答案提示：${item.answer}`;
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+          } else {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            textarea.remove();
+          }
+          button.textContent = '已复制';
+          setTimeout(() => { button.textContent = '复制提示'; }, 1200);
+        });
+      });
+    }
+
+    function applyFilter() {
+      const query = normalizeText(searchInput.value);
+      let visibleCount = 0;
+      contentEl.querySelectorAll('.section').forEach(sectionEl => {
+        let sectionVisible = false;
+        sectionEl.querySelectorAll('.qa-card').forEach(card => {
+          const matched = !query || card.getAttribute('data-search').includes(query);
+          card.hidden = !matched;
+          if (matched) {
+            sectionVisible = true;
+            visibleCount += 1;
+          }
+        });
+        sectionEl.hidden = !sectionVisible;
+      });
+      statusEl.textContent = query ? `当前匹配 ${visibleCount} 题` : '';
+    }
+
+    async function loadPromptQa() {
+      try {
+        const response = await fetch('/api/admin/prompt-qa');
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || '加载提示问答失败');
+        }
+        document.getElementById('sourceName').textContent = data.source || 'PDF 问题串';
+        document.getElementById('questionCount').textContent = data.question_count || '-';
+        document.getElementById('sectionCount').textContent = data.section_count || '-';
+        sections = parsePromptMarkdown(data.content || '');
+        renderSections();
+        statusEl.textContent = `已加载 ${sections.reduce((sum, section) => sum + section.items.length, 0)} 条问题和答案提示`;
+      } catch (error) {
+        statusEl.className = 'error';
+        statusEl.textContent = error.message;
+      }
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    clearSearch.addEventListener('click', () => {
+      searchInput.value = '';
+      applyFilter();
+      searchInput.focus();
+    });
+
+    loadPromptQa();
+  </script>
+</body>
+</html>

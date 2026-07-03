@@ -1,0 +1,34 @@
+case_id,label,mechanism_closed,hypothesis_discriminated,reasoning_closed,discriminator_types,hypothesis_count,max_mechanism_depth,mechanism_score
+case:llmwiki_pitch-24v-feedback-loss,变桨24V控制电源或开关反馈丢失,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_pitch-hydraulic-pressure-loss,液压变桨压力不足或蓄能能力下降,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_pitch-actuator-position-error,变桨执行机构卡滞或位置反馈异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_converter-dc-link-grid-disturbance,变流器直流母线或电网电压扰动,1,1,1,single_archetype_counterfactual,1,3,89
+case:llmwiki_converter-control-communication-loss,变流器控制板或通信链路中断,1,1,1,single_archetype_counterfactual,1,3,89
+case:llmwiki_generator-bearing-thermal-lubrication,发电机轴承热-润滑-对中失效,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_gearbox-bearing-gear-wear,齿轮箱轴承或齿轮磨损导致振动与温升,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_yaw-drive-brake-limit,偏航驱动、制动或限位链路异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_thermal-management-sensor-chain,控制柜或机舱热管理与温度传感链异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_plc-io-feedback-chain,PLC输入输出反馈链路异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_rotor-blade-imbalance-damage,叶片不平衡、结冰或结构损伤引发载荷异常,1,1,1,single_archetype_counterfactual,1,3,89
+case:llmwiki_safety-chain-emergency-stop,安全链或急停保护链断开,1,1,1,single_archetype_counterfactual,1,3,89
+case:llmwiki_main-shaft-bearing-lubrication-load,主轴轴承润滑、载荷或密封失效,1,1,1,single_archetype_counterfactual,1,3,89
+case:llmwiki_mechanical-brake-pressure-friction,机械制动压力、摩擦片或反馈异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_hydraulic-station-pump-accumulator-valve,液压站泵源、蓄能器或阀组异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_cooling-water-loop-flow-temperature,水冷回路流量、压力或散热能力不足,1,1,1,single_archetype_counterfactual,1,3,89
+case:llmwiki_lubrication-system-flow-grease-oil,集中润滑或齿轮油润滑不足,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_communication-network-loss,机组通信网络或现场总线中断,1,1,1,single_archetype_counterfactual,1,3,89
+case:llmwiki_grid-transformer-protection,电网、箱变或并网保护异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_sensor-measurement-chain-drift-fault,传感器测量链路漂移、断线或干扰,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_yaw-cable-twist-position-limit,偏航扭缆、角度或位置限位异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_nacelle-tower-vibration-structural-load,机舱、塔筒或基础结构振动载荷异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_environment-lightning-grounding-surge,雷击、浪涌或接地屏蔽异常,1,1,1,pairwise_archetype_competition,1,3,89
+case:llmwiki_scada-data-quality-alarm-correlation,SCADA数据质量、报警关联或工况边界异常,1,1,1,single_archetype_counterfactual,1,3,89
+case:yaw_hydraulic_pressure,偏航液压系统压力异常,1,1,1,single_archetype_counterfactual,1,3,89
+case:yaw_brake_pressure_sensor,T_228/T_229 偏航制动压力低/传感器故障,1,1,1,pairwise_archetype_competition,1,3,89
+case:hydraulic_pump_runtime,YX277/YX278/YX279 液压泵动作时间异常,1,1,1,single_archetype_counterfactual,1,3,89
+case:hydraulic_pump_breaker_trip,5806 液压泵断路器跳闸,1,1,1,single_archetype_counterfactual,1,3,89
+case:brake_pump_no_pressure,65 刹车泵无压力/A240.1无反馈,1,1,1,pairwise_archetype_competition,1,3,89
+case:yaw_speed_encoder_feedback,192/193/194 偏航速度/位置反馈异常,1,1,1,single_archetype_counterfactual,1,3,89
+case:converter_igbt,变流器IGBT板卡故障,1,1,1,single_archetype_counterfactual,1,3,89
+case:main_shaft_bearing_wear,主轴轴承复合磨损故障,1,1,1,single_archetype_counterfactual,1,3,89
+case:generator_winding_temp_jump,发电机绕组端温度高/跳变,1,1,1,single_archetype_counterfactual,1,3,89

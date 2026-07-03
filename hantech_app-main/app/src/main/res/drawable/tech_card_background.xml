@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 科技感卡片背景 - 渐变 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="135"
+        android:startColor="#E8F5E9"
+        android:centerColor="#FFFFFF"
+        android:endColor="#F1F8E9"
+        android:type="linear" />
+    <corners android:radius="20dp" />
+    <stroke
+        android:width="2dp"
+        android:color="#81C784" />
+</shape>
+

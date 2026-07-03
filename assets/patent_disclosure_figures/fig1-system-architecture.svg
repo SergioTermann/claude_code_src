@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#334155"/>
+    </marker>
+    <style>
+      .title{font:700 34px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#0f172a}
+      .subtitle{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#475569}
+      .boxTitle{font:700 22px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#0f172a}
+      .boxText{font:400 16px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#334155}
+      .tag{font:700 15px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#ffffff}
+      .box{fill:#ffffff;stroke:#cbd5e1;stroke-width:2;rx:14}
+      .blue{fill:#dbeafe;stroke:#2563eb}
+      .teal{fill:#ccfbf1;stroke:#0f766e}
+      .green{fill:#dcfce7;stroke:#16a34a}
+      .amber{fill:#fef3c7;stroke:#d97706}
+      .rose{fill:#ffe4e6;stroke:#e11d48}
+      .line{stroke:#334155;stroke-width:2.4;fill:none;marker-end:url(#arrow)}
+      .dash{stroke:#64748b;stroke-width:2;fill:none;stroke-dasharray:7 7;marker-end:url(#arrow)}
+    </style>
+  </defs>
+
+  <rect width="1400" height="860" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">图1 系统总体结构图</text>
+  <text x="72" y="104" class="subtitle">本地风电资料先构建为带机型约束、来源证据和故障机理的领域知识，再约束模型生成答案。</text>
+
+  <rect x="65" y="170" width="230" height="150" class="box blue"/>
+  <text x="95" y="215" class="boxTitle">本地风电资料</text>
+  <text x="95" y="250" class="boxText">故障码表 / 厂家手册</text>
+  <text x="95" y="276" class="boxText">风场机型映射</text>
+  <text x="95" y="302" class="boxText">检修记录 / 技术报告</text>
+
+  <rect x="390" y="150" width="260" height="190" class="box teal"/>
+  <text x="425" y="195" class="boxTitle">资料处理部分</text>
+  <text x="425" y="230" class="boxText">文本抽取</text>
+  <text x="425" y="256" class="boxText">字段识别</text>
+  <text x="425" y="282" class="boxText">名称标准化与别名保留</text>
+  <text x="425" y="308" class="boxText">来源位置记录</text>
+
+  <rect x="745" y="95" width="265" height="150" class="box green"/>
+  <text x="780" y="140" class="boxTitle">领域知识构建</text>
+  <text x="780" y="175" class="boxText">风场 - 机型 - 品牌</text>
+  <text x="780" y="201" class="boxText">故障码 - 部件 - 原因</text>
+  <text x="780" y="227" class="boxText">处理建议 - 复位 - 来源</text>
+
+  <rect x="745" y="315" width="265" height="150" class="box amber"/>
+  <text x="780" y="360" class="boxTitle">故障机理归纳</text>
+  <text x="780" y="395" class="boxText">将分散故障条目挂接到</text>
+  <text x="780" y="421" class="boxText">反馈链路、执行机构、</text>
+  <text x="780" y="447" class="boxText">电源链路等机理模板</text>
+
+  <rect x="1100" y="150" width="235" height="190" class="box rose"/>
+  <text x="1130" y="195" class="boxTitle">检索增强问答</text>
+  <text x="1130" y="230" class="boxText">识别故障码和意图</text>
+  <text x="1130" y="256" class="boxText">限定机型和风场</text>
+  <text x="1130" y="282" class="boxText">召回证据和机理</text>
+  <text x="1130" y="308" class="boxText">生成现场回答</text>
+
+  <rect x="390" y="565" width="260" height="145" class="box"/>
+  <text x="425" y="610" class="boxTitle">证据回溯</text>
+  <text x="425" y="645" class="boxText">答案结论回到原始资料</text>
+  <text x="425" y="671" class="boxText">可核查机型、故障条目</text>
+  <text x="425" y="697" class="boxText">和处理依据</text>
+
+  <rect x="745" y="565" width="265" height="145" class="box"/>
+  <text x="780" y="610" class="boxTitle">多轮现场排查</text>
+  <text x="780" y="645" class="boxText">保存故障对象、验证动作</text>
+  <text x="780" y="671" class="boxText">和用户反馈</text>
+  <text x="780" y="697" class="boxText">继续生成下一步动作</text>
+
+  <rect x="1100" y="565" width="235" height="145" class="box"/>
+  <text x="1130" y="610" class="boxTitle">本地/内网部署</text>
+  <text x="1130" y="645" class="boxText">资料不出公网</text>
+  <text x="1130" y="671" class="boxText">支持风场现场使用</text>
+
+  <path d="M295 245 H390" class="line"/>
+  <path d="M650 230 C700 210 705 175 745 170" class="line"/>
+  <path d="M650 270 C700 310 705 385 745 390" class="line"/>
+  <path d="M1010 170 H1100" class="line"/>
+  <path d="M1010 390 C1065 355 1065 255 1100 245" class="line"/>
+  <path d="M1215 340 V565" class="line"/>
+  <path d="M1100 640 H1010" class="dash"/>
+  <path d="M745 640 H650" class="dash"/>
+  <path d="M520 565 V340" class="dash"/>
+
+  <rect x="80" y="770" width="1240" height="48" rx="10" fill="#e2e8f0"/>
+  <text x="105" y="801" class="subtitle">核心思想：先把本地资料变为可计算、可追溯、可限定机型范围的知识，再让模型在该知识约束下回答现场问题。</text>
+</svg>

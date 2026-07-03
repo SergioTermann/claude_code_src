@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>风电部件故障处理报告清洗版知识图谱</title>
+  <style>
+    body{margin:0;background:#f6f7f9;color:#202938;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+    .app{height:100vh;display:grid;grid-template-rows:auto 1fr}
+    header{background:#fff;border-bottom:1px solid #d8dee8;padding:14px 18px}
+    h1{font-size:20px;margin:0}.meta{font-size:12px;color:#667085;margin-top:4px}
+    main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr)360px}
+    svg{width:100%;height:100%;display:block}
+    .side{background:#fff;border-left:1px solid #d8dee8;padding:14px;overflow:auto}
+    .card{border:1px solid #d8dee8;border-radius:6px;padding:9px;margin:8px 0;cursor:pointer}
+    .card:hover,.card.active{border-color:#111827;background:#f8fafc}
+    .pill{font-size:12px;color:#667085}
+    .node circle{stroke:#fff;stroke-width:2px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+    .node.active circle{stroke:#111827;stroke-width:3px}
+    .node text{font-size:12px;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+    .edge{stroke:#a8b3c5;stroke-opacity:.72}.edge.active{stroke:#111827;stroke-width:3}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>风电部件故障处理报告清洗版知识图谱</h1>
+    <div class="meta" id="meta">加载中</div>
+  </header>
+  <main>
+    <svg id="graph"></svg>
+    <aside class="side">
+      <b>节点</b>
+      <div id="list"></div>
+      <b>详情</b>
+      <div id="detail" class="card">点击节点查看关系</div>
+    </aside>
+  </main>
+</div>
+<script>
+const colors={fault_case:"#cf3f4a",component:"#2f6fed",causal_factor:"#c05621",symptom:"#dc2626",diagnostic_signal:"#057a85",action:"#27864f"};
+const svg=document.getElementById("graph"),list=document.getElementById("list"),detail=document.getElementById("detail"),meta=document.getElementById("meta");
+let graph,nodes,edges,by,active=null;
+fetch("curated-parts-graph.json").then(r=>r.json()).then(data=>{graph=data;nodes=data.nodes.map((n,i)=>({...n,i}));edges=data.edges;by=new Map(nodes.map(n=>[n.id,n]));meta.textContent=`节点 ${nodes.length} · 关系 ${edges.length} · 来源 4 份可读 PDF`;renderList();draw();});
+function layout(){const rect=svg.getBoundingClientRect(),w=Math.max(rect.width,720),h=Math.max(rect.height,520);svg.setAttribute("viewBox",`0 0 ${w} ${h}`);const groups={};for(const n of nodes)(groups[n.type]??=[]).push(n);Object.entries(groups).forEach(([type,items],groupIndex)=>{const radius=type==="fault_case"?90:165+groupIndex*30;items.forEach((n,index)=>{const angle=2*Math.PI*index/items.length+groupIndex*.42;n.x=w/2+Math.cos(angle)*radius;n.y=h/2+Math.sin(angle)*radius;});});for(let i=0;i<70;i++){for(const e of edges){const s=by.get(e.source),t=by.get(e.target);const dx=t.x-s.x,dy=t.y-s.y,d=Math.max(1,Math.hypot(dx,dy)),f=(d-180)*.003;s.x+=dx/d*f;s.y+=dy/d*f;t.x-=dx/d*f;t.y-=dy/d*f;}}}
+function draw(){layout();svg.replaceChildren();for(const e of edges){const s=by.get(e.source),t=by.get(e.target);const line=document.createElementNS("http://www.w3.org/2000/svg","line");line.setAttribute("class","edge"+(active&&(e.source===active||e.target===active)?" active":""));line.setAttribute("x1",s.x);line.setAttribute("y1",s.y);line.setAttribute("x2",t.x);line.setAttribute("y2",t.y);svg.append(line);}for(const n of nodes){const group=document.createElementNS("http://www.w3.org/2000/svg","g");group.setAttribute("class","node"+(n.id===active?" active":""));group.setAttribute("transform",`translate(${n.x},${n.y})`);group.onclick=()=>select(n.id);const circle=document.createElementNS("http://www.w3.org/2000/svg","circle");circle.setAttribute("r",n.type==="fault_case"?19:14);circle.setAttribute("fill",colors[n.type]||"#64748b");const text=document.createElementNS("http://www.w3.org/2000/svg","text");text.setAttribute("x",20);text.setAttribute("y",4);text.textContent=n.label.length>24?n.label.slice(0,23)+"...":n.label;group.append(circle,text);svg.append(group);}}
+function select(id){active=id;const node=by.get(id);const relations=edges.filter(e=>e.source===id||e.target===id);detail.innerHTML=`<h3>${escapeHtml(node.label)}</h3><div class="pill">${escapeHtml(node.type)}</div>`+relations.map(e=>`<div class="card"><b>${escapeHtml(e.type)}</b><br>${escapeHtml(by.get(e.source).label)} -> ${escapeHtml(by.get(e.target).label)}</div>`).join("");renderList();draw();}
+function renderList(){list.innerHTML=nodes.map(n=>`<div class="card ${n.id===active?"active":""}" data-id="${escapeHtml(n.id)}"><b>${escapeHtml(n.label)}</b><div class="pill">${escapeHtml(n.type)}</div></div>`).join("");for(const card of list.querySelectorAll(".card"))card.onclick=()=>select(card.dataset.id);}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}
+window.addEventListener("resize",()=>{if(nodes)draw();});
+</script>
+</body>
+</html>

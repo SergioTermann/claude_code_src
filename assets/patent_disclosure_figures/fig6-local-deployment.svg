@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#334155"/>
+    </marker>
+    <style>
+      .title{font:700 34px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#0f172a}
+      .sub{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#475569}
+      .head{font:700 22px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#0f172a}
+      .txt{font:400 16px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#334155}
+      .box{fill:#fff;stroke:#cbd5e1;stroke-width:2;rx:14}
+      .zone{fill:#f1f5f9;stroke:#94a3b8;stroke-width:2;stroke-dasharray:8 8;rx:18}
+      .line{stroke:#334155;stroke-width:2.4;fill:none;marker-end:url(#arrow)}
+      .block{fill:#dcfce7;stroke:#16a34a;stroke-width:2;rx:12}
+      .warn{fill:#fee2e2;stroke:#dc2626;stroke-width:2;rx:12}
+    </style>
+  </defs>
+  <rect width="1400" height="860" fill="#f8fafc"/>
+  <text x="70" y="70" class="title">图6 本地化和企业内网部署结构图</text>
+  <text x="72" y="104" class="sub">风场资料、知识库和模型服务部署在本机或企业内网，减少公网依赖和资料外发。</text>
+
+  <rect x="70" y="155" width="835" height="560" class="zone"/>
+  <text x="105" y="200" class="head">风场现场或企业内网</text>
+
+  <rect x="125" y="255" width="220" height="120" class="box"/>
+  <text x="160" y="300" class="head">用户入口</text>
+  <text x="160" y="335" class="txt">Web / 命令行</text>
+  <text x="160" y="361" class="txt">工单或现场终端</text>
+
+  <rect x="455" y="235" width="270" height="160" class="block"/>
+  <text x="495" y="280" class="head">Windrise 本地服务</text>
+  <text x="495" y="318" class="txt">检索路由</text>
+  <text x="495" y="344" class="txt">证据回溯</text>
+  <text x="495" y="370" class="txt">多轮排查状态</text>
+
+  <rect x="455" y="480" width="270" height="150" class="box"/>
+  <text x="495" y="525" class="head">本地知识库</text>
+  <text x="495" y="560" class="txt">故障条目 / 领域关系</text>
+  <text x="495" y="586" class="txt">故障机理 / 来源资料</text>
+  <text x="495" y="612" class="txt">质量统计</text>
+
+  <rect x="125" y="480" width="220" height="150" class="box"/>
+  <text x="160" y="525" class="head">原始资料</text>
+  <text x="160" y="560" class="txt">手册、故障码表、</text>
+  <text x="160" y="586" class="txt">检修记录、报告</text>
+
+  <rect x="780" y="300" width="250" height="150" class="box"/>
+  <text x="820" y="345" class="head">本地/内网模型</text>
+  <text x="820" y="380" class="txt">只接收检索证据</text>
+  <text x="820" y="406" class="txt">负责组织答案</text>
+
+  <rect x="1080" y="300" width="230" height="150" class="warn"/>
+  <text x="1120" y="345" class="head">公网服务</text>
+  <text x="1120" y="380" class="txt">默认不上传资料</text>
+  <text x="1120" y="406" class="txt">避免数据外发</text>
+
+  <path d="M345 315 H455" class="line"/>
+  <path d="M590 395 V480" class="line"/>
+  <path d="M345 555 H455" class="line"/>
+  <path d="M725 315 H780" class="line"/>
+  <path d="M780 390 C730 455 710 500 725 555" class="line"/>
+  <path d="M1030 375 H1080" class="line"/>
+  <line x1="1070" y1="280" x2="1320" y2="470" stroke="#dc2626" stroke-width="5"/>
+  <line x1="1320" y1="280" x2="1070" y2="470" stroke="#dc2626" stroke-width="5"/>
+
+  <rect x="130" y="760" width="1140" height="58" rx="12" fill="#ecfdf5" stroke="#16a34a" stroke-width="2"/>
+  <text x="160" y="795" class="sub">效果：企业资料留在本地或内网，弱网络环境下仍可使用，模型回答受本地证据约束。</text>
+</svg>

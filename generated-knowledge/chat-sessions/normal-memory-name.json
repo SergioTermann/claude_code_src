@@ -1,0 +1,24 @@
+{
+  "updatedAt": 1782365299195,
+  "turns": [
+    {
+      "user": "我叫张三",
+      "assistant": "大模型接口这次没有返回可用内容，请再发一次。"
+    },
+    {
+      "user": "我叫什么名字",
+      "assistant": "你叫张三。"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "userName": "什么名字",
+    "favoriteColor": "",
+    "faultCodes": [],
+    "systems": [],
+    "components": [],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  }
+}

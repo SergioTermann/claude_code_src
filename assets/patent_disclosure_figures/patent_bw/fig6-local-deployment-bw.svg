@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#111"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .text{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .small{font:400 15px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .box{fill:#fff;stroke:#111;stroke-width:2}
+      .zone{fill:#fff;stroke:#111;stroke-width:2;stroke-dasharray:8 6}
+      .line{stroke:#111;stroke-width:2;fill:none;marker-end:url(#arrow)}
+      .cross{stroke:#111;stroke-width:4}
+    </style>
+  </defs>
+  <rect width="1400" height="860" fill="#fff"/>
+  <text x="70" y="70" class="title">图6 本地化和企业内网部署结构图</text>
+
+  <rect x="70" y="145" width="850" height="565" class="zone"/>
+  <text x="105" y="195" class="text">500 风场现场或企业内网</text>
+
+  <rect x="125" y="255" width="220" height="120" class="box"/>
+  <text x="160" y="300" class="text">510 用户入口</text>
+  <text x="160" y="332" class="small">Web、命令行、工单终端</text>
+
+  <rect x="455" y="235" width="270" height="160" class="box"/>
+  <text x="495" y="280" class="text">520 本地服务</text>
+  <text x="495" y="314" class="small">检索路由、证据回溯</text>
+  <text x="495" y="342" class="small">多轮排查状态</text>
+
+  <rect x="455" y="480" width="270" height="150" class="box"/>
+  <text x="495" y="525" class="text">530 本地知识库</text>
+  <text x="495" y="558" class="small">故障条目、领域关系</text>
+  <text x="495" y="586" class="small">机理知识、来源资料</text>
+
+  <rect x="125" y="480" width="220" height="150" class="box"/>
+  <text x="160" y="525" class="text">540 原始资料</text>
+  <text x="160" y="558" class="small">手册、故障码表</text>
+  <text x="160" y="586" class="small">检修记录、报告</text>
+
+  <rect x="780" y="300" width="250" height="150" class="box"/>
+  <text x="820" y="345" class="text">550 本地/内网模型</text>
+  <text x="820" y="378" class="small">接收检索证据</text>
+  <text x="820" y="406" class="small">负责组织答案</text>
+
+  <rect x="1080" y="300" width="230" height="150" class="box"/>
+  <text x="1120" y="345" class="text">560 公网服务</text>
+  <text x="1120" y="378" class="small">默认不上传资料</text>
+  <line x1="1070" y1="280" x2="1320" y2="470" class="cross"/>
+  <line x1="1320" y1="280" x2="1070" y2="470" class="cross"/>
+
+  <path d="M345 315 H455" class="line"/>
+  <path d="M590 395 V480" class="line"/>
+  <path d="M345 555 H455" class="line"/>
+  <path d="M725 315 H780" class="line"/>
+  <path d="M780 390 C735 455 720 505 725 555" class="line"/>
+  <path d="M1030 375 H1080" class="line"/>
+</svg>

@@ -1,0 +1,25 @@
+{
+  "updatedAt": 1782445891629,
+  "turns": [
+    {
+      "user": "PLC DI反馈丢失，SCADA状态量和现场触点不一致怎么查",
+      "assistant": "最可能判断：先按SCADA数据质量、报警关联或工况边界异常处理。\n现场验证：先导出报警前后趋势和伴随告警，按时间线对齐现场动作。\n合格标准：如果报警只在特定状态切换点出现，优先查状态量和阈值逻辑；如果趋势和现场现象一致，再按真实设备异常处理。\n做完反馈：报警时间、前后趋势、伴随告警列表。"
+    }
+  ],
+  "memory": {
+    "topic": "风机故障诊断",
+    "userName": "",
+    "favoriteColor": "",
+    "faultCodes": [],
+    "systems": [],
+    "components": [
+      "SCADA"
+    ],
+    "symptoms": [
+      "SCADA数据质量、报警"
+    ],
+    "actions": [],
+    "pendingFeedback": []
+  },
+  "summary": "主题：风机故障诊断；相关部件：SCADA；已知现象：SCADA数据质量、报警；当前排查主线：SCADA数据质量、报警关联或工况边界异常；用户说“PLC DI反馈丢失，SCADA状态量和现场触点不一致怎么查”，Windrise建议“先按SCADA数据质量、报警关联或工况边界异常处理”"
+}

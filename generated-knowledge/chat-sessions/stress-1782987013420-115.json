@@ -1,0 +1,24 @@
+{
+  "updatedAt": 1782987013421,
+  "turns": [
+    {
+      "user": "你好",
+      "assistant": "你好，有什么我可以帮你的吗？"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "userName": "",
+    "favoriteColor": "",
+    "vendors": [],
+    "models": [],
+    "faultCodes": [],
+    "systems": [],
+    "components": [],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  },
+  "summary": "用户说“你好”，Windrise建议“你好，有什么我可以帮你的吗”",
+  "lastReasoningRoute": null
+}

@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Windrise 知识图谱</title>
+  <style>
+    :root {
+      --bg: #f4f6f8;
+      --panel: #ffffff;
+      --line: #d7dee8;
+      --text: #182230;
+      --muted: #667085;
+      --blue: #2563eb;
+      --green: #14804a;
+      --red: #c83e4d;
+      --orange: #c05621;
+      --teal: #087f8c;
+      --violet: #6d5bd0;
+      --slate: #475467;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 960px;
+    }
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+      padding: 14px 18px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+    .meta {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    input, select, button {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+    }
+    input {
+      width: 260px;
+      padding: 0 10px;
+    }
+    select { padding: 0 8px; }
+    button {
+      padding: 0 11px;
+      cursor: pointer;
+    }
+    button.active {
+      border-color: var(--blue);
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 700;
+    }
+    main {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr) 380px;
+    }
+    .left, .right {
+      min-height: 0;
+      overflow: auto;
+      background: var(--panel);
+    }
+    .left {
+      border-right: 1px solid var(--line);
+      padding: 12px;
+    }
+    .right {
+      border-left: 1px solid var(--line);
+      padding: 14px;
+    }
+    .stage {
+      padding: 8px 0 10px;
+      border-bottom: 1px solid #eef2f7;
+      margin-bottom: 10px;
+    }
+    .stage-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .metric {
+      border: 1px solid #e6ebf2;
+      border-radius: 7px;
+      padding: 8px;
+      background: #fafbfc;
+    }
+    .metric b {
+      display: block;
+      font-size: 18px;
+      line-height: 1.1;
+    }
+    .metric span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .type-list {
+      display: grid;
+      gap: 6px;
+    }
+    .type-item {
+      display: grid;
+      grid-template-columns: 12px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      color: #344054;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--slate);
+    }
+    .case-list {
+      display: grid;
+      gap: 7px;
+    }
+    .case-card {
+      border: 1px solid #e4e9f1;
+      border-radius: 7px;
+      padding: 8px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .case-card:hover, .case-card.active {
+      border-color: #94a3b8;
+      background: #f8fafc;
+    }
+    .case-card b {
+      display: block;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .case-card span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .graph-wrap {
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+    }
+    svg.dragging { cursor: grabbing; }
+    .edge {
+      stroke: #b7c1d0;
+      stroke-opacity: 0.55;
+      stroke-width: 1.2;
+    }
+    .edge.dim { stroke-opacity: 0.08; }
+    .edge.active {
+      stroke: #1f2937;
+      stroke-opacity: 0.92;
+      stroke-width: 2.4;
+    }
+    .node circle {
+      stroke: #fff;
+      stroke-width: 2px;
+      filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.18));
+    }
+    .node.dim { opacity: 0.18; }
+    .node.active circle {
+      stroke: #111827;
+      stroke-width: 3px;
+    }
+    .node text {
+      font-size: 11px;
+      fill: #101828;
+      paint-order: stroke;
+      stroke: #fff;
+      stroke-width: 4px;
+      stroke-linejoin: round;
+      pointer-events: none;
+    }
+    .hint {
+      position: absolute;
+      left: 14px;
+      bottom: 12px;
+      max-width: 520px;
+      padding: 8px 10px;
+      border: 1px solid #e4e9f1;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.92);
+      color: var(--muted);
+      font-size: 12px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    }
+    .detail-title {
+      margin: 0 0 6px;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #344054;
+      font-size: 11px;
+      font-weight: 700;
+      margin: 0 5px 6px 0;
+    }
+    .summary {
+      color: #344054;
+      font-size: 13px;
+      line-height: 1.55;
+      margin: 8px 0 12px;
+    }
+    .rel-list {
+      display: grid;
+      gap: 7px;
+    }
+    .rel {
+      border: 1px solid #e4e9f1;
+      border-radius: 7px;
+      padding: 8px;
+      background: #fff;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+    .rel b {
+      color: #1d4ed8;
+      margin-right: 6px;
+    }
+    .empty {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      padding: 10px;
+      border: 1px dashed #d0d7e2;
+      border-radius: 7px;
+      background: #fafbfc;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <h1>Windrise 推理知识图谱</h1>
+        <div class="meta" id="meta">加载中</div>
+      </div>
+      <div class="toolbar">
+        <input id="search" placeholder="搜索：偏航、齿轮箱、303714、滤芯压差">
+        <select id="typeFilter">
+          <option value="">全部节点</option>
+        </select>
+        <button id="showCases" class="active">案例图</button>
+        <button id="showAll">全量图</button>
+      </div>
+    </header>
+    <main>
+      <aside class="left">
+        <section class="stage">
+          <div class="stage-title">图谱指标</div>
+          <div class="metric-grid" id="metrics"></div>
+        </section>
+        <section class="stage">
+          <div class="stage-title">节点类型</div>
+          <div class="type-list" id="typeList"></div>
+        </section>
+        <section>
+          <div class="stage-title">故障案例</div>
+          <div class="case-list" id="caseList"></div>
+        </section>
+      </aside>
+      <section class="graph-wrap">
+        <svg id="graph" aria-label="知识图谱"></svg>
+        <div class="hint">点击节点查看详情；拖动画布移动视图；搜索会高亮匹配节点和一跳关系。</div>
+      </section>
+      <aside class="right">
+        <div id="detail" class="empty">点击一个故障案例或图上的节点查看关系链。</div>
+      </aside>
+    </main>
+  </div>
+  <script>
+    const colorByType = {
+      fault_case: '#c83e4d',
+      system_domain: '#2563eb',
+      subsystem: '#3b82f6',
+      system: '#4f46e5',
+      component: '#087f8c',
+      causal_factor: '#c05621',
+      symptom: '#dc2626',
+      diagnostic_signal: '#14804a',
+      diagnostic_step: '#6d5bd0',
+      action: '#256f3a',
+      mechanism_archetype: '#7c3aed',
+      mechanism_layer: '#8b5cf6',
+      failure_mode: '#b45309',
+      propagation_step: '#9333ea',
+      observable: '#0f766e',
+      verification_test: '#0369a1',
+      control_barrier: '#15803d',
+      diagnostic_hypothesis: '#a21caf',
+      discriminating_evidence: '#be185d',
+      counterfactual_test: '#0e7490',
+      decision_rule: '#a16207',
+      principle: '#475467',
+    };
+    const typeLabels = {
+      fault_case: '故障案例',
+      system_domain: '系统域',
+      subsystem: '子系统',
+      system: '系统',
+      component: '部件',
+      causal_factor: '原因',
+      symptom: '症状',
+      diagnostic_signal: '证据/信号',
+      diagnostic_step: '排查步骤',
+      action: '处理措施',
+      mechanism_archetype: '机理原型',
+      mechanism_layer: '机理层级',
+      failure_mode: '失效模式',
+      propagation_step: '传播步骤',
+      observable: '可观测量',
+      verification_test: '验证试验',
+      control_barrier: '控制屏障',
+      diagnostic_hypothesis: '竞争假设',
+      discriminating_evidence: '鉴别证据',
+      counterfactual_test: '反事实试验',
+      decision_rule: '判别规则',
+      principle: '机理',
+    };
+    const relationLabels = {
+      CAN_TRIGGER: '触发',
+      MANIFESTS_AS: '表现',
+      DIAGNOSED_BY: '证据',
+      HAS_DIAGNOSTIC_STEP: '排查',
+      MITIGATED_BY: '处理',
+      INVOLVES_COMPONENT: '涉及',
+      PRINCIPLE: '机理',
+      EXPLAINED_BY_ARCHETYPE: '机理解释',
+      HAS_MECHANISM_LAYER: '包含层级',
+      MECHANISM_PROPAGATES_TO: '传播到',
+      MECHANISM_RESULTS_IN: '形成',
+      HAS_FAILURE_MODE: '失效模式',
+      HAS_PROPAGATION_START: '传播起点',
+      HAS_PROPAGATION_STEP: '传播步骤',
+      HAS_OBSERVABLE: '观测量',
+      VALIDATES_ARCHETYPE: '验证机理',
+      VERIFIED_BY_TEST: '验证试验',
+      CONTROLLED_BY_BARRIER: '控制屏障',
+      HAS_COMPETING_HYPOTHESIS: '竞争假设',
+      DISCRIMINATES_ARCHETYPE: '鉴别机理',
+      REQUIRES_DISCRIMINATING_EVIDENCE: '需要证据',
+      RESOLVED_BY_COUNTERFACTUAL_TEST: '反事实试验',
+      HAS_DECISION_RULE: '判别规则',
+    };
+
+    const svg = document.getElementById('graph');
+    const meta = document.getElementById('meta');
+    const metrics = document.getElementById('metrics');
+    const typeList = document.getElementById('typeList');
+    const caseList = document.getElementById('caseList');
+    const detail = document.getElementById('detail');
+    const search = document.getElementById('search');
+    const typeFilter = document.getElementById('typeFilter');
+    const showCases = document.getElementById('showCases');
+    const showAll = document.getElementById('showAll');
+
+    let graph = null;
+    let nodes = [];
+    let edges = [];
+    let byId = new Map();
+    let activeId = '';
+    let mode = 'cases';
+    let view = { x: 0, y: 0, scale: 1 };
+    let dragging = null;
+
+    fetch('windrise-reasoning-graph.json')
+      .then(response => response.json())
+      .then(data => {
+        graph = data;
+        byId = new Map((data.nodes || []).map(node => [node.id, node]));
+        nodes = (data.nodes || []).map((node, index) => ({ ...node, index, x: 0, y: 0 }));
+        edges = (data.edges || []).filter(edge => byId.has(edge.source) && byId.has(edge.target));
+        byId = new Map(nodes.map(node => [node.id, node]));
+        init();
+      });
+
+    function init() {
+      meta.textContent = `节点 ${nodes.length} · 关系 ${edges.length} · 加权别名 ${graph.weighted_aliases?.length || 0} · 案例画像 ${graph.retrieval_profiles?.length || 0}`;
+      renderMetrics();
+      renderTypeControls();
+      renderCaseList();
+      layout();
+      render();
+      selectNode(nodes.find(node => node.type === 'fault_case')?.id || nodes[0]?.id || '');
+    }
+
+    function renderMetrics() {
+      const summary = graph.quality_summary || {};
+      metrics.innerHTML = [
+        ['节点', summary.node_count || nodes.length],
+        ['关系', summary.edge_count || edges.length],
+        ['案例', summary.fault_case_count || nodes.filter(n => n.type === 'fault_case').length],
+        ['质量均值', summary.average_profile_quality || '-'],
+      ].map(([label, value]) => `<div class="metric"><b>${escapeHtml(value)}</b><span>${escapeHtml(label)}</span></div>`).join('');
+    }
+
+    function renderTypeControls() {
+      const counts = countBy(nodes, node => node.type);
+      const types = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+      typeFilter.innerHTML = '<option value="">全部节点</option>' + types
+        .map(type => `<option value="${escapeHtml(type)}">${escapeHtml(typeLabels[type] || type)}</option>`)
+        .join('');
+      typeList.innerHTML = types.map(type => `
+        <div class="type-item">
+          <span class="dot" style="background:${color(type)}"></span>
+          <span>${escapeHtml(typeLabels[type] || type)}</span>
+          <span>${counts[type]}</span>
+        </div>
+      `).join('');
+    }
+
+    function renderCaseList() {
+      const profiles = [...(graph.retrieval_profiles || [])]
+        .filter(profile => byId.has(profile.case_id))
+        .sort((a, b) => (b.quality_score || 0) - (a.quality_score || 0));
+      caseList.innerHTML = profiles.map(profile => `
+        <div class="case-card ${profile.case_id === activeId ? 'active' : ''}" data-id="${escapeHtml(profile.case_id)}">
+          <b>${escapeHtml(profile.label)}</b>
+          <span>质量 ${profile.quality_score || 0} · ${escapeHtml(profile.system || '清洗案例')}</span>
+        </div>
+      `).join('');
+      caseList.querySelectorAll('.case-card').forEach(card => {
+        card.onclick = () => selectNode(card.dataset.id);
+      });
+    }
+
+    function layout() {
+      const rect = svg.getBoundingClientRect();
+      const width = Math.max(rect.width, 900);
+      const height = Math.max(rect.height, 680);
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      const visible = baseVisibleNodes();
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const cases = visible.filter(node => node.type === 'fault_case');
+      const others = visible.filter(node => node.type !== 'fault_case');
+      placeRing(cases, centerX, centerY, Math.min(width, height) * 0.18, -0.4);
+      const groups = groupBy(others, node => node.type);
+      let ring = 0;
+      for (const type of Object.keys(groups).sort()) {
+        placeRing(groups[type], centerX, centerY, Math.min(width, height) * (0.31 + ring * 0.06), ring * 0.31);
+        ring += 1;
+      }
+      relax(visible, 80, width, height);
+    }
+
+    function placeRing(items, cx, cy, radius, offset) {
+      const count = Math.max(1, items.length);
+      items.forEach((node, index) => {
+        const angle = (Math.PI * 2 * index) / count + offset;
+        node.x = cx + Math.cos(angle) * radius;
+        node.y = cy + Math.sin(angle) * radius;
+      });
+    }
+
+    function relax(visible, iterations, width, height) {
+      const visibleIds = new Set(visible.map(node => node.id));
+      const visibleEdges = edges.filter(edge => visibleIds.has(edge.source) && visibleIds.has(edge.target));
+      for (let i = 0; i < iterations; i += 1) {
+        for (const edge of visibleEdges) {
+          const source = byId.get(edge.source);
+          const target = byId.get(edge.target);
+          const dx = target.x - source.x;
+          const dy = target.y - source.y;
+          const dist = Math.max(1, Math.hypot(dx, dy));
+          const ideal = source.type === 'fault_case' || target.type === 'fault_case' ? 150 : 210;
+          const force = (dist - ideal) * 0.0028;
+          source.x += (dx / dist) * force;
+          source.y += (dy / dist) * force;
+          target.x -= (dx / dist) * force;
+          target.y -= (dy / dist) * force;
+        }
+        for (let a = 0; a < visible.length; a += 1) {
+          for (let b = a + 1; b < visible.length; b += 1) {
+            const one = visible[a];
+            const two = visible[b];
+            const dx = two.x - one.x;
+            const dy = two.y - one.y;
+            const dist = Math.max(1, Math.hypot(dx, dy));
+            if (dist > 58) continue;
+            const push = (58 - dist) * 0.012;
+            one.x -= (dx / dist) * push;
+            one.y -= (dy / dist) * push;
+            two.x += (dx / dist) * push;
+            two.y += (dy / dist) * push;
+          }
+        }
+      }
+      visible.forEach(node => {
+        node.x = clamp(node.x, 40, width - 180);
+        node.y = clamp(node.y, 36, height - 36);
+      });
+    }
+
+    function render() {
+      const visible = filteredVisibleNodes();
+      const visibleIds = new Set(visible.map(node => node.id));
+      const activeIds = relatedIds(activeId);
+      const query = normalizedQuery();
+      svg.replaceChildren();
+      const root = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      root.setAttribute('transform', `translate(${view.x},${view.y}) scale(${view.scale})`);
+      svg.append(root);
+
+      for (const edge of edges) {
+        if (!visibleIds.has(edge.source) || !visibleIds.has(edge.target)) continue;
+        const source = byId.get(edge.source);
+        const target = byId.get(edge.target);
+        const isActive = activeId && (edge.source === activeId || edge.target === activeId);
+        const isDim = (activeId && !isActive) || (query && !matchesNode(source, query) && !matchesNode(target, query));
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('class', `edge${isActive ? ' active' : ''}${isDim ? ' dim' : ''}`);
+        line.setAttribute('x1', source.x);
+        line.setAttribute('y1', source.y);
+        line.setAttribute('x2', target.x);
+        line.setAttribute('y2', target.y);
+        root.append(line);
+      }
+
+      for (const node of visible) {
+        const isActive = node.id === activeId;
+        const isRelated = activeIds.has(node.id);
+        const isMatch = !query || matchesNode(node, query);
+        const isDim = (activeId && !isActive && !isRelated) || (query && !isMatch && !isRelated);
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('class', `node${isActive ? ' active' : ''}${isDim ? ' dim' : ''}`);
+        group.setAttribute('transform', `translate(${node.x},${node.y})`);
+        group.onclick = event => {
+          event.stopPropagation();
+          selectNode(node.id);
+        };
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('r', radius(node));
+        circle.setAttribute('fill', color(node.type));
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', radius(node) + 7);
+        text.setAttribute('y', 4);
+        text.textContent = truncate(node.label, node.type === 'fault_case' ? 26 : 20);
+        group.append(circle, text);
+        root.append(group);
+      }
+    }
+
+    function selectNode(id) {
+      if (!id || !byId.has(id)) return;
+      activeId = id;
+      const node = byId.get(id);
+      const profile = (graph.retrieval_profiles || []).find(item => item.case_id === id);
+      const relations = edges
+        .filter(edge => edge.source === id || edge.target === id)
+        .slice(0, 80);
+      detail.innerHTML = `
+        <h2 class="detail-title">${escapeHtml(node.label)}</h2>
+        <div>
+          <span class="tag">${escapeHtml(typeLabels[node.type] || node.type)}</span>
+          ${profile ? `<span class="tag">质量 ${profile.quality_score || 0}</span>` : ''}
+          ${profile?.system ? `<span class="tag">${escapeHtml(profile.system)}</span>` : ''}
+        </div>
+        ${profile?.summary ? `<div class="summary">${escapeHtml(profile.summary)}</div>` : ''}
+        ${profile ? renderProfile(profile) : ''}
+        <div class="stage-title">一跳关系 ${relations.length}</div>
+        <div class="rel-list">
+          ${relations.map(edge => renderRelation(edge)).join('') || '<div class="empty">没有一跳关系</div>'}
+        </div>
+      `;
+      renderCaseList();
+      render();
+    }
+
+    function renderProfile(profile) {
+      const terms = [
+        ['高置信词', profile.high_confidence_terms],
+        ['症状', profile.symptom_terms],
+        ['信号', profile.signal_terms],
+        ['原因', profile.cause_terms],
+        ['机理', profile.mechanism_terms],
+        ['失效模式', profile.failure_mode_terms],
+        ['验证', profile.verification_terms],
+        ['竞争假设', profile.hypothesis_terms],
+        ['判别规则', profile.decision_terms],
+        ['排查', profile.diagnostic_step_terms],
+      ].filter(([, values]) => values?.length);
+      return terms.map(([label, values]) => `
+        <div class="stage">
+          <div class="stage-title">${escapeHtml(label)}</div>
+          ${values.slice(0, 10).map(value => `<span class="tag">${escapeHtml(value)}</span>`).join('')}
+        </div>
+      `).join('');
+    }
+
+    function renderRelation(edge) {
+      const source = byId.get(edge.source);
+      const target = byId.get(edge.target);
+      return `
+        <div class="rel">
+          <b>${escapeHtml(relationLabels[edge.type] || edge.type)}</b>
+          ${escapeHtml(source?.label || edge.source)} -> ${escapeHtml(target?.label || edge.target)}
+        </div>
+      `;
+    }
+
+    function baseVisibleNodes() {
+      if (mode === 'all') return nodes;
+      const allowedTypes = new Set([
+        'fault_case',
+        'system_domain',
+        'subsystem',
+        'component',
+        'symptom',
+        'diagnostic_signal',
+        'diagnostic_step',
+        'action',
+        'causal_factor',
+        'mechanism_archetype',
+        'mechanism_layer',
+        'failure_mode',
+        'propagation_step',
+        'observable',
+        'verification_test',
+        'control_barrier',
+        'diagnostic_hypothesis',
+        'discriminating_evidence',
+        'counterfactual_test',
+        'decision_rule',
+      ]);
+      return nodes.filter(node => allowedTypes.has(node.type));
+    }
+
+    function filteredVisibleNodes() {
+      const query = normalizedQuery();
+      const selectedType = typeFilter.value;
+      let visible = baseVisibleNodes().filter(node => !selectedType || node.type === selectedType);
+      if (query) {
+        const matched = new Set(visible.filter(node => matchesNode(node, query)).map(node => node.id));
+        for (const edge of edges) {
+          if (matched.has(edge.source)) matched.add(edge.target);
+          if (matched.has(edge.target)) matched.add(edge.source);
+        }
+        visible = visible.filter(node => matched.has(node.id));
+      }
+      if (activeId) {
+        const activeSet = relatedIds(activeId);
+        activeSet.add(activeId);
+        const activeVisible = visible.filter(node => activeSet.has(node.id));
+        if (activeVisible.length >= 2 && activeVisible.length <= 140) return activeVisible;
+      }
+      return visible.slice(0, mode === 'all' ? 520 : 360);
+    }
+
+    function relatedIds(id) {
+      const result = new Set();
+      for (const edge of edges) {
+        if (edge.source === id) result.add(edge.target);
+        if (edge.target === id) result.add(edge.source);
+      }
+      return result;
+    }
+
+    function matchesNode(node, query) {
+      const text = [node.label, node.type, ...(node.aliases || [])].join(' ').toLowerCase();
+      return text.includes(query);
+    }
+
+    function normalizedQuery() {
+      return search.value.trim().toLowerCase();
+    }
+
+    function countBy(items, keyFn) {
+      return items.reduce((acc, item) => {
+        const key = keyFn(item);
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function groupBy(items, keyFn) {
+      return items.reduce((acc, item) => {
+        const key = keyFn(item);
+        (acc[key] ||= []).push(item);
+        return acc;
+      }, {});
+    }
+
+    function color(type) {
+      return colorByType[type] || '#64748b';
+    }
+
+    function radius(node) {
+      if (node.type === 'fault_case') return 17;
+      if (node.type === 'system_domain') return 15;
+      if (node.type === 'subsystem') return 13;
+      return 10;
+    }
+
+    function truncate(value, max) {
+      const text = String(value || '');
+      return text.length > max ? `${text.slice(0, max - 1)}...` : text;
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      }[char]));
+    }
+
+    search.addEventListener('input', () => render());
+    typeFilter.addEventListener('change', () => {
+      layout();
+      render();
+    });
+    showCases.onclick = () => {
+      mode = 'cases';
+      showCases.classList.add('active');
+      showAll.classList.remove('active');
+      layout();
+      render();
+    };
+    showAll.onclick = () => {
+      mode = 'all';
+      showAll.classList.add('active');
+      showCases.classList.remove('active');
+      layout();
+      render();
+    };
+    svg.addEventListener('click', () => {
+      activeId = '';
+      detail.innerHTML = '<div class="empty">点击一个故障案例或图上的节点查看关系链。</div>';
+      renderCaseList();
+      render();
+    });
+    svg.addEventListener('pointerdown', event => {
+      dragging = { x: event.clientX, y: event.clientY, vx: view.x, vy: view.y };
+      svg.classList.add('dragging');
+      svg.setPointerCapture(event.pointerId);
+    });
+    svg.addEventListener('pointermove', event => {
+      if (!dragging) return;
+      view.x = dragging.vx + event.clientX - dragging.x;
+      view.y = dragging.vy + event.clientY - dragging.y;
+      render();
+    });
+    svg.addEventListener('pointerup', event => {
+      dragging = null;
+      svg.classList.remove('dragging');
+      svg.releasePointerCapture(event.pointerId);
+    });
+    svg.addEventListener('wheel', event => {
+      event.preventDefault();
+      const next = clamp(view.scale * (event.deltaY > 0 ? 0.92 : 1.08), 0.45, 2.2);
+      view.scale = next;
+      render();
+    }, { passive: false });
+    window.addEventListener('resize', () => {
+      if (!graph) return;
+      layout();
+      render();
+    });
+  </script>
+</body>
+</html>

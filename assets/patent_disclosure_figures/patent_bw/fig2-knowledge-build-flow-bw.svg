@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="860" viewBox="0 0 1400 860">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#111"/>
+    </marker>
+    <style>
+      .title{font:700 30px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .text{font:400 18px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .small{font:400 15px "Noto Sans SC","Microsoft YaHei",Arial,sans-serif;fill:#111}
+      .box{fill:#fff;stroke:#111;stroke-width:2}
+      .line{stroke:#111;stroke-width:2;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1400" height="860" fill="#fff"/>
+  <text x="70" y="70" class="title">图2 资料接入至知识构建的方法流程图</text>
+
+  <rect x="90" y="150" width="240" height="120" class="box"/>
+  <text x="125" y="195" class="text">S1 接收资料</text>
+  <text x="125" y="230" class="small">手册、故障码表、记录</text>
+  <path d="M330 210 H430" class="line"/>
+
+  <rect x="430" y="150" width="240" height="120" class="box"/>
+  <text x="465" y="195" class="text">S2 抽取字段</text>
+  <text x="465" y="230" class="small">故障码、机型、原因</text>
+  <path d="M670 210 H770" class="line"/>
+
+  <rect x="770" y="150" width="240" height="120" class="box"/>
+  <text x="805" y="195" class="text">S3 标准化</text>
+  <text x="805" y="230" class="small">统一名称并保留别名</text>
+  <path d="M1010 210 H1110" class="line"/>
+
+  <rect x="1110" y="150" width="240" height="120" class="box"/>
+  <text x="1145" y="195" class="text">S4 构建关系</text>
+  <text x="1145" y="230" class="small">形成可计算领域知识</text>
+
+  <path d="M1230 270 V365 H210 V430" class="line"/>
+
+  <rect x="90" y="430" width="310" height="130" class="box"/>
+  <text x="125" y="475" class="text">S5 生成知识库</text>
+  <text x="125" y="510" class="small">索引、知识页、图谱、质量报告</text>
+  <path d="M400 495 H540" class="line"/>
+
+  <rect x="540" y="430" width="310" height="130" class="box"/>
+  <text x="575" y="475" class="text">S6 挂接故障机理</text>
+  <text x="575" y="510" class="small">按系统、部件、表现归纳</text>
+  <path d="M850 495 H990" class="line"/>
+
+  <rect x="990" y="430" width="310" height="130" class="box"/>
+  <text x="1025" y="475" class="text">S7 供问答检索</text>
+  <text x="1025" y="510" class="small">限定范围、召回证据、生成答案</text>
+
+  <rect x="170" y="690" width="1060" height="80" class="box"/>
+  <text x="210" y="738" class="text">输出：可检索知识库、可阅读知识页、领域关系图谱、故障机理知识和质量统计信息</text>
+</svg>

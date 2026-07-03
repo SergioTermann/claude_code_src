@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="work_order_systems">
+        <item>待确认系统</item>
+        <item>变桨系统</item>
+        <item>偏航系统</item>
+        <item>传动链/齿轮箱</item>
+        <item>发电机系统</item>
+        <item>变流器系统</item>
+        <item>叶片系统</item>
+        <item>通信/SCADA</item>
+    </string-array>
+
+    <string-array name="work_order_priorities">
+        <item>P1 紧急</item>
+        <item>P2 高</item>
+        <item>P3 普通</item>
+        <item>P4 计划</item>
+    </string-array>
+
+    <string-array name="work_order_action_types">
+        <item>故障抢修</item>
+        <item>巡检消缺</item>
+        <item>预防性维护</item>
+        <item>远程复位/观察</item>
+    </string-array>
+</resources>

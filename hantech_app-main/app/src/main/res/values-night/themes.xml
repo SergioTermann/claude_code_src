@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- 风起时域夜间主题 -->
+    <style name="Theme.Hantech" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <!-- 主色调 - 绿色（夜间模式） -->
+        <item name="colorPrimary">@color/green_200</item>
+        <item name="colorPrimaryVariant">@color/green_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- 辅助色 -->
+        <item name="colorSecondary">@color/green_200</item>
+        <item name="colorSecondaryVariant">@color/green_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- 状态栏颜色 -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- FAB 颜色 -->
+        <item name="colorAccent">@color/green_200</item>
+    </style>
+</resources>

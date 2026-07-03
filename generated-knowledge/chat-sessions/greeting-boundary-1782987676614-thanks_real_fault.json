@@ -1,0 +1,39 @@
+{
+  "updatedAt": 1782987676651,
+  "turns": [
+    {
+      "user": "谢谢，变流器板卡还带电，我能不能先插拔一下看是否恢复？",
+      "assistant": "最可能判断：不能带电插拔变流器板卡或功率模块，也不能在直流母线未放电时检查。\n现场验证：停机断电挂牌，等待直流母线放电并实测母线电压。\n合格标准：母线电压低于厂家维护手册允许值、无残余电压和误送电风险后，才允许开柜检查。\n安全约束：禁止带电插拔板卡，禁止未验电接触母线，禁止单人进行高压柜内操作。\n复位前确认：确认电压频率、母线电压、保护记录和接触器/断路器反馈正常后，再按权限复位。\n做完反馈：母线电压、验电结果、放电等待时间、保护记录、机型/厂家。"
+    }
+  ],
+  "memory": {
+    "topic": "",
+    "userName": "",
+    "favoriteColor": "",
+    "vendors": [],
+    "models": [],
+    "faultCodes": [],
+    "systems": [],
+    "components": [
+      "直流母线",
+      "断路器"
+    ],
+    "symptoms": [],
+    "actions": [],
+    "pendingFeedback": []
+  },
+  "summary": "相关部件：直流母线、断路器；当前排查主线：电网、箱变或并网保护异常；用户说“谢谢，变流器板卡还带电，我能不能先插拔一下看是否恢复”，Windrise建议“不能带电插拔变流器板卡或功率模块，也不能在直流母线未放电时检查”",
+  "lastReasoningRoute": {
+    "case": {
+      "id": "case:converter_igbt",
+      "label": "变流器IGBT板卡故障"
+    },
+    "system_domain": {
+      "id": "domain:converter_electrical",
+      "label": "变流器与电气系统",
+      "signals": [],
+      "first_actions": []
+    },
+    "subsystem": null
+  }
+}

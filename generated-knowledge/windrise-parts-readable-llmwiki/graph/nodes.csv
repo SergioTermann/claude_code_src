@@ -1,0 +1,720 @@
+id,type,label,count
+action:850ea554d574,action,2 变流器原理 块与 INU 模块对调，通过故障转移的方式确认了,9
+action:c96a781d609e,action,更换 INU 流流量偏少，如图 2 所示,8
+action:78f9d7504c38,action,流器 IGBT 模块故障报文，确认为 INU 2W SC 故,8
+action:b6527d58235a,action,障，初步分析为 IGBT 驱动板工况不稳定，更换 INU,8
+action:5341f6c2148f,action,研究采用传动链振动在线监测系统、热成像及内窥镜检查等综合诊,8
+action:6fe8c7330676,action,断方法，确认故障主要由轴承复合磨损引起，表现为内圈剥落、外圈15%覆盖率损伤及滚动体凹坑，通过,8
+action:f3c6e2038ad7,action,实施四级处理方案实现对故障的有效处理，为风电机组主轴维护提供了可推广的技术方案,8
+action:600b0d0896f8,action,检查内部滚子和保持架时发现保支架间,8
+action:b22469bb72dc,action,通过测量剥落 检查轴承支座安装未存在位移、检查固定螺栓未存,8
+action:709808247c94,action,区面积与轴承接触面积比值，证实轴承已进入加速 在松动、检查齿轮箱弹性支撑正常、固定螺栓未存,8
+action:704f579138e4,action,对其它部件进行检查发现,7
+action:236ae17bbe6b,action,力进行了改进，通过运行观察发现 IGBT 板卡故障,7
+action:9aca3e53a9f8,action,变流器 IG B T 板卡故障处理效果分析 影响[J].2021，15(11):22-33.,7
+action:8ede80693535,action,模块的次数为 3 次，需单独更换 IGBT 板卡的次数 [4] 李济.风电变流器中 IGBT 常见故障分析及应对措施[J].机电信息，,7
+action:6af612ade818,action,图4 现场安装通通风机实物图 再次为变压器上电进行绝缘检查时，绝缘值都比较,7
+action:b12155a067ae,action,压力异常故障处理全流程解析,7
+action:3fda93cc9242,action,"目前,国内外学者围绕风电机组液压系统故障诊断开 与此同时,现场测试获取了如下关键数据 ：",7
+action:99e97efa1a7c,action,障的处理提供重要的理论依据和实践指导,7
+action:01b4383f3dc2,action,"原理溯源及现场多维度测试,系统开展故障诊断,并提出",7
+action:afabe777e8cf,action,"为后续的设备维护、故障排查和系统升级提供可靠的图纸 本研究提出的故障诊断方法和处理经验,为同类风电",7
+action:2e3cafbd6165,action,"维护优化 ：将缓冲器检查工作纳入季度定期维护项目 究进一步聚焦液压系统隐蔽元件的可靠性设计问题,深入",7
+action:211800d2e29a,action,"体系,制定标准化、规范化的检查作业流程和详细的检查 探索更为先进、高效的故障诊断和预防技术,为风电产业",7
+action:d441241b0298,action,主轴磨损故障现场诊断与检查,7
+action:5c0e0cd50a28,action,综合振动分析、热成像检测及内窥镜检查结果，,7
+action:9191123919fb,action,主轴磨损故障处理,7
+action:961b41f6ac91,action,应急处理措施,7
+action:d73023022aed,action,在故障确认后，检修团队立即 组高海拔地区运维规范》，新增12项高海拔专项条,7
+action:63ffbbc59edd,action,启动应急处理程序 ：首先实施紧急停机操作，切断 款,7
+action:bff90a896446,action,故障分析及处理,7
+action:a29552ba68c4,action,机组电控系统或测量仪器采集信号时，可能受到各种干 22# 机报发电机绕组温度高故障，查看故障手册故障值为,7
+action:ec1bb6e7a064,action,这种误差轻则使测量准确度降低，重则使测量 120℃,7
+action:07fdc0c7c47d,action,用于发电机绕组温度测量的电子 常,7
+action:606987e4aaff,action,（10.2）进行拆卸检查,6
+action:ec5809d9c0d2,action,"检查过程中发现,该截止阀的阀门处 的安装工艺安装回原处",6
+action:b863f41c2440,action,"于完全拧开状态,与设计图纸要求完全相符,且未发现阀门 观察发现,偏航结束后偏航回路压力上升速度仍未达到正",6
+action:b007c51bbc96,action,"再次启动液压站, 动器油管中间的阻尼缓冲器存在堵塞故障的可能性",6
+action:5d67792dc67e,action,定差节流阀（22.1）等关键组件展开逐一细致检查,5
+action:ceb14a4f7a87,action,（1）主回路测试 ：运用高精度压力测量仪器对主回,5
+action:af97e1c0316b,action,"此时,所有换向阀均保持初始状态,未发生换向动作,液 路压力进行测量,测量结果显示主回路压力处于正常范围",5
+action:051cd4d3e090,action,"回路压力上升至 150 bar 及随后的 5 min 时间内,对系统 综合以上两项测试结果,可以初步排除主回路存在故障的",5
+action:b47bf3e3a2b5,action,启机并网观察数据， 测量误差大的原因很可能是温度传感器在发电机内部存在,2
+action:e0fcdd7e15a3,action,再仔细检查发电机 结论,2
+action:55504f127df4,action,启机并网观察数据，发电机绕组温度值仍然存在较大的跳 的交变电磁场，这对绕组温度测量和信号传输产生较大的干,2
+action:3c32360a5f14,action,由这个故障处理,2
+action:afb11f277a4e,action,变流器散热风扇一直在启动状态，但 K8 接触器却,1
+action:6def0d5e7556,action,检查温度传感器未见异常，拆卸 K8 接,1
+action:5ffef1852619,action,了十几回用电负荷，其中大部分为电机负载，并且 故障发生后能及时更换，保障发电量,1
+action:e99e6b6d0dcd,action,（2）定期清理或更换变流器通风滤网，保证,1
+action:39fca5c826fd,action,边毗邻煤场，存在较大的煤粉尘影响，容易造成驱 的巡检以及采取相应防潮措施，例如定期更换变流,1
+action:d658eb2ef836,action,现场经测试分析，发现变流器散热 热电机功率、增加工业风扇来加速空气对流、延伸,1
+action:14fb64170e12,action,为 240W，散热风量仅为 4950m3/h，实际测量和计 实际情况适时对变流器和塔筒门散热电机的控制,1
+action:7fe46bf317e3,action,算，散热风量不能满足变流器 6000 m3/h 的散热要 参数进行更改，例如将塔筒门风扇温控器风扇启动,1
+action:2be4d88cc993,action,响了变流器散热的烟囱效应，虽然塔筒内部增加了 面氧化、锈蚀进行处理,1
+action:2a7fd54c65f4,action,定期完成设备的检查和卫,1
+action:5f4e716a8e92,action,"运行状态进行详细监测,观察到以下现象 ：液压站电机仅 可能性",1
+action:d7a81018b563,action,"基于上述现象,初步判断可排除除偏航回路 对液压站进行断电处理,并释放系统内部压力",1
+action:bb09a3263762,action,"换向阀（14.2）两个常闭阀存在密封不严、无法有效封油 经细致观察发现,偏航结束后偏航回路压力上升依旧呈现",1
+action:659602058e88,action,"待其恢复正常运行状态后观察发现,偏航结束后偏航回路压 （7）为获取更全面准确的系统信息,与液压站厂家进",1
+action:597e43cefda2,action,进行拆卸检查,1
+action:e6566256d719,action,"向阀中的小球,观察到小球能够顺畅移动,未出现卡滞现象, 的双重缓冲功能,以提高系统运行的稳定性和可靠性",1
+action:fcd18426a2f1,action,"完成安装后,恢复液压站正常运行后持续观察,发现偏航 （8）在液压站断电泄压的安全前提下,对图 3 中标蓝",1
+action:f521ee44358d,action,节流阀（22.1）进行检查,1
+action:21cdadab9626,action,"检查发现该节流阀的阀门可在 产生吸附作用,导致无法直接取出",1
+action:4ff209d0d63d,action,"经仔细观察,发现柱",1
+action:d1ac5cb87b35,action,"对该孔洞进行清理,清理完毕将柱塞",1
+action:633dd582b019,action,"记必须对齐（该阀门出厂设定状态为拧紧后逆时针回旋约 旋紧复位,并恢复液压站到正常状态",1
+action:d04c11e71829,action,"将定差节流阀（22.1）拆卸后进行全面检查,未发 束后偏航回路压力在 11 s 后迅速上升至 153 bar 左右,同",1
+action:9d6853b3f86c,action,"之后,恢复液压站正常运行状态并进行观察,结果显 尼缓冲器存在堵塞故障",1
+action:fe3fdcb29b45,action,"由此可判断,定差节流阀（22.1） 故障处理与预防措施",1
+action:e23243cc6c63,action,（6）经过对截止阀（10.2）、电磁换向阀（15.2）、单 一、故障处理,1
+action:9e2b8e4661a1,action,"主要功能是抑制偏航制动时偏航回路压力的过快上升,确 进型,φ5 mm）进行更换,从根本上解决原缓冲器存在的",1
+action:0161a0171838,action,"阻尼缓冲器的孔洞进行照射观察,发现孔洞透光性良好, 图纸更新 ：对液压系统图纸进行全面修订和完善,在",1
+action:9a80b353a07c,action,"定期对缓冲器进行全面检查、清洁、保养和性能测试, 的可持续发展提供坚实的技术支撑",1
+action:0f7849d69250,action,及时发现潜在的故障隐患并进行处理,1
+action:a99994c066e7,action,式中 ：xi 为振动信号采样值，μ 为均值，σ 为标 表2 拆解检查结果汇总,1
+action:b458469cef5a,action,检查项目 检查结果 允许值 超标程度,1
+action:5c8d010a23ef,action,1.2 内窥镜检查 内圈剥落尺寸 无 —,1
+action:355f595c23cf,action,确认机组主轴系统存在复合型磨损故障，主要表现,1
+action:b8d060eee6f3,action,结果 ：高海拔地区昼夜温差大（日温差达25℃）导 通过现场检查可判定，本次故障的诱因主要体,1
+action:6994ae4460a0,action,达 D4级（严重损伤阶段），必须立即停机处理,1
+action:420a67852097,action,建议采取四级处理方案 ：一级处理为立即停机并更 安装工艺存在缺陷,1
+action:6af56db83d50,action,二级处理包括主轴轴颈抛光修复（粗 0.15mm（标准要求≤0.05mm），造成附加偏心载,1
+action:0bef1dd0c15b,action,三级处理涉及润滑系 荷,1
+action:2aaa1ea53fea,action,四级处理为后续加装 强度是平原的1.8倍，导致密封件提前老化，日温差,1
+action:9a167efa42d0,action,2 故障现场检查 由此可以判定，本次轴承故障的发生是由直接,1
+action:a3cb502043e1,action,运维人员在工程现场进行检查的结果汇总如表2 原因和根本原因共同作用导致的系统性失效问题,1
+action:1b2fff027a81,action,现场运维人员对 A22风机对主轴进行检查，上 因及其影响程度，表4从管理维度深入剖析故障发,1
+action:56ce27d4e81c,action,塔打开止推轴承齿轮箱侧端盖检查，发现轴承油脂 生的系统性原因,1
+action:1b64bf0ca14d,action,内窥镜检查影像 和气象数据,1
+action:2d6cf8e60ea8,action,随后对主轴系统进行临时性处理 ：彻底排空污 理维度，将非计划停机损失纳入 KPI 考核，与维护,1
+action:6717b46017e7,action,考虑到其他机组存在类似 作开发新型自修复润滑脂，实验室测试显示其磨粒,1
+action:5e0abbd16c8d,action,组存在早期磨损征兆，及时安排计划性维护避免故 年非计划停机次数减少72%，验证了处理方案的有,1
+action:81f29b3360ce,action,部件修复与更换方案,1
+action:69b46a45dc27,action,根据拆解检查结果制定 入集团标准故障库,1
+action:5dbde5f52b3b,action,分级处理方案 ：对于剥落面积超过10% 的轴承组件 综上所述，本文形成的技术方案和管理经验，可,1
+action:02d613217533,action,实施整体更换，选用改进型密封结构的 SKF CARB 为高海拔地区风电机组的可靠运行提供重要参考，对,1
+action:61811c6a74d5,action,口密封更换为迷宫式 + 磁性流体复合密封，实测防,1
+action:933ddbdefa1d,action,测量仪和超声波探伤检测，确保修复质量符合 IEC 224.,1
+action:36d480eac588,action,一台功率为 3.0MW 机组，发电机绕组温度测量系统如 些问题，如接入机舱控制柜的各种电缆和信号线的工艺较,1
+action:8303fdff40bd,action,图 1 所示，定子采用了 6 套 Pt100 温度传感器测量绕组温 差，特别是现场安装单位接线很不规范，以至于机舱柜和,1
+action:092f3afd24a1,action,电机旁边的机舱柜内的巴赫曼 PLC，最后经 PLC 处理发送,1
+action:29e93915429a,action,图1 风电机组发电机绕组温度测量系统,1
+action:6af679ac9c8f,action,用信号叠加一并送入后面的测量电路，直接成为干扰信号，,1
+action:98183a565779,action,故障处理方案 图3 机舱底板下方布线混乱,1
+action:97244d212908,action,自发电机外部，那么需要重新布线或更换信号电缆,1
+action:8529fc747ecd,action,（1）先用万用表测量传感器的阻值是否正常，以初步,1
+action:71080af192d8,action,1Ω 则需更换传感器,1
+action:95cfb9172480,action,检查信号接地是否正常，以排查受电磁干扰的,1
+action:fb5532751e21,action,故障处理过程 图5 2V相绕组温度瞬态曲线－处理之后,1
+action:333b7476b333,action,对换通道，观察机组在停机和并网时就地面板显示的环境 所以故障原因可确定为发电机温度信号受到了电磁干扰,1
+action:ab4902ba4561,action,试验结果是 ：环境温度值波动较 经检查发现，从发电机温度传感器接线盒至机舱控制柜,1
+action:450caa794c74,action,通过更换信号电缆，可以将干扰范围缩 可知，处理模拟量信号采集和传输失真的问题，应考虑受电,1
+action:0eb36eb53201,action,启机并网观察发电机绕组温度数据 ：面板显示 磁干扰原因，逐步缩小受干扰范围，最终找到干扰源,1
+action:1f406e5f7f27,action,除 2V 相之外其余绕组温度跳变幅值和频率都很小，温度传 扰信号进行测试，是分析干扰的前提,1
+causal_factor:9c00c951b8ce,causal_factor,分析,15
+causal_factor:f294860a1629,causal_factor,摘 要：通过对某风场 2MW 风电机组多次出现的变流器 IGBT 板卡故障进行分析，总结可能造成变流器 IGBT,9
+causal_factor:94c6d4a70a65,causal_factor,间的电压幅度和相位同步），定子断路器/接触器即,9
+causal_factor:671241e8b8e2,causal_factor,该风电场 2MW 风力发电机组为双馈型机组， 流器时，断路器断开，转子通过变浆控制和机械抱,9
+causal_factor:1979c49b4b91,causal_factor,的定子回路通过定子断路器连接到三相电网，转子,9
+causal_factor:52dd12eadd47,causal_factor,素相对较多,9
+causal_factor:c07c1dc39234,causal_factor,数 2.0~3.0 5.3 76.7%,9
+causal_factor:d221b1523195,causal_factor,确定故障元件为 INU 模块的 V 相 IGBT 驱 1.5m），造成从导流罩抽送至二层以上空间的热气,8
+causal_factor:972b4a3e5fcc,causal_factor,动板损坏，从而引起了变流器高温停机,8
+causal_factor:a80a54d087da,causal_factor,侧其他故障触发、变流器转子侧故障触发，导出变,8
+causal_factor:381e07a0981e,causal_factor,波动造成的，电网电压的不稳定极易导致 IGBT 驱 力着手，具体有效措施如下,8
+causal_factor:451e78493ca1,causal_factor,摘要：本文针对某云南高海波地区风电场风电机组主轴系统频发磨损故障问题，通过多维度诊断分析揭示,8
+causal_factor:6fe8c7330676,causal_factor,断方法，确认故障主要由轴承复合磨损引起，表现为内圈剥落、外圈15%覆盖率损伤及滚动体凹坑，通过,8
+causal_factor:c9388fdc9348,causal_factor,主轴磨损,8
+causal_factor:df4c349fd173,causal_factor,向变化快等极端工况，导致主轴系统故障率较平原 本案例在对风电机组主轴故障诊断过程中，选,8
+causal_factor:4f1ea6e8cee6,causal_factor,1 主轴磨损故障现场诊断与检查,8
+causal_factor:4ff62f2e0e8e,causal_factor,密封唇口磨损 1.2mm ≤0.3mm 300%,8
+causal_factor:51a7d6b6c650,causal_factor,保持架铜合金引导面磨损量达0.3mm， 隙过大，滚子存在位移情况，滚子表面有明显划痕,8
+causal_factor:709808247c94,causal_factor,区面积与轴承接触面积比值，证实轴承已进入加速 在松动、检查齿轮箱弹性支撑正常、固定螺栓未存,8
+causal_factor:dc846907d0e4,causal_factor,磨损阶段,8
+causal_factor:e33299c916ad,causal_factor,机组主轴系统存在复合型磨损故障，主要表现,8
+causal_factor:76ccc687e193,causal_factor,轴承内圈滚道出现大面积剥落损伤，导致振动,8
+causal_factor:4a9b192dd700,causal_factor,素研究 [ J]. 机械传,8
+causal_factor:58f609a2f156,causal_factor,6 个传感器同时损坏,8
+causal_factor:1befcc43b893,causal_factor,电磁干扰造,8
+causal_factor:846eec81a634,causal_factor,变流器 与环境设备,7
+causal_factor:ad1f3d9a1387,causal_factor,8 次，造成的直接损失约为 25 万元（未统计电 [5] 毕长飞.大功率直驱风电机组变流器的功率器件热负荷分析[J].机械,7
+causal_factor:0601c8dbb967,causal_factor,小蜗壳式风机损坏造成的 压变绝缘的问题也得到较好解决,7
+causal_factor:deb1e9ead071,causal_factor,"目前,国内外学者围绕风电机组液压系统故障诊断开 与此同时,现场测试获取了如下关键数据",7
+causal_factor:172ab8ebbada,causal_factor,"尤其是偏航系统结构复杂,导致故障现象并不具有规律性, （3）对比正常机组运行数据可知,正常情况下机组压",7
+causal_factor:3dc3b20f7f3c,causal_factor,"诊断流程,深度挖掘未标注阻尼缓冲器堵塞这一特殊故障",7
+causal_factor:f3a9dca5eb47,causal_factor,（1）液压系统中隐蔽的阻尼缓冲器堵塞是导致砀山风,7
+causal_factor:4870fa54c0bb,causal_factor,2 主轴磨损故障处理,7
+causal_factor:5e0abbd16c8d,causal_factor,组存在早期磨损征兆，及时安排计划性维护避免故 年非计划停机次数减少72%，验证了处理方案的有,7
+causal_factor:1d11479b7b81,causal_factor,"时自动触发强化监测模式，振动报警阈值动态下调 机械工程师 ,2023(10):113-115.",7
+causal_factor:bce677382d41,causal_factor,可能导致误报故障或误动作，甚至造成重大事故的发生,7
+causal_factor:1be7947685a8,causal_factor,置身于强电磁场中,7
+causal_factor:1790beff6d35,causal_factor,接线工艺不规范,7
+causal_factor:aaeffd13367f,causal_factor,度（另有 6 套传感器为备用），然后通过信号电缆传送至发 底板下方布线混乱，这对模拟信号传输造成很大的影响,7
+causal_factor:8b77b120da3c,causal_factor,"此,对这两个常开换向阀进行调换",6
+causal_factor:1daae5b101e4,causal_factor,"（3）在液压站断电泄压的安全状态下,对常开截止阀 无明显堵塞迹象",6
+causal_factor:d272e054c742,causal_factor,内部及通道存在明显的堵塞物或杂质,6
+causal_factor:7854bf86d13a,causal_factor,"此,暂时排除液压站至偏航制",6
+causal_factor:b007c51bbc96,causal_factor,"再次启动液压站, 动器油管中间的阻尼缓冲器存在堵塞故障的可能性",6
+causal_factor:c0ee7dfa124b,causal_factor,进一步排除常开截止阀（10.2）存在堵塞故障的可能性,6
+causal_factor:980b1650dbca,causal_factor,"据此,可排除单向阀（9.3）存在堵塞故障的可能性",6
+causal_factor:745b2d21c356,causal_factor,机舱没,5
+causal_factor:2e2fdb065dd0,causal_factor,"的情况,进而导致系统漏压,液压站电机为维持系统压力, 迟缓状态",5
+causal_factor:e77106a0b042,causal_factor,"由此可推断,电磁换向阀（15.2）存在堵塞故",5
+causal_factor:6ceccdb74ef2,causal_factor,素共同作用的 1.3 故障出现原因,3
+causal_factor:9859d2485c8c,causal_factor,很可能是温度传感器在发电机内部存在,3
+causal_factor:d36a22c5b9c4,causal_factor,素造成,3
+causal_factor:39fca5c826fd,causal_factor,边毗邻煤场，存在较大的煤粉尘影响，容易造成驱 的巡检以及采取相应防潮措施，例如定期更换变流,2
+causal_factor:49d46a2d0952,causal_factor,动板短路或接触不良,2
+causal_factor:77c384ea5893,causal_factor,，导致非计划停机次数增加，严重影响发电效 8倍，提示滚动体表面存在严重损伤,2
+causal_factor:340894d67a42,causal_factor,合现场实际状况初步判断为风电机组主轴轴承磨损 高达8.7（正常值通常小于4），波形中可见周期性冲,2
+causal_factor:d88b62694bf8,causal_factor,出现点蚀和边缘缺损，造成周期性冲击振动,2
+causal_factor:b081e877737d,causal_factor,主要体,2
+causal_factor:d264d327843b,causal_factor,高海拔地区强湍流影,2
+causal_factor:8ee6e5ad5205,causal_factor,素加剧了材料劣化,2
+causal_factor:432565f71c23,causal_factor,分析表 开始,2
+causal_factor:45b2d430a5d1,causal_factor,类别 具体表现 影响程度 证据来源 确定数据矩阵,2
+causal_factor:5ac7d3a766c5,causal_factor,追溯表,2
+causal_factor:f4f63aeeb9a5,causal_factor,类别 具体问题 改进方向 支持证据,2
+causal_factor:58db7016fb19,causal_factor,采集信,2
+causal_factor:8b334a111387,causal_factor,可确定为发电机温度信号受到了电磁干扰,2
+causal_factor:4ced3189eeb9,causal_factor,这段信号电缆，将事先准备好的若干米长的多芯信号（屏蔽） 造成发电机温度传感器测温不准确的原因,2
+causal_factor:6fd924885488,causal_factor,摘 要：通过对某风场 2MW 风电机组多次出现的变流器 IGBT 板卡故障进行分析，总结,1
+causal_factor:526632c09663,causal_factor,，并就此提出改进措施和建议，可为同类变流器的运行维护工作提供参考,1
+causal_factor:e8b32b844260,causal_factor,触头氧化、机构卡涩现象，易造成相关设备工作异常,1
+causal_factor:28b1873a35ec,causal_factor,有三个方面,1
+causal_factor:299e0008ff37,causal_factor,沿海地区盐雾影响,1
+causal_factor:8b42507d069e,causal_factor,确定故障元件为 INU 模块的 V 相 IGBT 驱 1.5m）,1
+causal_factor:88eebc87e011,causal_factor,动板损坏，从而,1
+causal_factor:809c2ad5c49f,causal_factor,电实验和零速实验，实验结果显示模块正常，风机,1
+causal_factor:f261da3ee2c2,causal_factor,侧其他故障,1
+causal_factor:19fae3a1a850,causal_factor,分析，解决变流器 IGBT 板卡,1
+causal_factor:a8350e78ca32,causal_factor,波动,1
+causal_factor:406774220bcd,causal_factor,边毗邻煤场，存在较大的煤粉尘影响，容易,1
+causal_factor:3c11166286bc,causal_factor,触头氧化、机构卡涩现象，易,1
+causal_factor:38bbfbdf83a7,causal_factor,件的,1
+causal_factor:d773b34a316a,causal_factor,有三个方面，一是原设计通风 散热管道至变流器散热出口等措施来提升散热能,1
+causal_factor:e01b0c076ac3,causal_factor,二是由于沿海地区盐雾影响，塔筒门散热风扇 温度值较定值调低迫,1
+causal_factor:a48f6cc07829,causal_factor,变流器 与环境设备，2022(05):47-49.,1
+causal_factor:03fcdba582ec,causal_factor,8 次,1
+causal_factor:fe2be4023bab,causal_factor,且能够极大的降低由于小蜗壳式风机损坏,1
+causal_factor:56a8a2951137,causal_factor,尤其是偏航系统结构复杂,1
+causal_factor:96afd69f00a5,causal_factor,初始的常开状态切换 锁定在图 1 所示的绿色线条标识的油路,1
+causal_factor:49988b35667c,causal_factor,"常闭状态转变为常开状态, 路中的截止阀（10.2）、电磁换向阀（15.2）、单向阀（9.3）",1
+causal_factor:af01a8ba8ed0,causal_factor,"的情况,进而",1
+causal_factor:b8d2e2637b9a,causal_factor,"柱塞孔空间狭小,缺乏适配的专用工具,且该",1
+causal_factor:16aeb1ff4177,causal_factor,"发现该节流阀的阀门可在 产生吸附作用,导致无法直接取出",1
+causal_factor:6f53e19f5de6,causal_factor,现内部存在铁屑、杂质或堵塞情况,1
+causal_factor:9d6853b3f86c,causal_factor,"之后,恢复液压站正常运行状态并进行观察,结果显 尼缓冲器存在堵塞故障",1
+causal_factor:fcbc092835d1,causal_factor,存在堵塞故障的可能性可予以排除,1
+causal_factor:f1cd9cf0cb6e,causal_factor,疑其存在堵塞问题,1
+causal_factor:98043a11914d,causal_factor,"发现此处内部安装有一阻尼缓冲器,通过咨询厂家得知其 能较大程度避免油路堵塞情况",1
+causal_factor:02adfcc0fff4,causal_factor,发现该节流阀的阀门可在 产生吸附作用,1
+causal_factor:389f169131a1,causal_factor,"基于此,将故障排查方向转向偏航 量和压力控制",1
+causal_factor:18e2766e2834,causal_factor,（1）液压系统中隐蔽的阻尼缓冲器堵塞是,1
+causal_factor:2a36a5f6f9a4,causal_factor,断方法，确认故障主要由轴承复合磨损,1
+causal_factor:092ac382ffbb,causal_factor,向变化快等极端工况,1
+causal_factor:311b63d5f76c,causal_factor,标8倍）形成三体磨损，进一步加剧了表面损伤,1
+causal_factor:3680c0f1fc64,causal_factor,润滑系统失效是加速磨损的关键因素,1
+causal_factor:c1405ef759b2,causal_factor,障影响分析显示，若继续运行，预计3个月内将导致 许值≤150ppm），且基础油粘度从原320cSt 降至,1
+causal_factor:f8df675f5484,causal_factor,210cSt，导致油膜厚度不足，形成金属直接接触,1
+causal_factor:6af56db83d50,causal_factor,二级处理包括主轴轴颈抛光修复（粗 0.15mm（标准要求≤0.05mm），造成附加偏心载,1
+causal_factor:2aaa1ea53fea,causal_factor,四级处理为后续加装 强度是平原的1.8倍，导致密封件提前老化，日温差,1
+causal_factor:5c010ef8671b,causal_factor,和根本原因共同作用导致的系统性失效问题,1
+causal_factor:9a7001994564,causal_factor,表3详细列出了导致主轴轴承磨损故障的直接技术原,1
+causal_factor:ff8c5222193c,causal_factor,及其影响程度,1
+causal_factor:26e4e01a3a1f,causal_factor,充足，但油脂颜色发黑且油脂内含有金属粉末，如 次故障的本质是 ：高海拔环境→密封结构失效→污,1
+causal_factor:e94ce4169f4e,causal_factor,未建立磨损颗粒趋势分析,1
+causal_factor:d31d6cd359b9,causal_factor,轴承内圈滚道出现大面积剥落损伤,1
+causal_factor:30380b2ba743,causal_factor,出现点蚀和边缘缺损,1
+causal_factor:20d8f1232b7d,causal_factor,障影响分析显示，若继续运行，预计3个月内将,1
+causal_factor:8f57aea78937,causal_factor,210cSt,1
+causal_factor:b386757123cf,causal_factor,二级处理包括主轴轴颈抛光修复（粗 0.15mm（标准要求≤0.05mm）,1
+causal_factor:e3bed0d9f99a,causal_factor,四级处理为后续加装 强度是平原的1.8倍,1
+causal_factor:34f6a7e9d7dc,causal_factor,25℃的热循环应力促,1
+causal_factor:2c1856c5344c,causal_factor,此可以判定，本次轴承故障的发生是由直接,1
+causal_factor:69edd8cc3733,causal_factor,运维人员在工程现场进行检查的结果汇总如表2 原因和根本原因共同作用,1
+causal_factor:e1d4ccc5bc00,causal_factor,表3详细列出了,1
+causal_factor:8497f19f689d,causal_factor,及其影响程度，表4从管理维度深入剖析故障发,1
+causal_factor:cb3354135c0b,causal_factor,染润滑脂,1
+causal_factor:7d6efafaa360,causal_factor,分析，实施三 机组主轴轴承结构参数对其应力的影响分析 [ J].,1
+causal_factor:8f008be9e411,causal_factor,时自动,1
+causal_factor:ca604e6fcdf8,causal_factor,或者设计方面电缆选型不合理，造成信号传,1
+causal_factor:c470d7f72337,causal_factor,号受电磁干扰造成，干扰信号是发电机内部电磁场和外部,1
+causal_factor:016efaa1717d,causal_factor,干扰共同引起（如机舱变压器和动力电缆），如果干扰源主,1
+causal_factor:3dd1b4419e0b,causal_factor,这种误差轻则,1
+causal_factor:21ff2332d295,causal_factor,可能,1
+causal_factor:fb5a41c193ff,causal_factor,于置身于强电磁场中，必将受到极强的电磁干 成的，须查出受干扰的部位,1
+causal_factor:aec0de2f6bc3,causal_factor,于接线工艺不规范，也有可能受到电磁干扰,1
+causal_factor:231355bfc242,causal_factor,度（另有 6 套传感器为备用），然后通过信号电缆传送至发 底板下方布线混乱，这对模拟信号传输,1
+causal_factor:8c0aecca2fb0,causal_factor,或者设计方面电缆选型不合理,1
+causal_factor:fd8f487dca1f,causal_factor,由经验可知，如果信号电缆（线）,1
+causal_factor:e3a713b15486,causal_factor,号受电磁干扰,1
+causal_factor:f9021ae10e34,causal_factor,干扰共同,1
+causal_factor:3af755186b3b,causal_factor,最后，拆除发电机温度传感器接线盒至机舱控制柜的 布线，也将,1
+causal_factor:e59a3e797463,causal_factor,这段信号电缆，将事先准备好的若干米长的多芯信号（屏蔽）,1
+causal_factor:6810bba2d005,causal_factor,，逐步缩小受干扰范围，最终找到干扰源,1
+component:6f454c002ccb,component,IGBT,6
+component:54a2a0a871b6,component,接触器,5
+component:836b876c873e,component,温度传感器,4
+component:fa7a63c409ef,component,断路器,3
+component:bcca7c29f64e,component,风扇,2
+component:05de69616218,component,液压泵,2
+component:6348867dd227,component,制动器,2
+component:ba08d6d0194c,component,齿轮箱轴承,2
+corpus:2978f89e354b,corpus,windrise-parts-readable,1
+diagnostic_signal:9a7342874186,diagnostic_signal,间的电压,9
+diagnostic_signal:13456a647a70,diagnostic_signal,闸制动为静止状态,9
+diagnostic_signal:ce4fca2880be,diagnostic_signal,额定电压,9
+diagnostic_signal:d8565e49760d,diagnostic_signal,额定连续电流,9
+diagnostic_signal:400588d76235,diagnostic_signal,IGBT 电压等级：1700V,9
+diagnostic_signal:88eae9dccf50,diagnostic_signal,最大连续直流电压,9
+diagnostic_signal:7001dd36f8df,diagnostic_signal,甚至长期临界于变流器最高运行环境温度,8
+diagnostic_signal:704f579138e4,diagnostic_signal,对其它部件进行检查发现,8
+diagnostic_signal:b58b13cfa16f,diagnostic_signal,变流器散热风扇一直在启动状态,8
+diagnostic_signal:d3bea9efb1b9,diagnostic_signal,温度,8
+diagnostic_signal:064b2194b081,diagnostic_signal,电网电压,8
+diagnostic_signal:5665580b49e4,diagnostic_signal,根本解决环境温度,8
+diagnostic_signal:8bb7513a190a,diagnostic_signal,研究采用传动链振动,8
+diagnostic_signal:ba155cf9e29d,diagnostic_signal,故障状态,8
+diagnostic_signal:45e6f3ef354f,diagnostic_signal,振动速度有效值 ≤2.8mm/s 4.8mm/s 71.4%,8
+diagnostic_signal:5f1a682b5bbe,diagnostic_signal,振动信号,8
+diagnostic_signal:8adca19f8ba0,diagnostic_signal,择使用多维度振动,8
+diagnostic_signal:d78beff5e322,diagnostic_signal,离线振动,8
+diagnostic_signal:4be3e313e17b,diagnostic_signal,内部滚子和保持架时发现保支架间,8
+diagnostic_signal:1ebe26de5a87,diagnostic_signal,化状态，表明润滑系统已严重污染,8
+diagnostic_signal:b22469bb72dc,diagnostic_signal,通过测量剥落 检查轴承支座安装未存在位移、检查固定螺栓未存,8
+diagnostic_signal:709808247c94,diagnostic_signal,区面积与轴承接触面积比值，证实轴承已进入加速 在松动、检查齿轮箱弹性支撑正常、固定螺栓未存,8
+diagnostic_signal:e90e34e4fc34,diagnostic_signal,综合振动,8
+diagnostic_signal:a9d5244c3c22,diagnostic_signal,信号中 BPFI 频率成分显著增强,8
+diagnostic_signal:40d5b9aca58e,diagnostic_signal,经采取上述措施后，运行监测，变流器正常运,7
+diagnostic_signal:5197d734b82a,diagnostic_signal,行温度下降约 15℃，未再发生高温变流器跳闸情,7
+diagnostic_signal:6af612ade818,diagnostic_signal,图4 现场安装通通风机实物图 再次为变压器上电进行绝缘检查时，绝缘值都比较,7
+diagnostic_signal:b12155a067ae,diagnostic_signal,压力异常故障处理全流程解析,7
+diagnostic_signal:03e722f33cf7,diagnostic_signal,"风电机组的核心子系统之一,其液压制动性能的优劣直 2023 年 4 月 18 日,SCADA 系统监测到一系列异常报",7
+diagnostic_signal:c49c371a6e5d,diagnostic_signal,偏航压力,7
+diagnostic_signal:66d603012cf5,diagnostic_signal,液压站持续处于欠压状态,7
+diagnostic_signal:3d9df0488362,diagnostic_signal,系统压力,7
+diagnostic_signal:0ea3ce6b4601,diagnostic_signal,基于压力信号,7
+diagnostic_signal:c543282e0411,diagnostic_signal,风电机组偏航液压系统压力,7
+diagnostic_signal:2e3cafbd6165,diagnostic_signal,"维护优化 ：将缓冲器检查工作纳入季度定期维护项目 究进一步聚焦液压系统隐蔽元件的可靠性设计问题,深入",7
+diagnostic_signal:211800d2e29a,diagnostic_signal,"体系,制定标准化、规范化的检查作业流程和详细的检查 探索更为先进、高效的故障诊断和预防技术,为风电产业",7
+diagnostic_signal:9a80b353a07c,diagnostic_signal,"定期对缓冲器进行全面检查、清洁、保养和性能测试, 的可持续发展提供坚实的技术支撑",7
+diagnostic_signal:eeaf59f199f6,diagnostic_signal,建立基于油液分析的润滑优化模型，通过监测,7
+diagnostic_signal:98386b63854d,diagnostic_signal,宏观剥落→振动加剧→二次损伤,7
+diagnostic_signal:c43808f7e470,diagnostic_signal,重点培养振动,7
+diagnostic_signal:6719c01a9111,diagnostic_signal,重点核查密封状态,7
+diagnostic_signal:69b46a45dc27,diagnostic_signal,根据拆解检查结果制定 入集团标准故障库,7
+diagnostic_signal:1baf6e83a73f,diagnostic_signal,仪和超声波探伤检测，确保修复质量符合 IEC 224.,7
+diagnostic_signal:4ee1c1809626,diagnostic_signal,风电机组发电机绕组端温度,7
+diagnostic_signal:57bd8d92ffff,diagnostic_signal,机组电控系统或测量仪器采集信号,7
+diagnostic_signal:ec1bb6e7a064,diagnostic_signal,这种误差轻则使测量准确度降低，重则使测量 120℃,7
+diagnostic_signal:dbae8b3eb23c,diagnostic_signal,这台发电机无法与其他机组对比分析绕组温度,7
+diagnostic_signal:82c76474d332,diagnostic_signal,当受干扰的信号,7
+diagnostic_signal:de549f198b33,diagnostic_signal,分析绕组温度,7
+diagnostic_signal:23c68e6cc566,diagnostic_signal,在液压站断电泄压的安全状态,6
+diagnostic_signal:606987e4aaff,diagnostic_signal,（10.2）进行拆卸检查,6
+diagnostic_signal:e15a8323ab75,diagnostic_signal,"过程中发现,该截止阀的阀门处 的安装工艺安装回原处",6
+diagnostic_signal:cb1a73aa5db9,diagnostic_signal,恢复液压站正常运行状态,6
+diagnostic_signal:b25033c97304,diagnostic_signal,于完全拧开状态,6
+diagnostic_signal:dc9ff71db6a8,diagnostic_signal,待其恢复正常运行状态,6
+diagnostic_signal:4d655fc403dc,diagnostic_signal,由初始的常开状态,5
+diagnostic_signal:3f0cf6148833,diagnostic_signal,常闭状态,5
+diagnostic_signal:5d67792dc67e,diagnostic_signal,定差节流阀（22.1）等关键组件展开逐一细致检查,5
+diagnostic_signal:970c65968e07,diagnostic_signal,运用高精度压力,5
+diagnostic_signal:834d6be33018,diagnostic_signal,所有换向阀均保持初始状态,5
+diagnostic_signal:9765455b1da1,diagnostic_signal,压油在该回路中建立压力,5
+diagnostic_signal:761b65de9c1a,diagnostic_signal,额定连续直流电压,3
+diagnostic_signal:0cccc7fef1fb,diagnostic_signal,额定电流,3
+diagnostic_signal:e7d684297be6,diagnostic_signal,发电机绕组温度,3
+diagnostic_signal:848d470b4ef3,diagnostic_signal,板卡温度,2
+diagnostic_signal:f6ac996faebc,diagnostic_signal,240W，散热风量仅为 4950m3/h，实际测量和计 实际情况适时对变流器和塔筒门散热电机的控制,2
+diagnostic_signal:4f1ea6e8cee6,diagnostic_signal,1 主轴磨损故障现场诊断与检查,2
+diagnostic_signal:8e21899847bc,diagnostic_signal,主轴前、后轴承座布置三向加速度传感器，采样频,2
+diagnostic_signal:b8d060eee6f3,diagnostic_signal,结果 ：高海拔地区昼夜温差大（日温差达25℃）导 通过现场检查可判定，本次故障的诱因主要体,2
+diagnostic_signal:7d9ac5035193,diagnostic_signal,故 检测发现润滑脂中金属磨屑浓度达1200ppm（允,2
+diagnostic_signal:378bd8c537c3,diagnostic_signal,另一端接至发电机温度,2
+diagnostic_signal:579e2b0c982f,diagnostic_signal,由此可知，2V 相温度传感器存在,2
+diagnostic_signal:687a13e7b631,diagnostic_signal,并且重新布置温度信号,2
+diagnostic_signal:bdf8e5b4be56,diagnostic_signal,误差大的原因很可能是温度,2
+diagnostic_signal:675efeebbd90,diagnostic_signal,安装问题，或传感器本体存在问题,2
+diagnostic_signal:9536e26fbc21,diagnostic_signal,运行环境温度,1
+diagnostic_signal:9cea66a3d48b,diagnostic_signal,风机电压,1
+diagnostic_signal:39dca8e6c231,diagnostic_signal,双馈型机组变流器主要采用三相电压,1
+diagnostic_signal:668b38aeca38,diagnostic_signal,二是由于沿海地区盐雾影响，塔筒门散热风扇 温度值较定值调低迫使风扇强启或提高变流器模,1
+diagnostic_signal:deaf30816589,diagnostic_signal,高环境温度,1
+diagnostic_signal:2a7fd54c65f4,diagnostic_signal,定期完成设备的检查和卫,1
+diagnostic_signal:04646fa6733b,diagnostic_signal,塔底环境温度升高，夏季风电机组塔底环境温度,1
+diagnostic_signal:36b152550073,diagnostic_signal,的，电网电压的不稳定极易导致 IGBT 驱 力着手，具体有效措施如下,1
+diagnostic_signal:db3559c68c2e,diagnostic_signal,"（2）在恢复刹车操作后,压力回升过程极为缓慢",1
+diagnostic_signal:2947eb9a7ec1,diagnostic_signal,在得电信号,1
+diagnostic_signal:5bd4abb57fb2,diagnostic_signal,利用专业电流,1
+diagnostic_signal:892ad0e9df65,diagnostic_signal,运行电流,1
+diagnostic_signal:42aac54a5820,diagnostic_signal,回路压力,1
+diagnostic_signal:2a4080ad9f60,diagnostic_signal,运行状态,1
+diagnostic_signal:3a2016cf3333,diagnostic_signal,主回路压力,1
+diagnostic_signal:cc306870aff3,diagnostic_signal,但偏航回路压力,1
+diagnostic_signal:34328b341e39,diagnostic_signal,并释放系统内部压力,1
+diagnostic_signal:1c2c2256ef95,diagnostic_signal,恢复液压站正常供电和运行状态,1
+diagnostic_signal:2542db0f2bd3,diagnostic_signal,偏航结束后偏航回路压力,1
+diagnostic_signal:c7dc6dc654ef,diagnostic_signal,液压站电机为维持系统压力,1
+diagnostic_signal:a81554f4b8a8,diagnostic_signal,"常闭状态,换向阀（14.3）则",1
+diagnostic_signal:323ce9745299,diagnostic_signal,"系统漏压,液压站电机为维持系统压力, 迟缓状态",1
+diagnostic_signal:597e43cefda2,diagnostic_signal,进行拆卸检查,1
+diagnostic_signal:9e27af8ec278,diagnostic_signal,结束后偏航回路压力,1
+diagnostic_signal:f521ee44358d,diagnostic_signal,节流阀（22.1）进行检查,1
+diagnostic_signal:16aeb1ff4177,diagnostic_signal,"发现该节流阀的阀门可在 产生吸附作用,导致无法直接取出",1
+diagnostic_signal:64ea42582f77,diagnostic_signal,该阀门出厂设定状态,1
+diagnostic_signal:c307d501b54f,diagnostic_signal,束后偏航回路压力,1
+diagnostic_signal:953574867e97,diagnostic_signal,示偏航结束后偏航回路压力,1
+diagnostic_signal:35485c2a7ade,diagnostic_signal,量和压力,1
+diagnostic_signal:5f85d9c1a93e,diagnostic_signal,主要功能是抑制偏航制动时偏航回路压力,1
+diagnostic_signal:fb342ddc0e47,diagnostic_signal,"偏航回路压力恢复至正常范围,保障机",1
+diagnostic_signal:7edd0e0e86ac,diagnostic_signal,同时同步记录转速信号,1
+diagnostic_signal:bf0ab246bb0a,diagnostic_signal,近年多台机组的主轴系统陆续出现异常振动,1
+diagnostic_signal:a55f6aaffd7b,diagnostic_signal,号风机主轴齿轮箱轴承温度,1
+diagnostic_signal:20ad9b964f0a,diagnostic_signal,项目 检查结果 允许值 超标程度,1
+diagnostic_signal:d7d83cdcd458,diagnostic_signal,1.1.2 内窥镜检查 内圈剥落尺寸 无 —,1
+diagnostic_signal:cd609797115e,diagnostic_signal,验证振动,1
+diagnostic_signal:e90ed8387234,diagnostic_signal,本案例采用工业内窥镜进行可视化检测 ：内圈滚道 滚动体凹坑直径 0.8mm（平均） ≤0.2mm 300%,1
+diagnostic_signal:27bfb45bfc2f,diagnostic_signal,实现状态,1
+diagnostic_signal:2639f4e1bd87,diagnostic_signal,1.2 故障现场检查 由此可以判定，本次轴承故障的发生是由直接,1
+diagnostic_signal:a3cb502043e1,diagnostic_signal,运维人员在工程现场进行检查的结果汇总如表2 原因和根本原因共同作用导致的系统性失效问题,1
+diagnostic_signal:1b2fff027a81,diagnostic_signal,现场运维人员对 A22风机对主轴进行检查，上 因及其影响程度，表4从管理维度深入剖析故障发,1
+diagnostic_signal:56ce27d4e81c,diagnostic_signal,塔打开止推轴承齿轮箱侧端盖检查，发现轴承油脂 生的系统性原因,1
+diagnostic_signal:48bde2393987,diagnostic_signal,外圈剥 振动频谱分析（BPFI 幅值,1
+diagnostic_signal:1b64bf0ca14d,diagnostic_signal,内窥镜检查影像 和气象数据,1
+diagnostic_signal:17b4b6e5e8cc,diagnostic_signal,振动监测阈值设置过高（4.5mm/s）,1
+diagnostic_signal:4bef6e26d0d1,diagnostic_signal,优化状态,1
+diagnostic_signal:f8e744cbbd78,diagnostic_signal,个月振动,1
+diagnostic_signal:fc9f1692369b,diagnostic_signal,轴承硬度 HRC45（低于设计 加强入厂检测,1
+diagnostic_signal:128bdb1e5ca8,diagnostic_signal,建立 材质检测报告,1
+diagnostic_signal:117bac1e4506,diagnostic_signal,振动,1
+diagnostic_signal:87e6d137b6c9,diagnostic_signal,周期性冲击振动,1
+diagnostic_signal:1d11479b7b81,diagnostic_signal,"时自动触发强化监测模式，振动报警阈值动态下调 机械工程师 ,2023(10):113-115.",1
+diagnostic_signal:4fb03b0691ed,diagnostic_signal,所以先判断发电机温度,1
+diagnostic_signal:004359f557c8,diagnostic_signal,用于发电机绕组温度,1
+diagnostic_signal:8303fdff40bd,diagnostic_signal,图 1 所示，定子采用了 6 套 Pt100 温度传感器测量绕组温 差，特别是现场安装单位接线很不规范，以至于机舱柜和,1
+diagnostic_signal:f31f3f44eb7f,diagnostic_signal,然后通过信号,1
+diagnostic_signal:bece795f794e,diagnostic_signal,显地看出发电机绕组温度,1
+diagnostic_signal:092fa430e3f6,diagnostic_signal,风电机组发电机绕组温度,1
+diagnostic_signal:75000f32b305,diagnostic_signal,态数据中也可以明显地看出发电机绕组温度,1
+diagnostic_signal:eee50dc18b4c,diagnostic_signal,有随机粗大干扰信号,1
+diagnostic_signal:dd51f49e7dfa,diagnostic_signal,绕组温度,1
+diagnostic_signal:e1b5fd0016c5,diagnostic_signal,机绕组温度,1
+diagnostic_signal:e7822ad4a0f3,diagnostic_signal,绕组的温度,1
+diagnostic_signal:bde9ae60f14e,diagnostic_signal,1V相绕组温度,1
+diagnostic_signal:dcd6376438ad,diagnostic_signal,如果信号,1
+diagnostic_signal:62b83b7bca6f,diagnostic_signal,测温传感器的金属测温探头及导线在强电磁场下将产生相,1
+diagnostic_signal:b985481ad36a,diagnostic_signal,当大的感应电流,1
+diagnostic_signal:18848d26db52,diagnostic_signal,直接成为干扰信号,1
+diagnostic_signal:8b3e0bf696cb,diagnostic_signal,感应电流,1
+diagnostic_signal:38596fab267d,diagnostic_signal,自身温度,1
+diagnostic_signal:f53a2a505f3a,diagnostic_signal,可知温度,1
+diagnostic_signal:37763b7537ef,diagnostic_signal,干扰信号,1
+diagnostic_signal:81addc2454e0,diagnostic_signal,那么需要重新布线或更换信号,1
+diagnostic_signal:8529fc747ecd,diagnostic_signal,（1）先用万用表测量传感器的阻值是否正常，以初步,1
+diagnostic_signal:b0eab9d1d9d1,diagnostic_signal,判断温度,1
+diagnostic_signal:04ebf3e880dd,diagnostic_signal,当前温度,1
+diagnostic_signal:3a6b9d1c9fde,diagnostic_signal,计算当前温度,1
+diagnostic_signal:71080af192d8,diagnostic_signal,1Ω 则需更换传感器,1
+diagnostic_signal:a2a97e3f2052,diagnostic_signal,与其他正常的温度,1
+diagnostic_signal:3bd190ca0ea4,diagnostic_signal,重新敷设发电机温度,1
+diagnostic_signal:6e0f24410007,diagnostic_signal,的温度传感器信号,1
+diagnostic_signal:3cb5ef618143,diagnostic_signal,2V相绕组温度,1
+diagnostic_signal:dd236bb48c70,diagnostic_signal,在机舱控制内的温度,1
+diagnostic_signal:7db097d11581,diagnostic_signal,信号线与任一相发电机绕组温度传感器的信号,1
+diagnostic_signal:6a8b0cbe462e,diagnostic_signal,所以故障原因可确定为发电机温度信号,1
+diagnostic_signal:3ea009e5ba5d,diagnostic_signal,相绕组温度,1
+diagnostic_signal:31bfce0c0b64,diagnostic_signal,环境温度,1
+diagnostic_signal:a3f2d312a202,diagnostic_signal,发电 分析绕组温度值波动大的原,1
+diagnostic_signal:f56b0e7fe17a,diagnostic_signal,信号传,1
+diagnostic_signal:a77cb2b8104e,diagnostic_signal,，干扰信号是发电机内部电磁场和外部,1
+diagnostic_signal:6139c0a7aca0,diagnostic_signal,模拟量信号,1
+diagnostic_signal:e0fcdd7e15a3,diagnostic_signal,再仔细检查发电机 结论,1
+diagnostic_signal:79d64287e163,diagnostic_signal,温度传感器接线盒，用万用表测得接线盒内的接地端子与,1
+diagnostic_signal:af6634650266,diagnostic_signal,这台机组的发电机绕组温度信号,1
+diagnostic_signal:b9a04b157a21,diagnostic_signal,或者在电机内部温度,1
+diagnostic_signal:fbf43563dc0a,diagnostic_signal,拆除发电机温度,1
+diagnostic_signal:950932fc610f,diagnostic_signal,这段信号,1
+diagnostic_signal:c3086de5355f,diagnostic_signal,通过更换信号,1
+diagnostic_signal:b43236308791,diagnostic_signal,启机并网观察发电机绕组温度,1
+diagnostic_signal:a554bd8ac1d7,diagnostic_signal,相之外其余绕组温度,1
+diagnostic_signal:b18f5bd5928c,diagnostic_signal,相的温度,1
+diagnostic_signal:5b9d88ba3e1f,diagnostic_signal,相温度传感器出线接至备用温度,1
+diagnostic_signal:bf3adef92841,diagnostic_signal,模拟量信号采集和传输受电磁干扰是多方面,1
+diagnostic_signal:25ced6af5173,diagnostic_signal,温度传感器信号受到很大的电磁耦合，这都是,1
+diagnostic_signal:be74120b9ffc,diagnostic_signal,发电机温度传感器测温不准确的原因,1
+diagnostic_signal:b04e5199db1f,diagnostic_signal,启机并网观察发电机绕组温度数据 ：面板显示 磁干扰原,1
+document:694ce1c23e2f,document,砀山风电场15#风电机组偏航液压系统压力异常故障处理全流程解析_孙士雪.pdf,5
+document:69be17484fa1,document,2MW风电机组变流器IGBT板卡故障的分析及解决方案_林延填.pdf,4
+document:3a7db3fbf8c0,document,风电机组主轴的检修维护及故障分析与应对策略_卢祥林.pdf,4
+document:225c317ca503,document,风电机组发电机绕组端温度高故障分析及处理_张新旺.pdf,3
+fault_code:8114b9dabe64,fault_code,1.2,6
+fault_code:522b07e413f5,fault_code,2MW,3
+fault_code:d0d5f5f3d469,fault_code,2.2,3
+fault_code:4491f8b5ecc0,fault_code,1.1,3
+fault_name:92e8ceeeb4f5,fault_name,1 故障,4
+fault_name:186ce380096f,fault_name,2 故障,4
+fault_name:b286df3c0a0e,fault_name,福建水力发电 2MW 风电机组变流器 IGBT 板卡故障,2
+fault_name:a70700b0c731,fault_name,通过对某风场 2MW 风电机组多次出现的变流器 IGBT 板卡故障,2
+fault_name:89d47f642552,fault_name,总结可能造成变流器 IGBT 板卡故障,2
+fault_name:0922d1c203fc,fault_name,变流器 的故障有 IGBT 板卡故障,2
+fault_name:f929ce673e42,fault_name,充电回路异常,2
+fault_name:e7c491d511b3,fault_name,当转 中变流器 IGBT 板卡故障,2
+fault_name:c8e07eb4206d,fault_name,转子 次出现的变流器 IGBT 板卡故障,2
+fault_name:cf66f7f2714c,fault_name,2 变流器 IGBT 板卡故障,2
+fault_name:e5b6b00543be,fault_name,查看变流器内部故障,2
+fault_name:71e518e8e742,fault_name,发现报警,2
+fault_name:cfd8a609f11a,fault_name,根据 ISU 模块报出的故障,2
+fault_name:478e589ce409,fault_name,通过故障,2
+fault_name:c8cb7f065307,fault_name,用三相电压型交-直- 故障,2
+fault_name:5f3648006b58,fault_name,根据导出故障,2
+fault_name:9308e531a28f,fault_name,发现故障,2
+fault_name:a25e435559c1,fault_name,确定故障,2
+fault_name:8c2b9a95df1d,fault_name,变流器跳闸故障,2
+fault_name:9b7abde57fd4,fault_name,变流器总故障,2
+fault_name:56bad61dde1a,fault_name,变流器转子 侧其他故障,2
+fault_name:27aa446ed114,fault_name,变流器转子侧故障,2
+fault_name:7a6557767ad2,fault_name,导出变 流器 IGBT 模块故障,2
+fault_name:c8c8947e8375,fault_name,检查温度传感器未见异常,2
+fault_name:8ab78cab4807,fault_name,3 变流器 IGBT 板卡故障,2
+fault_name:9dc406c0fb43,fault_name,根据风电场运行数据 经上述故障,2
+fault_name:7719785363d0,fault_name,IGBT 驱动板故障很大一部分是电网 故障,2
+fault_name:a0633540d5f6,fault_name,并且 故障,2
+fault_name:32cff5e4955c,fault_name,易造成相关设备工作异常,2
+fault_name:85644d8efbec,fault_name,根本解决环境温度过高,2
+fault_name:d7e788ffebe8,fault_name,2019 年改造后一年期 7 台机组发生 IGBT 故障,2
+fault_name:2bf5d770fa7c,fault_name,变流器 IGBT 板卡故障,2
+fault_name:5a2fbd5f4733,fault_name,器系统 常见的故障,2
+fault_name:6c5afafac30a,fault_name,本文对常见的两种故障,2
+fault_name:883c9375d898,fault_name,通过运行观察发现 IGBT 板卡故障,2
+fault_name:4ddad44cdc31,fault_name,风电机组变流器对海上风电场可靠性的 4 变流器 IG B T 板卡故障,2
+fault_name:bb986626abd1,fault_name,风电机组变流器故障,2
+fault_name:7bb0fb008203,fault_name,双馈风电机组变流器 IGBT 结温计算与稳 IGBT 板卡故障,2
+fault_name:d27b4b220513,fault_name,风电变流器中 IGBT 常见故障,2
+fault_name:aeb12176c9d3,fault_name,通风机故障,2
+fault_name:b560110f25b4,fault_name,对保障风力发电 故障,2
+fault_name:c9c306b9befe,fault_name,风电机组偏航液压系统 压力异常故障,2
+fault_name:dc317931e656,fault_name,SCADA 系统监测到一系列异常,2
+fault_name:922ca001a3d7,fault_name,统故障在风电机组总故障,2
+fault_name:74edaf32037c,fault_name,偏航压力出现显著异常,2
+fault_name:30875549f052,fault_name,偏航液压系统故障在整个液压系统故障,2
+fault_name:f48042a6342f,fault_name,液压站持续处于欠压,2
+fault_name:49c2db7486f3,fault_name,国内外学者围绕风电机组液压系统故障,2
+fault_name:dc326a9d3ddf,fault_name,压系统故障,2
+fault_name:acdc97361890,fault_name,实现了对潜在故障,2
+fault_name:746b72cb9fdb,fault_name,导致故障,2
+fault_name:1fae3cbaba06,fault_name,正常情况下机组压 还需要结合现场故障,2
+fault_name:92645f960cf4,fault_name,在 其偏航液压系统出现报警故障,2
+fault_name:bf51beae25ca,fault_name,科学化的 液压系统分析与故障,2
+fault_name:7ad1552e9058,fault_name,深度挖掘未标注阻尼缓冲器堵塞这一特殊故障,2
+fault_name:1172f6238dae,fault_name,液压油的流动路径为沿图 1 所示的 故障,2
+fault_name:c64883763f1d,fault_name,发生故障,2
+fault_name:fc39dcb86d94,fault_name,风电机组偏航系统故障,2
+fault_name:bf7471788607,fault_name,基于压力信号的液压系统故障,2
+fault_name:8ff4bc482cec,fault_name,液压油从油箱经液压泵 本研究采用逐步排除法开展故障,2
+fault_name:c46f3b2f7141,fault_name,可以初步排除主回路存在故障,2
+fault_name:acdaa22e482a,fault_name,运行过程中液压站未产生异常,2
+fault_name:eb2574f22101,fault_name,因机舱没 外其他回路存在异常,2
+fault_name:96a6a1be69f1,fault_name,动器油管中间的阻尼缓冲器存在堵塞故障,2
+fault_name:ebef76d5b509,fault_name,存在堵塞故障,2
+fault_name:d9f65d44ac62,fault_name,结果显 尼缓冲器存在堵塞故障,2
+fault_name:e0a410bb08f4,fault_name,故障处理与预防措施 存在堵塞故障,2
+fault_name:07f90fa5846c,fault_name,优化液压油流 均未发现明显故障,2
+fault_name:ea5c0821ef8c,fault_name,航液压系统压 力异常,2
+fault_name:1baf1fbd7cc4,fault_name,攀升的故障,2
+fault_name:7721f284308b,fault_name,系统开展故障,2
+fault_name:f6ea2a6cb791,fault_name,风电机组偏航液压系统压力异常,2
+fault_name:3688d99d8d7b,fault_name,逐步排除法在复杂液压系统故障,2
+fault_name:f94af16cbf37,fault_name,精准定位故障,2
+fault_name:08984b4450c3,fault_name,故障排查和系统升级提供可靠的图纸 本研究提出的故障,2
+fault_name:78e690125057,fault_name,高效的故障,2
+fault_name:2eaf21f731b7,fault_name,及时发现潜在的故障,2
+fault_name:18912fbbe55c,fault_name,风电机组主轴的检修维护及 故障,2
+fault_name:8102c5e612e0,fault_name,本文针对某云南高海波地区风电场风电机组主轴系统频发磨损故障,2
+fault_name:0cdf3629c77c,fault_name,通过多维度诊断分析揭示 了故障,2
+fault_name:7712f2f3855d,fault_name,确认故障,2
+fault_name:4e3905c1873c,fault_name,通过 实施四级处理方案实现对故障,2
+fault_name:12df42132699,fault_name,表1 故障,2
+fault_name:a64e26a351da,fault_name,监测参数 正常值范围 故障,2
+fault_name:98b0cc904ba1,fault_name,统计显示主轴轴承故障占风电机组机械故障,2
+fault_name:d6c96effa873,fault_name,导致主轴系统故障,2
+fault_name:5facab97c659,fault_name,本案例在对风电机组主轴故障,2
+fault_name:be4e6ec3ea90,fault_name,择使用多维度振动监测技术精确定位故障,2
+fault_name:dfcadb5daebd,fault_name,在 1 主轴磨损故障,2
+fault_name:8fb7b0fd824d,fault_name,滚动体故 近年多台机组的主轴系统陆续出现异常,2
+fault_name:16f31d3d0dd9,fault_name,经包络解调后识别出外圈故障频率 号风机主轴齿轮箱轴承温度异常,2
+fault_name:d493307dfb85,fault_name,运维人员根据表1故障,2
+fault_name:5882d7324a9a,fault_name,波形中可见周期性冲 与轴颈表面损伤的复合故障,2
+fault_name:9fd4c9c0aaaa,fault_name,确认机组主轴系统存在复合型磨损故障,2
+fault_name:0c33ce2eba8a,fault_name,3 故障,2
+fault_name:eee320187578,fault_name,本次故障,2
+fault_name:172e889d8d94,fault_name,可能引发灾难性故障,2
+fault_name:477bb725766c,fault_name,本次轴承故障,2
+fault_name:cf00db005678,fault_name,表3详细列出了导致主轴轴承磨损故障,2
+fault_name:dd0557429d04,fault_name,表4从管理维度深入剖析故障,2
+fault_name:1cb2aa8f3d88,fault_name,如 次故障,2
+fault_name:edcfc6513555,fault_name,New Energy Generation And Storage 表3 主轴故障,2
+fault_name:45e26a1a8ad7,fault_name,内窥镜检查影像 和气象数据 表4 主轴故障,2
+fault_name:3561dd07515b,fault_name,改进方向 支持证据 振动监测阈值设置过高,2
+fault_name:8fc50859e182,fault_name,历史数据显示故障,2
+fault_name:6c575bc149c0,fault_name,为预防类似故障,2
+fault_name:788d27216817,fault_name,构 2 主轴磨损故障,2
+fault_name:14943f3e2577,fault_name,平均故障,2
+fault_name:382adae16973,fault_name,根据拆解检查结果制定 入集团标准故障,2
+fault_name:2eaf79e75d8f,fault_name,基于故障,2
+fault_name:9902bcd55722,fault_name,振动报警,2
+fault_name:5df3e0ca767a,fault_name,风电机组发电机绕组端温度高 故障,2
+fault_name:207bfa53ea81,fault_name,机报发电机绕组温度高故障,2
+fault_name:100b9040962d,fault_name,查看故障手册故障,2
+fault_name:6e4b2431bf2e,fault_name,可能导致误报故障,2
+fault_name:63793b18322c,fault_name,那么可以断定故障,2
+fault_name:b648d18b48ac,fault_name,查看故障,2
+fault_name:4de6b97a72e4,fault_name,可知这台发电机 绕组的温度最大值已超过故障报警,2
+fault_name:f1729e5ba846,fault_name,图3 机舱底板下方布线混乱 对故障,2
+fault_name:95a9b43da87b,fault_name,观察机组在停机和并网时就地面板显示的环境 所以故障,2
+fault_name:0cb5b3d89963,fault_name,由这个故障,2
+model:070657d0b1fb,model,A22,2
+model:ea8825f00efb,model,PM10,2
+model:6c37d7fa24d0,model,ACS800-67,1
+model:dbf8010ca658,model,IP54,1
+model:8ae810c1d6ca,model,P33,1
+model:43af7e45b324,model,XJCZCG-047,1
+model:c24a95c8cb24,model,CWT3300-D165,1
+model:445257eb8068,model,HRC45,1
+model:3b9f8faf06da,model,HRC52,1
+section:694ce1c23e2f,section,砀山风电场15#风电机组偏航液压系统压力异常故障处理全流程解析_孙士雪.pdf,4
+section:69be17484fa1,section,2MW风电机组变流器IGBT板卡故障的分析及解决方案_林延填.pdf,3
+section:3a7db3fbf8c0,section,风电机组主轴的检修维护及故障分析与应对策略_卢祥林.pdf,3
+section:225c317ca503,section,风电机组发电机绕组端温度高故障分析及处理_张新旺.pdf,2
+symptom:bce7ba643708,symptom,的故障有 IGBT 板卡故障、充电回路异常等[2]，其 控制模式设定为转矩控制或者有功功率控制,9
+symptom:86fd92941734,symptom,运行环境温度：-25~+50ºC 障停机，查看变流器内部故障信息记录，发现报警,9
+symptom:972b4a3e5fcc,symptom,动板损坏，从而引起了变流器高温停机,8
+symptom:b93a7ebc4d3f,symptom,障、变流器跳闸故障、变流器总故障、变流器转子,8
+symptom:0158358365e1,symptom,温度传感器未见异常，拆卸 K8 接,8
+symptom:03fab01a2721,symptom,在风机长时间停机的潮湿天气，应,8
+symptom:e8b32b844260,symptom,触头氧化、机构卡涩现象，易造成相关设备工作异常,8
+symptom:01c22a8a21d6,symptom,IGBT 驱动板在高负 升，根本解决环境温度过高的问题，例如根据变流,8
+symptom:6fe8c7330676,symptom,断方法，确认故障主要由轴承复合磨损引起，表现为内圈剥落、外圈15%覆盖率损伤及滚动体凹坑，通过,8
+symptom:5a44cab72ea6,symptom,近年多台机组的主轴系统陆续出现异常振动和温升 障频率（BSF=1.99× 转频）的谐波幅值较基准增长,8
+symptom:77c384ea5893,symptom,，导致非计划停机次数增加，严重影响发电效 8倍，提示滚动体表面存在严重损伤,8
+symptom:be01fa5db85e,symptom,号风机主轴齿轮箱轴承温度异常，影响风电机组正 （BPFO=2.03× 转频）,8
+symptom:e33299c916ad,symptom,机组主轴系统存在复合型磨损故障，主要表现,8
+symptom:ba46ae3909f4,symptom,落面积达15%，引发高频共振现象,8
+symptom:6994ae4460a0,symptom,达 D4级（严重损伤阶段），必须立即停机处理,8
+symptom:420a67852097,symptom,建议采取四级处理方案 ：一级处理为立即停机并更 安装工艺存在缺陷,8
+symptom:86964566d783,symptom,轴承座与主轴的同轴度偏差达,8
+symptom:8475d9c48c38,symptom,直接原因类别 具体表现 影响程度 证据来源 确定数据矩阵,8
+symptom:5197d734b82a,symptom,行温度下降约 15℃，未再发生高温变流器跳闸情,7
+symptom:82a293d3c824,symptom,压器经过长期（大于 24h 小于 72h）断电停机后,7
+symptom:b12155a067ae,symptom,压力异常故障处理全流程解析,7
+symptom:2f5a6de0f3ee,symptom,偏航系统作 二、故障现象,7
+symptom:03e722f33cf7,symptom,"风电机组的核心子系统之一,其液压制动性能的优劣直 2023 年 4 月 18 日,SCADA 系统监测到一系列异常报",7
+symptom:d58a92a748d6,symptom,"统故障在风电机组总故障中所占的比例约为 15%~20%,而 （1）偏航结束后,偏航压力出现显著异常波动",7
+symptom:b12c6f8d05a1,symptom,"偏航液压系统故障在整个液压系统故障中的占比更是超过 （2）液压站持续处于欠压状态（在补充液压油后,该",7
+symptom:357682794743,symptom,欠压故障得以消除）,7
+symptom:2ad33c70881d,symptom,"力异常攀升的故障,通过 SCADA 数据深度解析、液压系统",7
+symptom:d0385de53292,symptom,电场 15# 风电机组偏航液压系统压力异常的直接诱因,7
+symptom:63ffbbc59edd,symptom,启动应急处理程序 ：首先实施紧急停机操作，切断 款,7
+symptom:2d6cf8e60ea8,symptom,随后对主轴系统进行临时性处理 ：彻底排空污 理维度，将非计划停机损失纳入 KPI 考核，与维护,7
+symptom:5e0abbd16c8d,symptom,组存在早期磨损征兆，及时安排计划性维护避免故 年非计划停机次数减少72%，验证了处理方案的有,7
+symptom:1d11479b7b81,symptom,"时自动触发强化监测模式，振动报警阈值动态下调 机械工程师 ,2023(10):113-115.",7
+symptom:412f54dc38e6,symptom,描述,7
+symptom:2b53ec3a2f69,symptom,但是，22# 机处于停机或待机时，面板显示的发电机,7
+symptom:cedca9566a7f,symptom,绕组的温度最大值已超过故障报警值,7
+symptom:71e0c0a792b6,symptom,计算当前温度下的 Pt100 的阻值，如阻值偏差超过,7
+symptom:333b7476b333,symptom,对换通道，观察机组在停机和并网时就地面板显示的环境 所以故障原因可确定为发电机温度信号受到了电磁干扰,7
+symptom:e6566256d719,symptom,"向阀中的小球,观察到小球能够顺畅移动,未出现卡滞现象, 的双重缓冲功能,以提高系统运行的稳定性和可靠性",6
+symptom:f0781d298c2d,symptom,综合以上现象可,6
+symptom:5f4e716a8e92,symptom,"运行状态进行详细监测,观察到以下现象 ：液压站电机仅 可能性",5
+symptom:b51254a62017,symptom,"动作一次,运行过程中液压站未产生异常声响,设备表面 （2）通过对液压站原理图的深入研究发现,偏航回",5
+symptom:d7a81018b563,symptom,"基于上述现象,初步判断可排除除偏航回路 对液压站进行断电处理,并释放系统内部压力",5
+symptom:5c33d6573939,symptom,外其他回路存在异常的可能性,5
+symptom:17b4b6e5e8cc,symptom,振动监测阈值设置过高（4.5mm/s）,2
+symptom:cd7cf8447cba,symptom,变流器 IGBT,1
+symptom:30e94bdc7dd3,symptom,板卡故障的原,1
+symptom:569efebe1878,symptom,从导流罩抽送至二层以上空间的热气,1
+symptom:2dbd261ea3a6,symptom,了变流器高温停机,1
+symptom:5d55a582926f,symptom,、变流器转子侧故障触发，导出变,1
+symptom:b3dae3d7edca,symptom,根据风电场运行数据 经上述故障原,1
+symptom:79353f3a6798,symptom,存在很多未知负载，电网不稳定,1
+symptom:293dde8b6df8,symptom,驱 的巡检以及采取相应防潮措施，例如定期更换变流,1
+symptom:38e21cc8b5a2,symptom,相关设备工作异常,1
+symptom:58cb7d1e3f77,symptom,用寿命,1
+symptom:05ace8071854,symptom,明显不足，主要原,1
+symptom:0ee096681421,symptom,风扇强启或提高变流器模,1
+symptom:f0d8b491f3ba,symptom,统计了该风场技改前一年期 7 台机组,1
+symptom:f313c03f573a,symptom,的直接损失约为 25 万元（未统计电 [5] 毕长飞.大功率直驱风电机组变流器的功率器件热负荷分析[J].机械,1
+symptom:503d35be9f88,symptom,的 压变绝缘的问题也得到较好解决,1
+symptom:172ab8ebbada,symptom,"尤其是偏航系统结构复杂,导致故障现象并不具有规律性, （3）对比正常机组运行数据可知,正常情况下机组压",1
+symptom:ae8f0457f8f4,symptom,"其偏航液压系统出现报警故障后,采用系统化、科学化的 液压系统分析与故障诊断",1
+symptom:f359a245ba09,symptom,"描述 绿色线条至蓝色线条方向,具体油路为 ：液压油从油箱出",1
+symptom:3eac1dd203da,symptom,"并不具有规律性, （3）对比正常机组运行数据可知,正常情况下机组压",1
+symptom:3092c3438d24,symptom,"生换向动作,电磁换向阀（15.2）",1
+symptom:bde9ab0f2192,symptom,有备用电磁换向阀,1
+symptom:38e07c86cf1b,symptom,无法直接取出,1
+symptom:adb69f7be83c,symptom,砀山风,1
+symptom:2161cce4707e,symptom,，表现为内圈剥落、外圈15%覆盖率损伤及滚动体凹坑，通过,1
+symptom:04693b3192bb,symptom,峰值,1
+symptom:8b8251b7d0e5,symptom,主轴系统故障率较平原 本案例在对风电机组主轴故障诊断过程中，选,1
+symptom:72abfcd8ca7c,symptom,机理分析表明，该复合磨损是多种,1
+symptom:dc9bbe94a2c6,symptom,结果 ：高海拔地区昼夜温差大（日温差达25℃）导 通过现场检查可判定，本次故障的诱,1
+symptom:5b43cf074150,symptom,润滑系统污染（金属磨屑浓度超 荷为3850kN，而实际运行中,1
+symptom:5558c1bf6d56,symptom,许值≤150ppm），且基础油粘度从原320cSt 降至,1
+symptom:0f0d94ac9ec3,symptom,油膜厚度不足，形成金属直接接触,1
+symptom:ba152a97f444,symptom,附加偏心载,1
+symptom:aa3833ea2a46,symptom,环境,1
+symptom:b1c8f6bf21a6,symptom,密封件提前老化，日温差,1
+symptom:4c0dc18b76e3,symptom,轴承钢产生微裂纹,1
+symptom:54bc0d240500,symptom,1.2 故障现场检查,1
+symptom:7037d74c1530,symptom,的系统性失效问题,1
+symptom:e38d63b2b852,symptom,主轴轴承磨损故障的直接技术原,1
+symptom:e8d363bf1114,symptom,现场运维人员对 A22风机对主轴进行检查，上,1
+symptom:01efde671755,symptom,表3 主轴故障直接原,1
+symptom:54d70431c977,symptom,直接原,1
+symptom:450f7c98c7c7,symptom,表4 主轴故障根本原,1
+symptom:d64dae7f6017,symptom,根本原,1
+symptom:b93ba2a3cc85,symptom,用专用清洗剂对轴承腔体进行三次循 团队绩效直接挂钩,1
+symptom:e628267cefba,symptom,基于故障根,1
+symptom:75fe8871112b,symptom,改造，采用特殊配方的氟橡胶密封件，耐磨性提高 风电机组主轴疲劳强度影响,1
+symptom:539141662ea1,symptom,"强化监测模式，振动报警阈值动态下调 机械工程师 ,2023(10):113-115.",1
+symptom:e125897613ae,symptom,准确度降低，重则使测量 120℃,1
+symptom:1da1c8189734,symptom,误报故障或误动作，甚至造成重大事故的发生,1
+symptom:547cc7f37028,symptom,如果模块正常，那么可以断定故障原,1
+symptom:9c1c71449192,symptom,元件和设备,1
+symptom:cc1e1b6751c2,symptom,扰，或者,1
+symptom:8e62e60ee65f,symptom,很大的影响,1
+symptom:f7295a8ee3aa,symptom,用不合理、不正确,1
+symptom:722de68e4db6,symptom,对故障数据分析，可知温度跳变的可能原,1
+symptom:186e655c2dfa,symptom,（如机舱变压器和动力电缆），如果干扰源主,1
+symptom:20fb32dc6e10,symptom,对换通道，观察机组在停机和并网时就地面板显示的环境 所以故障原,1
+symptom:574d6a1ac15a,symptom,启机并网观察数据， 测量误差大的原,1
+system:51198095738b,system,液压系统,4
+system:0169dd5f049c,system,SCADA,4
+system:bfc8eeb8b8f4,system,偏航系统,1
+system:3b38804e36bc,system,主控系统,1
+system:b59dea4e1bf8,system,PLC,1
+term:947f6b771f60,term,停机,7
+term:d3bea9efb1b9,term,温度,6
+term:41eef008cb28,term,风机,5
+term:9f8d394ef97e,term,发电机,5
+term:7cd04214ce37,term,机舱,5
+term:cb8ea1925439,term,风场,4
+term:23362670e490,term,传感器,4
+term:8898b14992fa,term,偏航,4
+term:3f5ad413e2f2,term,变流器,3
+term:6f454c002ccb,term,IGBT,3
+term:f1a6f056e7d7,term,电流,3
+term:b9f7fdf18d29,term,并网,3
+term:45ebccbcba96,term,主轴,3
+term:117bac1e4506,term,振动,3
+term:54a2a0a871b6,term,接触器,2
+term:a561a61eb5ad,term,电压,2
+term:38d0a8358b11,term,齿轮箱,2
+term:7bc3b508c8d5,term,变桨,1
+term:fa7a63c409ef,term,断路器,1
+term:0e7fe9ba5c8e,term,塔筒,1
+term:ad18e46a4471,term,轮毂,1
+term:52a5c38f0efc,term,复位,1

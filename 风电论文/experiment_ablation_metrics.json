@@ -1,0 +1,43 @@
+{
+  "fault_records": 11865,
+  "unique_codes": 4849,
+  "ambiguous_codes": 1714,
+  "ambiguous_code_rate": 0.35347494328727574,
+  "max_meaning_groups_per_code": 19,
+  "case_count": 33,
+  "strategy_ready_cases": 33,
+  "ablation_rows": [
+    {
+      "variant": "Plain code lookup / chunk RAG",
+      "scope_disambiguation_rate": 0.0,
+      "profile_completeness": 0.7273,
+      "prevention_closure": 0,
+      "hypothesis_discrimination": 0.0,
+      "verification_strategy_ready": 0.0
+    },
+    {
+      "variant": "Scope-bound retrieval only",
+      "scope_disambiguation_rate": 1.0,
+      "profile_completeness": 0.7273,
+      "prevention_closure": 0,
+      "hypothesis_discrimination": 0.0,
+      "verification_strategy_ready": 0.0
+    },
+    {
+      "variant": "Scope + mechanism closure",
+      "scope_disambiguation_rate": 1.0,
+      "profile_completeness": 1,
+      "prevention_closure": 1,
+      "hypothesis_discrimination": 0.0,
+      "verification_strategy_ready": 0.0
+    },
+    {
+      "variant": "Full framework",
+      "scope_disambiguation_rate": 1.0,
+      "profile_completeness": 1,
+      "prevention_closure": 1,
+      "hypothesis_discrimination": 1,
+      "verification_strategy_ready": 1.0
+    }
+  ]
+}
