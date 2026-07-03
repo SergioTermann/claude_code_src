@@ -1,0 +1,55 @@
+{
+  "records": 11476,
+  "unique_codes": 4463,
+  "ambiguous_codes": 909,
+  "ambiguous_rate": 0.2037,
+  "max_meaning_groups": 11,
+  "baseline_miss_rate": 0.2883,
+  "pearson": 0.9805,
+  "spearman": 0.9992,
+  "gain_pearson": 0.9477,
+  "gain_spearman": 0.9715,
+  "optimal_point": {
+    "ask_rate": 0.474,
+    "residual_miss": 0.0,
+    "miss_reduction": 1.0
+  },
+  "budget_curve": [
+    {
+      "budget": 0.02,
+      "aeg": 0.2716,
+      "freq": 0.2731,
+      "random": 0.2831
+    },
+    {
+      "budget": 0.05,
+      "aeg": 0.248,
+      "freq": 0.25,
+      "random": 0.2747
+    },
+    {
+      "budget": 0.1,
+      "aeg": 0.2097,
+      "freq": 0.2131,
+      "random": 0.2597
+    },
+    {
+      "budget": 0.15,
+      "aeg": 0.1731,
+      "freq": 0.1761,
+      "random": 0.2453
+    },
+    {
+      "budget": 0.2,
+      "aeg": 0.1371,
+      "freq": 0.1396,
+      "random": 0.2295
+    },
+    {
+      "budget": 0.3,
+      "aeg": 0.074,
+      "freq": 0.0768,
+      "random": 0.2032
+    }
+  ]
+}
