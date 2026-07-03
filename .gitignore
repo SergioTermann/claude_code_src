@@ -40,3 +40,6 @@ hantech_app-main/captures/
 
 # 参考快照(旧项目副本,124M),保留磁盘但不入库
 reference/
+
+# 运行时会话存储(含测试产物),不入库
+generated-knowledge/chat-sessions/

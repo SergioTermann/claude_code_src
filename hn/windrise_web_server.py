@@ -28,7 +28,6 @@ from urllib.parse import urlparse, urlunparse
 from werkzeug.security import check_password_hash, generate_password_hash
 from prompts import (
     CLASSIFICATION_PROMPT,
-    SYSTEM_PROMPT,
     CHAT_SYSTEM_PROMPT,
     DIAGNOSIS_SYSTEM_PROMPT,
 )
@@ -1223,7 +1222,6 @@ def reset_langchain_progress(total_files=0):
 
 
 def update_langchain_progress(**kwargs):
-    global langchain_progress
     langchain_progress.update(kwargs)
     langchain_progress['updated_at'] = datetime.now().isoformat()
 
@@ -4784,7 +4782,7 @@ def update_all_wind_farm_models():
                 wind_farms[fid]['note'] = fdata['note']
 
         save_wind_farm_models(wind_farms)
-        print(f"✅ 风场配置已批量更新")
+        print("✅ 风场配置已批量更新")
         return jsonify({'success': True, 'wind_farms': wind_farms})
     except Exception as e:
         print(f"❌ 批量更新风场配置失败: {e}")
@@ -5630,7 +5628,6 @@ def dedupe_repeated_windrise_answer(answer):
         second = '\n'.join(lines[midpoint:]).strip()
         if first and first == second:
             return first
-    normalized = re.sub(r'\s+', '', text)
     for index in range(1, len(lines)):
         first = '\n'.join(lines[:index]).strip()
         second = '\n'.join(lines[index:]).strip()
@@ -6506,7 +6503,6 @@ def build_windrise_semantic_router_fallback(query, history):
 
 def call_windrise_semantic_router(query, history):
     fallback = build_windrise_semantic_router_fallback(query, history)
-    has_current_subject = has_specific_current_diagnosis_subject(query)
     if not WINDRISE_SEMANTIC_ROUTER_ENABLED or is_windrise_llm_temporarily_unavailable():
         return fallback
 
@@ -7853,7 +7849,7 @@ if __name__ == '__main__':
     local_ip = get_local_ip()
     
     print("=" * 60)
-    print(f"🚀 风起时域 Web 服务器启动中...")
+    print("🚀 风起时域 Web 服务器启动中...")
     print("=" * 60)
     print(f"📂 工作目录: {BASE_DIR}")
     print(f"📄 HTML 文件: {HTML_FILE}")
@@ -7920,7 +7916,7 @@ if __name__ == '__main__':
         print(f"🔧 请求队列大小: {SERVER_REQUEST_QUEUE_SIZE}")
         print(f"🔧 SQLite WAL 模式, busy_timeout={SQLITE_BUSY_TIMEOUT_MS}ms")
         print(f"🔧 内存缓存上限: {MAX_CACHED_CONVERSATIONS} 个会话")
-        print(f"💡 局域网内的其他设备可以通过上述地址访问")
+        print("💡 局域网内的其他设备可以通过上述地址访问")
         print("=" * 60)
         print("\n按 Ctrl+C 停止服务器\n")
         server.serve_forever()
