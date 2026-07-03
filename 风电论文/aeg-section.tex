@@ -1,0 +1,90 @@
+% =====================================================================
+%  Ambiguity-Entropy Gating (AEG) — 可插入 bare_jrnl_new_sample4.tex 的章节
+%
+%  用法:
+%   1) 方法小节:插入 \subsection{Domain Relationship Model} 之后
+%      (即 scope-binding 之后),作为其前置的主动风控。
+%   2) 实验小节:插入 \subsection{Module Ablation} 之后。
+%   3) 建议在 Abstract 与 Introduction 的贡献列表中补一句:
+%      "a pre-retrieval ambiguity-entropy gate that actively decides,
+%       from a single interpretable scalar, whether a fault code needs
+%       model disambiguation."
+%  记号沿用主文:F(c)=共享码 c 的故障条目集, Omega=scope 约束,
+%  A(q,s_t)=admissible set。
+% =====================================================================
+
+% ---------------------------------------------------------------- METHOD
+\subsection{Ambiguity-Entropy Gating}
+\label{sec:aeg}
+Scope binding (the Domain Relationship Model) resolves fault-code ambiguity \emph{after} a scope constraint $\Omega(q,s_t)$ becomes available. In practice the constraint is frequently absent in the first turn, yet always asking a technician for the turbine model is intrusive and slows field work. We therefore introduce an information-theoretic gate that decides, \emph{before} retrieval, whether a fault code is ambiguous enough to justify a disambiguation prompt.
+
+Let $\mathcal{M}(c)$ be the set of distinct fault meanings carried by code $c$ across $\mathcal{F}(c)$, and let $p_c(m)$ denote the empirical probability of meaning $m$. The \emph{ambiguity entropy} of code $c$ is
+\begin{equation}
+H(c) = -\!\!\sum_{m\in\mathcal{M}(c)}\!\! p_c(m)\,\log_2 p_c(m).
+\label{eq:aeg_entropy}
+\end{equation}
+A single-meaning code has $H(c)=0$; a code whose meanings are spread across many turbine models has large $H(c)$. Given a gate threshold $\tau$, the pre-retrieval policy is
+\begin{equation}
+\pi(c)=
+\begin{cases}
+\text{retrieve and answer}, & H(c)\le\tau \ \text{or}\ \Omega(q,s_t)\neq\varnothing,\\[2pt]
+\text{request turbine model}, & H(c)>\tau \ \text{and}\ \Omega(q,s_t)=\varnothing.
+\end{cases}
+\label{eq:aeg_policy}
+\end{equation}
+The gate turns disambiguation from a passive fallback (``prompt only after retrieval looks ambiguous'') into an active, quantifiable pre-retrieval risk control: only codes whose meaning distribution is genuinely uncertain trigger a prompt, and $\tau$ directly tunes the trade-off between intrusiveness and mis-hit risk. Because the gate only restricts \emph{which} codes require a scope constraint, it never enlarges the candidate set and preserves the admissibility property $\mathcal{A}(q,s_t)\subseteq\mathcal{F}(c)$ established for scope binding.
+
+% ------------------------------------------------------------ EXPERIMENT
+\subsection{Ambiguity-Entropy Gating: Effectiveness}
+\label{sec:aeg_eval}
+We evaluate the gate on all $11{,}476$ valid fault records ($4{,}463$ unique codes, of which $909$ are ambiguous under an exact-name meaning granularity). We model a first-turn query that reports a code without model context: a system returning the most frequent meaning has expected mis-hit rate $\mathrm{miss}(c)=1-\max_m p_c(m)$, weighted by code query frequency (approximated by record frequency). The uncontrolled baseline (plain code lookup, no gate) has a mis-hit rate of $28.8\%$; always asking removes all mis-hits but at a $100\%$ prompt rate.
+
+\noindent\textbf{Entropy predicts mis-hit.}
+$H(c)$ and $\mathrm{miss}(c)$ are strongly correlated (Pearson $0.98$, Spearman $0.999$). Mean mis-hit rises monotonically with entropy (Table~\ref{tab:aeg_buckets}), from $0\%$ for single-meaning codes to $74.1\%$ for $H>2$. As $H$ and $\mathrm{miss}$ are both functionals of $p_c$, this correlation is partly intrinsic and establishes $H$ as a well-behaved, gate-able proxy; the independent decision value is shown below.
+
+\noindent\textbf{Entropy gating is Pareto-optimal.}
+Under an equal ask-budget (fraction of queries prompted), ranking codes by $H$ leaves a lower residual mis-hit than random gating and consistently dominates frequency ranking (Table~\ref{tab:aeg_tradeoff}). At a $30\%$ budget the residual mis-hit drops to $7.4\%$ versus $19.8\%$ for random gating---a $62.5\%$ relative reduction---confirming that entropy is a valuable \emph{ranking} signal, not merely that asking helps.
+
+\noindent\textbf{Ask-gain is entropy-driven (independent check).}
+The mis-hit actually removed by asking for the model, $\mathrm{gain}(c)=\mathrm{miss}(c)-\mathbb{E}_{m}\!\left[1-\max_{m'}p_{c,m}(m')\right]$, is determined by the code$\times$model \emph{joint} distribution and is therefore not a function of $H(c)$. It nonetheless correlates strongly with $H$ (Pearson $0.95$, Spearman $0.97$): asking is worthless for single-meaning codes ($0\%$ gain) and removes $73.1\%$ of mis-hits for $H>2$ codes, with high-entropy codes ($H>1$) yielding $3\times$ the gain of low-entropy ambiguous ones. This independent evidence justifies deciding \emph{which} codes to disambiguate by entropy, rather than being a restatement of Eq.~\eqref{eq:aeg_entropy}. At the operating point that gates all ambiguous codes, a single model prompt on $47.4\%$ of queries reduces the mis-hit rate from $28.8\%$ to $\approx 0$.
+
+% --------------------------------------------------------------- TABLES
+\begin{table}[htbp]
+\centering
+\caption{Mis-hit and model-ask gain grouped by ambiguity entropy $H(c)$ (11{,}476 records).}
+\label{tab:aeg_buckets}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lrrr}
+\hline
+\textbf{Entropy range} & \textbf{Codes} & \textbf{Mean mis-hit} & \textbf{Ask-gain} \\
+\hline
+$H=0$ (single-meaning) & 3554 & $0.0\%$ & $0.0\%$ \\
+$0.5<H\le 1.0$ & 332 & $33.8\%$ & $20.9\%$ \\
+$1.0<H\le 2.0$ & 314 & $59.3\%$ & $49.8\%$ \\
+$H>2.0$ & 263 & $74.1\%$ & $73.1\%$ \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Residual mis-hit under an equal ask-budget: entropy gating vs.\ frequency and random gating (lower is better).}
+\label{tab:aeg_tradeoff}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{rrrr}
+\hline
+\textbf{Ask budget} & \textbf{AEG (entropy)} & \textbf{Frequency} & \textbf{Random} \\
+\hline
+$5\%$  & $\mathbf{24.8\%}$ & $25.0\%$ & $27.4\%$ \\
+$10\%$ & $\mathbf{21.0\%}$ & $21.3\%$ & $26.1\%$ \\
+$20\%$ & $\mathbf{13.7\%}$ & $14.0\%$ & $23.0\%$ \\
+$30\%$ & $\mathbf{7.4\%}$  & $7.7\%$  & $19.8\%$ \\
+\hline
+\end{tabular}
+\end{table}
+
+% ------------------------------------------------------ LIMITATION NOTE
+% 建议在 Limitations 小节补一句(可选):
+% Mis-hit rates are expected values under a most-frequent-meaning policy and a
+% query-frequency-equals-record-frequency assumption; a validation on real query
+% logs and a semantic meaning-granularity are left to future work.
