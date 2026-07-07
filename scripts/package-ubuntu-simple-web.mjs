@@ -190,7 +190,7 @@ bin/windrise-bash "303804是什么故障，怎么处理"
 
 ## 说明
 
-这个包启动的是 \`simple_home.html\`，不是 \`hn/dify_web_server_.py\`。页面里保留：
+这个包启动的是 \`simple_home.html\`，不是 \`hn/windrise_web_server.py\`。页面里保留：
 
 - 思维链开关
 - 普通问候不触发推理链

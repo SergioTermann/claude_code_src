@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 酷炫的渐变背景 -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#F7F8F5" />
-</shape>

@@ -10,6 +10,7 @@ function pickRisk(text: string): string {
 
 function pickSystem(text: string): string {
   if (has(text, /变桨/)) return '变桨系统'
+  if (has(text, /偏航/)) return '偏航系统'
   if (has(text, /通信|通讯/)) return '通信系统'
   if (has(text, /水冷/)) return '水冷系统'
   if (has(text, /齿轮箱|油温|滤芯/)) return '齿轮箱系统'
@@ -17,6 +18,42 @@ function pickSystem(text: string): string {
   if (has(text, /安全链|急停/)) return '安全链系统'
   if (has(text, /并网|电网|接触器|断路器/)) return '电网/并网系统'
   return '待补充'
+}
+
+function pickComponent(text: string): string {
+  if (has(text, /24V|24\s*v/i)) return '24V 控制电源/反馈回路'
+  if (has(text, /传感器|编码器/)) return '传感器/编码器与采集回路'
+  if (has(text, /液压|压力|阀|泵|蓄能器/)) return '液压阀组/泵/压力回路'
+  if (has(text, /接触器|断路器|开关|反馈/)) return '开关/接触器/断路器反馈回路'
+  return '待补充'
+}
+
+function pickTurbine(text: string): string {
+  const match = text.match(/(?:WTG[-_ ]?)?0*(\d+)\s*(?:号机|#|机组)?/i)
+  return match ? `WTG-${String(match[1]).padStart(3, '0')}` : '待补充'
+}
+
+function pickFaultCode(text: string): string {
+  return text.match(/[A-Za-z]?_?[0-9]{3,}/)?.[0] || '待补充'
+}
+
+function pickTimeWindow(text: string): string {
+  return text.match(/近\s*\d+\s*(?:分钟|小时)|last[_ -]?\d+\w*/i)?.[0] ||
+    (has(text, /当前|现在|今天|今日|刚才/) ? '当前/近期窗口' : '待补充')
+}
+
+function pickMissingContext(text: string): string {
+  const missing: string[] = []
+  if (pickTurbine(text) === '待补充') missing.push('风机ID')
+  if (pickSystem(text) === '待补充') missing.push('系统/部件')
+  if (pickFaultCode(text) === '待补充' && !has(text, /故障|报警|告警|异常|低压|跳变|压力|温度|振动|反馈/)) {
+    missing.push('故障码或告警现象')
+  }
+  if (pickTimeWindow(text) === '待补充') missing.push('运行时间窗')
+  if (!has(text, /风速|停机|限功率|复位|作业票|HMI|SCADA|CMS/i)) {
+    missing.push('运行状态/安全条件')
+  }
+  return missing.length ? missing.join('、') : '无明显缺口'
 }
 
 function pickFaultPhenomenon(text: string): string {
@@ -72,6 +109,35 @@ function pickFeedback(text: string): string {
   return '现场验证结果'
 }
 
+function pickPlannerPath(text: string): string[] {
+  const firstAction = pickFirstAction(text)
+  return [
+    '确认风机ID、机型、控制器版本、当前停机/限功率状态。',
+    '拉取CMS/SCADA时间窗趋势和告警平台伴随告警。',
+    '检索故障码表、厂家手册、场站SOP和已关闭历史工单。',
+    `现场只执行一个首个动作：${firstAction}`,
+    '将验证结果写入工单反馈字段，等待复核后再收敛根因。',
+  ]
+}
+
+function pickEvidenceSource(text: string): string {
+  if (pickFaultCode(text) !== '待补充') return '本地故障码表/LLMWiki 检索结果（待引用具体来源路径）'
+  if (has(text, /SOP|手册|厂家|历史工单/)) return '用户提供的手册/SOP/历史工单线索（待核验来源路径）'
+  return '当前用户输入与已知现场反馈；需补充厂家手册、场站SOP、历史工单或实时数据来源'
+}
+
+function pickLongTermMemory(text: string): string {
+  const items = ['已验收根因', '最终处置措施', '复发情况', '停机时长', '专家复核结论']
+  if (has(text, /更换|备件|模块|传感器|接触器|阀|泵/)) items.push('确认更换部件和备件型号')
+  return items.join('、')
+}
+
+function pickShortTermMemory(text: string): string {
+  const items = ['当前告警窗口', '近期复位状态', '临时限功率/旁路', '当天风况', '未验收候选原因']
+  if (has(text, /天气|风速|临时|旁路|限功率|观察/)) items.push('短期天气或临时运行限制')
+  return items.join('、')
+}
+
 export function buildSmartWorkOrderMarkdown(args: string): string {
   const text = String(args || '').trim()
   const request = text || '待补充'
@@ -91,36 +157,67 @@ export function buildSmartWorkOrderMarkdown(args: string): string {
     '',
     `- ${request}`,
     '',
-    '## 3. 最可能判断',
+    '## 3. 结构化故障 Case',
+    '',
+    `- 风机/机型：${pickTurbine(text)} / 待补充`,
+    `- 系统/部件：${pickSystem(text)} / ${pickComponent(text)}`,
+    `- 故障码/告警：${pickFaultCode(text)}`,
+    `- 时间窗：${pickTimeWindow(text)}`,
+    `- 运行状态：待补充`,
+    `- 缺失信息：${pickMissingContext(text)}`,
+    '',
+    '## 4. 证据来源与分级',
+    '',
+    '- 厂家手册/故障码表：待补充',
+    '- 场站 SOP：待补充',
+    '- 专家知识/历史工单：待补充',
+    '- 实时或快照数据：待补充',
+    `- 当前可用来源：${pickEvidenceSource(text)}`,
+    '',
+    '## 5. Planner 诊断路径',
+    '',
+    ...pickPlannerPath(text).map((item, index) => `${index + 1}. ${item}`),
+    '',
+    '## 6. 最可能判断',
     '',
     `- ${pickLikelyJudgment(text)}`,
     '',
-    '## 4. 首个现场动作',
+    '## 7. Safety Gate',
+    '',
+    '- 作业票：待补充',
+    '- 风速：待补充',
+    '- 停机/限功率状态：待补充',
+    '- 权限与二次确认：待补充',
+    '- 控制类动作边界：复位、启停机、参数调整、登塔、开柜、带电作业只生成建议，不直连执行。',
+    '',
+    '## 8. 首个现场动作',
     '',
     `- ${pickFirstAction(text)}`,
     '',
-    '## 5. 合格标准',
+    '## 9. 合格标准',
     '',
     `- ${pickAcceptance(text)}`,
     '',
-    '## 6. 需要反馈',
+    '## 10. 需要反馈',
     '',
     `- ${pickFeedback(text)}`,
     '',
-    '## 7. 安全注意事项',
+    '## 11. 备件与工具',
     '',
-    '- 先确认现场许可和停送电条件，再开始处理。',
-    '- 涉及安全链、并网、雷击浪涌或高压回路时，不要盲目复位。',
+    '- 待补充：根据现场确认结果再定，不自动编造备件型号。',
     '',
-    '## 8. 备件与工具',
+    '## 12. 闭环条件',
     '',
-    '- 待补充：根据现场确认结果再定。',
+    '- 现场反馈与最可能判断一致，首个动作能把问题范围继续缩小。',
+    '- 工单验收后补齐根因、最终措施、停机时长、备件结果和复发情况。',
     '',
-    '## 9. 闭环条件',
+    '## 13. 反馈入库',
     '',
-    '- 现场反馈与最可能判断一致，且下一步动作能把问题范围继续缩小。',
+    `- 可进入长期画像：${pickLongTermMemory(text)}`,
+    `- 仅短期 TTL 记忆：${pickShortTermMemory(text)}`,
+    '- 专家复核项：故障根因、处置措施、是否复发、是否更新SOP/图纸/点位字典。',
     '',
-    '## 10. 资料来源',
+    '## 14. 资料来源',
     '',
     '- 当前用户输入与已知现场反馈',
   ].join('\n')

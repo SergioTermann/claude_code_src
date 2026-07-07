@@ -42,8 +42,8 @@ const history = [
   {
     role: 'system',
     content: DISABLE_AUTO_LLMWIKI
-      ? '你是 Windrise，本地中文助手。直接回答用户问题，不输出推理过程。只有用户消息明确附带本地资料时才基于资料回答。'
-      : '你是 Windrise，本地中文助手。直接回答用户问题，不输出推理过程。有本地资料上下文时基于资料回答，否则直接回答。',
+      ? `${windOpsSystemInstruction()}\n\n直接回答用户问题，不输出推理过程。只有用户消息明确附带本地资料时才基于资料回答。`
+      : `${windOpsSystemInstruction()}\n\n直接回答用户问题，不输出推理过程。有本地资料上下文时基于资料回答，否则直接回答。`,
   },
 ]
 const conversationMemory = {
@@ -55,6 +55,70 @@ const conversationMemory = {
   lastFaultName: '',
   lastFaultAnswer: '',
   lastSource: '',
+}
+
+function windOpsSystemInstruction() {
+  return [
+    '你是 Windrise 风电运维智导助手，后端架构按 01_lecture1_wind_ops 的七层路线执行。',
+    '核心链路：业务层接收告警/提问；数据层先做故障 Case 标准化；记忆层使用风机画像、故障画像和短期工作记忆；模型应用层由 Planner 拆诊断路径；工具层只读调用 CMS/SCADA/EAM/备件/气象/工作票；模型层按任务路由；反馈层通过工单结果和专家复核沉淀经验。',
+    '输出约束：先给结论，再给一个最小下一步；关键结论必须基于本地资料、实时/快照数据或明确标注为待验证；不能编造故障原因、备件型号、复位权限或现场测量值。',
+    '安全边界：远程复位、启停机、参数调整、登塔、开柜、带电作业等高风险动作只生成建议和校验项，必须经过作业票、风速、停机状态、权限和人工二次确认。',
+  ].join('\n')
+}
+
+function buildWindOpsCase(query) {
+  const text = String(query || '')
+  const turbineMatch = text.match(/(?:WTG[-_ ]?)?0*(\d+)\s*(?:号机|#|机组)?/i)
+  const system =
+    /变桨|pitch/i.test(text) ? '变桨系统' :
+    /偏航|yaw/i.test(text) ? '偏航系统' :
+    /齿轮箱|油温|滤芯|润滑/i.test(text) ? '齿轮箱系统' :
+    /发电机|绕组|轴承温度/i.test(text) ? '发电机系统' :
+    /液压|制动|刹车|压力/i.test(text) ? '液压/制动系统' :
+    /变流|变频|IGBT/i.test(text) ? '变流系统' :
+    /通信|通讯|CAN|Profibus|EtherCAT/i.test(text) ? '通信系统' :
+    '待识别'
+  const component =
+    /24\s*v|24V/i.test(text) ? '24V 控制电源/反馈回路' :
+    /传感器|编码器/i.test(text) ? '传感器/编码器与采集回路' :
+    /阀|泵|蓄能器|压力/i.test(text) ? '液压阀组/泵/压力回路' :
+    /接触器|断路器|开关/i.test(text) ? '开关/接触器/断路器反馈回路' :
+    '待识别'
+  const code = extractCode(text)
+  const timeWindow =
+    text.match(/近\s*\d+\s*(?:分钟|小时)|last[_ -]?\d+\w*/i)?.[0] ||
+    (/昨天|今日|今天|刚才|当前|现在/.test(text) ? '当前/近期窗口' : '待补充')
+  const missing = []
+  if (!turbineMatch) missing.push('风机ID')
+  if (system === '待识别') missing.push('系统/部件')
+  if (!code && !/(报警|告警|故障|异常|低压|跳变|压力|温度|振动|反馈)/.test(text)) {
+    missing.push('故障码或故障现象')
+  }
+  if (timeWindow === '待补充') missing.push('运行时间窗')
+  if (!/(风速|停机|限功率|复位|作业票|HMI|SCADA|CMS)/i.test(text)) {
+    missing.push('运行状态/安全条件')
+  }
+  return {
+    turbineId: turbineMatch ? `WTG-${String(turbineMatch[1]).padStart(3, '0')}` : '待补充',
+    system,
+    component,
+    faultCode: code || '待补充',
+    timeWindow,
+    missing,
+  }
+}
+
+function renderWindOpsArchitectureContext(query) {
+  const faultCase = buildWindOpsCase(query)
+  const missing = faultCase.missing.length ? faultCase.missing.join('、') : '无明显缺口'
+  return [
+    'WindOps 架构上下文：',
+    `- 结构化 Case：风机=${faultCase.turbineId}；系统=${faultCase.system}；部件=${faultCase.component}；故障码=${faultCase.faultCode}；时间窗=${faultCase.timeWindow}；缺失=${missing}。`,
+    '- Planner 默认路径：确认告警和运行状态 -> 拉取 CMS/SCADA 趋势 -> 检索手册/SOP/历史工单 -> 通过 Safety Gate -> 输出一个现场动作和工单草稿字段。',
+    '- LLMWiki 证据分级：厂家手册/故障码表 > 场站 SOP > 专家知识 > 已关闭历史工单 > 未验证经验。',
+    '- Safety Gate：风速、停机状态、作业票、权限、二次确认；高风险控制动作只给建议，不直连执行。',
+    '- 反馈闭环：工单关闭后沉淀根因、措施、备件、复发率和专家复核；临时限电/临时旁路/短期天气影响设置 TTL。',
+  ].join('\n')
 }
 
 function printBanner() {
@@ -238,6 +302,7 @@ async function runLlmwiki(args) {
 async function searchKnowledge(query) {
   const code = extractCode(query)
   const mechanismSummary = buildMechanismSummaryForQuery(query)
+  const architectureContext = renderWindOpsArchitectureContext(query)
   const primary = await runLlmwiki(
     code ? `/llmwiki ask ${code} --limit 4` : `/llmwiki search ${query} --limit 6`,
   )
@@ -247,6 +312,7 @@ async function searchKnowledge(query) {
     : ''
   if (!systemPath || code) {
     return [
+      architectureContext,
       mechanismSummary,
       mechanismContext && !/^LLMWiki error:/i.test(mechanismContext)
         ? [`机理图谱上下文：wiki/fault-mechanisms.md`, mechanismContext, ''].join('\n')
@@ -261,7 +327,7 @@ async function searchKnowledge(query) {
     contexts.push(`机理图谱上下文：wiki/fault-mechanisms.md`, mechanismContext, '')
   }
   if (!systemContext || /^LLMWiki error:/i.test(systemContext)) {
-    return [mechanismSummary, ...(contexts.length ? contexts : []), primary].filter(Boolean).join('\n')
+    return [architectureContext, mechanismSummary, ...(contexts.length ? contexts : []), primary].filter(Boolean).join('\n')
   }
   contexts.push(
     `系统上下文：${systemPath}`,
@@ -269,7 +335,7 @@ async function searchKnowledge(query) {
     '',
     primary,
   )
-  return [mechanismSummary, contexts.join('\n')].filter(Boolean).join('\n')
+  return [architectureContext, mechanismSummary, contexts.join('\n')].filter(Boolean).join('\n')
 }
 
 function shouldAttachMechanismContext(text) {
@@ -1149,7 +1215,7 @@ async function answerWithRetrieval(text) {
   const codeOnlyQuery = !!extractCode(text) && !actionQuery && !principleQuery
 
   const prompt = actionQuery
-    ? `以下是本地 LLMWiki 检索到的相关资料，只作为回答依据，不要原样复述。
+    ? `以下是本地 LLMWiki 检索到的相关资料和 WindOps 架构上下文，只作为回答依据，不要原样复述。
 
 ${hits}
 
@@ -1161,8 +1227,9 @@ ${hits}
 2. 开头直接写“结论：...”，不要铺垫。
 3. 第二段写“下一步只做一件事：...”，只能给一个动作，不要同时列多个建议。
 4. 第三段写“请反馈：...”，最多要 1 到 3 个现场结果，不要一次要一串清单。
-5. 不主动解释长篇原理；用户追问为什么时再解释。
-6. 不输出思考过程、检索过程、证据分析或内部判断依据。`
+5. 如果涉及复位、启停机、参数调整、登塔、开柜或带电作业，必须先写 Safety Gate 校验项，且只生成建议，不说已经执行。
+6. 不主动解释长篇原理；用户追问为什么时再解释。
+7. 不输出思考过程、检索过程、证据分析或内部判断依据。`
     : principleQuery || codeOnlyQuery
       ? `以下是本地 LLMWiki 检索到的相关资料，只作为回答依据，不要原样复述。
 
@@ -1171,7 +1238,7 @@ ${hits}
 用户问题：${text}
 
 请用正常中文回答，像给现场同事解释一样清楚直接。
-如果是故障码查询，只说明故障名称、含义、复位方式、来源；如果是原理/机理/工作方式提问，就按原理说明，不要强行改成排障指令。
+如果是故障码查询，说明故障名称、含义、复位方式、结构化 Case 缺口和来源；如果是原理/机理/工作方式提问，就按原理说明，不要强行改成排障指令。
 不要输出思考过程、检索过程或内部判断依据。`
       : `以下是本地 LLMWiki 检索到的相关资料，只作为回答依据，不要原样复述。
 
@@ -1186,8 +1253,8 @@ ${hits}
       {
         role: 'system',
         content: actionQuery
-          ? '你是 Windrise，负责结合本地风电知识库和自身专业能力回答现场问题。面向一线运维人员，像导航一样给明确指令：结论优先，一次只给一个下一步动作，要求用户反馈最多 1 到 3 个明确结果。不要输出思考过程、检索结果、系统上下文或 Matches for 列表。'
-          : '你是 Windrise，负责结合本地风电知识库和自身专业能力回答现场问题。请用正常中文解释问题，保持简洁清楚，不要输出思考过程、检索结果、系统上下文或 Matches for 列表。',
+          ? `${windOpsSystemInstruction()}\n面向一线运维人员，像导航一样给明确指令：结论优先，一次只给一个下一步动作，要求用户反馈最多 1 到 3 个明确结果。不要输出思考过程、检索结果、系统上下文或 Matches for 列表。`
+          : `${windOpsSystemInstruction()}\n请用正常中文解释问题，保持简洁清楚，不要输出思考过程、检索结果、系统上下文或 Matches for 列表。`,
       },
       { role: 'user', content: prompt },
     ], `故障知识库总结：${query}`, CHAT_MODEL)
@@ -1203,7 +1270,7 @@ ${hits}
         {
           role: 'user',
           content: actionQuery
-            ? `本地知识库压缩上下文：\n${compactKnowledgeContext(hits)}\n\n用户问题：${text}\n\n请直接回答用户问题。格式固定为：结论；下一步只做一件事；请反馈。只给一个动作，请反馈最多 1 到 3 个结果，不解释思考过程。`
+            ? `本地知识库压缩上下文：\n${compactKnowledgeContext(hits)}\n\n${renderWindOpsArchitectureContext(text)}\n\n用户问题：${text}\n\n请直接回答用户问题。格式固定为：结论；下一步只做一件事；请反馈。只给一个动作，请反馈最多 1 到 3 个结果；涉及高风险动作时先写 Safety Gate 校验项，不解释思考过程。`
             : `本地知识库压缩上下文：\n${compactKnowledgeContext(hits)}\n\n用户问题：${text}\n\n请直接回答用户问题，正常解释含义、原理或故障信息，不要强行改成指令式排障。`,
         },
       ], `故障知识库压缩总结：${query}`, CHAT_MODEL)
@@ -1381,6 +1448,8 @@ function deterministicGenericMechanismAnswer(text) {
   if (!rule || !isFieldActionQuery(text)) return ''
   return [
     `结论：先按「${rule.label}」处理。`,
+    '',
+    'Safety Gate：确认作业票、停机/限功率状态、风速、人员权限和二次确认；如涉及复位、启停机或参数调整，只生成建议，不直连执行。',
     '',
     `下一步只做一件事：${rule.nextAction}`,
     '',

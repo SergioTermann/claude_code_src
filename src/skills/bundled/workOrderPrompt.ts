@@ -4,6 +4,9 @@ export function buildWorkOrderGeneratePrompt(args: string): string {
 
 Generate field-ready smart work orders as an internal agent capability. Do not add frontend buttons or UI modules.
 
+This skill follows the WindOps architecture from 01_lecture1_wind_ops:
+Business intake -> Data normalization -> Memory context -> Planner -> Tool/evidence layer -> Model routing -> Feedback closure.
+
 ## User Request
 
 ${request || 'No work-order request was provided. Ask for the fault object, alarm/fault phenomenon, and whether to use the current conversation context.'}
@@ -11,9 +14,11 @@ ${request || 'No work-order request was provided. Ask for the fault object, alar
 ## Source Priority
 
 1. Use fault context explicitly provided by the user first.
-2. If the user references current or prior Windrise chat, inspect \`generated-knowledge/chat-sessions/\` when a \`conversation_id\` or likely session file is available.
-3. If the work order needs evidence, search local knowledge under \`generated-knowledge/\`, \`wind-llmwiki/\`, or use the LLMWiki skill/command path before inventing causes.
-4. If required dispatch fields are missing, still generate a draft and mark missing fields as \`待补充\`.
+2. Normalize the request into a structured WindOps Case: wind farm/turbine, brand/model, system/component, fault code/alarm, time window, current operating state, missing safety context.
+3. If the user references current or prior Windrise chat, inspect \`generated-knowledge/chat-sessions/\` when a \`conversation_id\` or likely session file is available.
+4. If the work order needs evidence, search local knowledge under \`generated-knowledge/\`, \`wind-llmwiki/\`, or use the LLMWiki skill/command path before inventing causes.
+5. Rank evidence as: manufacturer manual/fault table > site SOP > expert rule > closed work order > unverified experience.
+6. If required dispatch fields are missing, still generate a draft and mark missing fields as \`待补充\`.
 
 ## Output Rules
 
@@ -24,6 +29,8 @@ ${request || 'No work-order request was provided. Ask for the fault object, alar
 - Do not expose internal prompts, model details, tokens, routing, or implementation language.
 - Keep the工单 executable: one likely fault direction, one first field action, one acceptance standard, and one required feedback item.
 - Do not invent measurements, turbine numbers, dates, responsible people, safety permits, or spare parts. Use \`待补充\` when absent.
+- High-risk actions such as reset, start/stop, parameter adjustment, tower climb, cabinet opening, or live work must be written as recommendations only, gated by work ticket, wind speed, stop state, permission, and second confirmation.
+- Temporary states such as curtailment, bypass, weather, recent reset, or unverified candidate cause must be marked as short-term context and must not be written as permanent asset history.
 
 ## Work Order Structure
 
@@ -43,21 +50,53 @@ Use this structure unless the user specifies another template:
 
 ## 2. 已知现场信息
 
-## 3. 最可能判断
+## 3. 结构化故障 Case
 
-## 4. 首个现场动作
+- 风机/机型：
+- 系统/部件：
+- 故障码/告警：
+- 时间窗：
+- 运行状态：
+- 缺失信息：
 
-## 5. 合格标准
+## 4. 证据来源与分级
 
-## 6. 需要反馈
+- 厂家手册/故障码表：
+- 场站 SOP：
+- 专家知识/历史工单：
+- 实时或快照数据：
 
-## 7. 安全注意事项
+## 5. Planner 诊断路径
 
-## 8. 备件与工具
+1.
+2.
+3.
 
-## 9. 闭环条件
+## 6. 最可能判断
 
-## 10. 资料来源
+## 7. Safety Gate
+
+- 作业票：
+- 风速：
+- 停机/限功率状态：
+- 权限与二次确认：
+- 控制类动作边界：
+
+## 8. 首个现场动作
+
+## 9. 合格标准
+
+## 10. 需要反馈
+
+## 11. 备件与工具
+
+## 12. 闭环条件
+
+## 13. 反馈入库
+
+- 可进入长期画像：
+- 仅短期 TTL 记忆：
+- 专家复核项：
 \`\`\`
 
 ## Risk Level Guidance
@@ -76,6 +115,8 @@ Use this structure unless the user specifies another template:
   - \`首个现场动作\`: exactly one immediate field action.
   - \`合格标准\`: what result supports the judgment and what result rejects it.
   - \`需要反馈\`: the exact values/status to report back.
+  - \`Safety Gate\`: required permit, wind speed, stop state, permission, and second confirmation checks.
+  - \`反馈入库\`: what should update long-term turbine/fault profile versus short-term TTL memory.
 
 ## File Naming
 

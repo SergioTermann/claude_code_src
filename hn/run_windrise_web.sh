@@ -25,4 +25,4 @@ else
 fi
 
 cd "$SCRIPT_DIR"
-exec "$PYTHON_BIN" dify_web_server_.py
+exec "$PYTHON_BIN" windrise_web_server.py

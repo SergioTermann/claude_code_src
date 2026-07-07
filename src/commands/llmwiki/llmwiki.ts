@@ -65,6 +65,15 @@ type FaultRecordGroup = {
   records: FaultRecord[]
 }
 
+type WindOpsCase = {
+  turbineId: string
+  system: string
+  component: string
+  faultCode: string
+  timeWindow: string
+  missing: string[]
+}
+
 type MechanismGraph = {
   nodes?: MechanismNode[]
   edges?: MechanismEdge[]
@@ -116,6 +125,90 @@ const MAX_SEARCH_RESULTS = 12
 const MAX_READ_CHARS = 30000
 const MAX_LIST_ITEMS = 80
 const DEFAULT_TREE_DEPTH = 2
+
+function buildWindOpsCase(query: string, record?: FaultRecord): WindOpsCase {
+  const text = String(query || '')
+  const turbineMatch = text.match(/(?:WTG[-_ ]?)?0*(\d+)\s*(?:号机|#|机组)?/i)
+  const recordSystem = record?.system || ''
+  const system =
+    recordSystem ||
+    (/变桨|pitch/i.test(text) ? '变桨系统' :
+    /偏航|yaw/i.test(text) ? '偏航系统' :
+    /齿轮箱|油温|滤芯|润滑/i.test(text) ? '齿轮箱系统' :
+    /发电机|绕组|轴承温度/i.test(text) ? '发电机系统' :
+    /液压|制动|刹车|压力/i.test(text) ? '液压/制动系统' :
+    /变流|变频|IGBT/i.test(text) ? '变流系统' :
+    /通信|通讯|CAN|Profibus|EtherCAT/i.test(text) ? '通信系统' :
+    '待识别')
+  const component =
+    /24\s*v|24V/i.test(text) ? '24V 控制电源/反馈回路' :
+    /传感器|编码器/i.test(text) ? '传感器/编码器与采集回路' :
+    /阀|泵|蓄能器|压力/i.test(text) ? '液压阀组/泵/压力回路' :
+    /接触器|断路器|开关/i.test(text) ? '开关/接触器/断路器反馈回路' :
+    record?.category || '待识别'
+  const timeWindow =
+    text.match(/近\s*\d+\s*(?:分钟|小时)|last[_ -]?\d+\w*/i)?.[0] ||
+    (/昨天|今日|今天|刚才|当前|现在/.test(text) ? '当前/近期窗口' : '待补充')
+  const missing: string[] = []
+  if (!turbineMatch) missing.push('风机ID')
+  if (system === '待识别') missing.push('系统/部件')
+  if (!record?.code && !extractFaultCodes(text).length) missing.push('故障码')
+  if (timeWindow === '待补充') missing.push('运行时间窗')
+  if (!/(风速|停机|限功率|复位|作业票|HMI|SCADA|CMS)/i.test(text)) {
+    missing.push('运行状态/安全条件')
+  }
+  return {
+    turbineId: turbineMatch ? `WTG-${String(turbineMatch[1]).padStart(3, '0')}` : '待补充',
+    system,
+    component,
+    faultCode: record?.code || extractFaultCodes(text)[0] || '待补充',
+    timeWindow,
+    missing,
+  }
+}
+
+function renderWindOpsCaseLines(query: string, record?: FaultRecord): string[] {
+  const faultCase = buildWindOpsCase(query, record)
+  const missing = faultCase.missing.length ? faultCase.missing.join('、') : '无明显缺口'
+  return [
+    '结构化Case：',
+    `- 风机：${faultCase.turbineId}`,
+    `- 系统/部件：${faultCase.system} / ${faultCase.component}`,
+    `- 故障码：${faultCase.faultCode}`,
+    `- 时间窗：${faultCase.timeWindow}`,
+    `- 待补充：${missing}`,
+  ]
+}
+
+function renderWindOpsPlanLines(query: string, record?: FaultRecord): string[] {
+  const action =
+    record?.solution ||
+    (/24\s*v|24V/i.test(query) ? '先读取24V电压曲线、充电器状态和开关/PLC反馈。' :
+    /压力|液压|制动|刹车/i.test(query) ? '先对齐机械压力表、HMI压力和建压/保压曲线。' :
+    '先确认告警时间窗、当前状态和伴随告警。')
+  return [
+    'Planner诊断路径：',
+    '1. 确认风机ID、机型、控制器版本、当前停机/限功率状态。',
+    '2. 拉取CMS/SCADA时间窗趋势和告警平台伴随告警。',
+    '3. 检索故障码表、厂家手册、场站SOP和已关闭历史工单。',
+    `4. 下一步只做一件事：${action}`,
+    '5. 将验证结果写入工单草稿，等待现场反馈后再收敛根因。',
+  ]
+}
+
+function renderSafetyGateLines(): string[] {
+  return [
+    'Safety Gate：',
+    '- 复位、启停机、参数调整、登塔、开柜、带电作业只生成建议，不直连执行。',
+    '- 执行前必须确认作业票、风速、停机状态、人员权限和二次确认。',
+  ]
+}
+
+function renderEvidencePriorityLines(): string[] {
+  return [
+    '证据分级：厂家手册/故障码表 > 场站SOP > 专家知识 > 已关闭历史工单 > 未验证经验。',
+  ]
+}
 
 export const call: LocalCommandCall = async args => {
   try {
@@ -586,6 +679,7 @@ async function answerFromProject(
     code && name
       ? `结论：${code} 为「${name}」。`
       : `结论：本地知识库命中 ${matches.length} 条相关资料。`,
+    ...renderWindOpsCaseLines(query, primary.record),
     site || brand || model
       ? `对象：${[site, brand, model].filter(Boolean).join(' / ')}`
       : '',
@@ -593,6 +687,9 @@ async function answerFromProject(
     solution ? `处理：${solution}` : '',
     reset ? `复位：${reset}` : '',
     logic ? `逻辑：${logic}` : '',
+    ...renderWindOpsPlanLines(query, primary.record),
+    ...renderSafetyGateLines(),
+    ...renderEvidencePriorityLines(),
     `来源：${primary.location}`,
   ].filter(Boolean)
 
@@ -643,6 +740,7 @@ async function traceQuestionPath(
     '1. 问题入口',
     `   用户问题：${query}`,
     `   检索关键词：${formatTraceTerms(terms, query)}`,
+    `   结构化Case：${renderWindOpsCaseLines(query, primaryRecord).slice(1).join('；')}`,
   ]
 
   if (records.length > 0) {
@@ -705,6 +803,7 @@ async function traceQuestionPath(
     lines.push(
       `   可信度：${assessment.label} (${assessment.score}/100)`,
       `   依据：${assessment.reasons.join('；') || '仅命中图谱节点，现场证据不足'}`,
+      '   Safety Gate：复位、启停机、参数调整、登塔、开柜、带电作业只生成建议，必须确认作业票、风速、停机状态、权限和二次确认。',
       `   下一步只做一件事：${assessment.nextAction}`,
       `   做完反馈：${assessment.feedback}`,
     )

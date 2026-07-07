@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>风电运维智导助手 · 技术路线</title>
+<style>
+:root {
+  --primary: #0f766e;
+  --primary-dark: #115e59;
+  --accent: #f59e0b;
+  --bg-dark: #0f172a;
+  --bg-slide: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --code-bg: #1e293b;
+  --good: #10b981;
+  --bad: #ef4444;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; font-family: "PingFang SC", "Microsoft YaHei", -apple-system, system-ui, sans-serif; background: var(--bg-dark); color: var(--text); }
+.deck { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+.slide {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  display: none; padding: 50px 70px; overflow-y: auto;
+  background: var(--bg-slide); flex-direction: column;
+}
+.slide.active { display: flex; }
+.slide h1 { font-size: 44px; color: var(--primary-dark); margin: 0 0 18px 0; font-weight: 700; }
+.slide h2 { font-size: 32px; color: var(--primary); margin: 0 0 22px 0; border-left: 6px solid var(--accent); padding-left: 16px; }
+.slide h3 { font-size: 22px; color: var(--text); margin: 18px 0 10px 0; }
+.slide p, .slide li { font-size: 19px; line-height: 1.62; color: var(--text); }
+.slide ul, .slide ol { padding-left: 24px; margin: 8px 0; }
+.slide li { margin-bottom: 6px; }
+.cover { background: linear-gradient(135deg, #064e3b 0%, #0f766e 56%, #14b8a6 100%); color: white; align-items: center; justify-content: center; text-align: center; }
+.cover h1 { color: white; font-size: 58px; margin-bottom: 14px; }
+.cover .subtitle { font-size: 26px; opacity: 0.92; margin-bottom: 36px; }
+.cover .meta { font-size: 18px; opacity: 0.75; margin-top: 28px; }
+.chip { display: inline-block; padding: 6px 14px; border-radius: 16px; background: rgba(255,255,255,0.18); margin: 4px 6px; font-size: 16px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.card { background: #f8fafc; border-left: 4px solid var(--primary); padding: 16px 20px; border-radius: 8px; }
+.card.bad { border-left-color: var(--bad); background: #fef2f2; }
+.card.good { border-left-color: var(--good); background: #f0fdf4; }
+.card.warn { border-left-color: var(--accent); background: #fffbeb; }
+.card h3 { margin-top: 0; }
+.kpi { display: inline-block; padding: 12px 18px; background: var(--primary); color: white; border-radius: 10px; font-weight: 700; margin: 6px; }
+.kpi.good { background: var(--good); }
+.kpi.bad { background: var(--bad); }
+.kpi.warn { background: var(--accent); }
+.code { background: var(--code-bg); color: #e2e8f0; padding: 16px; border-radius: 8px; font-family: "SF Mono", Consolas, Monaco, monospace; font-size: 15px; overflow-x: auto; line-height: 1.55; white-space: pre-wrap; }
+.code .k { color: #93c5fd; } .code .s { color: #fde68a; } .code .c { color: #94a3b8; font-style: italic; }
+.tag { display: inline-block; padding: 2px 10px; border-radius: 4px; background: #ccfbf1; color: #115e59; font-size: 14px; margin-right: 6px; }
+.tag.warn { background: #fef3c7; color: #92400e; }
+.tag.bad { background: #fee2e2; color: #991b1b; }
+.tag.good { background: #d1fae5; color: #065f46; }
+table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 16px; }
+th, td { padding: 10px 14px; border: 1px solid var(--border); text-align: left; vertical-align: top; }
+th { background: #f1f5f9; color: var(--primary-dark); font-weight: 600; }
+tr:nth-child(even) td { background: #f8fafc; }
+.footer { position: absolute; bottom: 16px; right: 30px; color: var(--muted); font-size: 14px; }
+.page-num { position: absolute; bottom: 16px; left: 30px; color: var(--muted); font-size: 14px; }
+.nav { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 100; }
+.nav button { background: var(--primary); color: white; border: none; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-size: 14px; }
+.nav button:hover { background: var(--primary-dark); }
+.svg-wrap { display: flex; justify-content: center; align-items: center; padding: 8px 0; }
+.svg-wrap svg { max-width: 100%; height: auto; }
+.tip { background: #fefce8; border: 1px dashed #ca8a04; padding: 10px 14px; border-radius: 6px; font-size: 15px; color: #713f12; margin: 8px 0; }
+.muted { color: var(--muted); font-size: 15px; }
+.q { background: #ecfeff; border-left: 4px solid var(--primary); padding: 10px 14px; margin: 10px 0; border-radius: 6px; font-size: 17px; }
+.hl-must { background: linear-gradient(135deg,#fff1f2,#ffe4e6); border: 2px solid #f43f5e; border-radius: 8px; padding: 10px 14px; margin: 8px 0; position: relative; }
+.hl-must::before { content: "关键决策"; position: absolute; top: -10px; left: 12px; background: #f43f5e; color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.hl-hot { background: linear-gradient(135deg,#fffbeb,#fef3c7); border: 2px solid #f59e0b; border-radius: 8px; padding: 10px 14px; margin: 8px 0; position: relative; }
+.hl-hot::before { content: "运维重点"; position: absolute; top: -10px; left: 12px; background: #f59e0b; color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.hl-bonus { background: linear-gradient(135deg,#f0fdf4,#dcfce7); border: 2px solid #22c55e; border-radius: 8px; padding: 10px 14px; margin: 8px 0; position: relative; }
+.hl-bonus::before { content: "可扩展"; position: absolute; top: -10px; left: 12px; background: #22c55e; color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- Slide 1: 封面 -->
+<section class="slide cover active">
+  <h1>风电运维智导助手</h1>
+  <div class="subtitle">基于 01_lecture1 的 Agent 技术路线改造版</div>
+  <div>
+    <span class="chip">七层架构</span>
+    <span class="chip">CMS / 告警平台</span>
+    <span class="chip">故障诊断</span>
+    <span class="chip">混合 RAG</span>
+    <span class="chip">工单闭环</span>
+    <span class="chip">安全合规</span>
+  </div>
+  <div class="meta">面向风场值班员、检修工程师、远程诊断中心</div>
+</section>
+
+<!-- Slide 2: 总览 -->
+<section class="slide">
+  <h2>本路线要解决什么</h2>
+  <div class="two-col">
+    <div class="card">
+      <h3>从原课件继承的技术骨架</h3>
+      <ul>
+        <li>单体 Agent 改为七层架构，职责边界清晰</li>
+        <li>数据层先改写与结构化，再交给大模型</li>
+        <li>记忆层沉淀长期画像、短期上下文和执行轨迹</li>
+        <li>Planner 拆任务，Executor 严格调工具</li>
+        <li>Hybrid RAG + 工具高可用 + 反馈飞轮</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>面向风电运维的关键变化</h3>
+      <ul>
+        <li>聚焦“故障定位 + 处置指导 + 工单闭环”</li>
+        <li>知识源覆盖 SOP、故障码、图纸、历史工单、厂家手册</li>
+        <li>工具覆盖 CMS、EAM、备件、气象、告警平台</li>
+        <li>输出聚焦 MTTR、可利用率、安全合规和备件效率</li>
+      </ul>
+    </div>
+  </div>
+  <table>
+    <tr><th>原 01_lecture1 模块</th><th>风电运维改造模块</th><th>目标</th></tr>
+    <tr><td>业务层：问答 / 提醒 / 任务流</td><td>告警研判 / 故障诊断 / 检修指导 / 工单生成 / 复盘</td><td>让助手能真正指导现场作业</td></tr>
+    <tr><td>数据层：Query 改写</td><td>故障语义标准化 + 设备实体对齐 + 风况/运行状态注入</td><td>减少误判与检索偏差</td></tr>
+    <tr><td>记忆层：用户画像</td><td>风机画像 + 故障画像 + 班组经验记忆</td><td>形成场站级经验沉淀</td></tr>
+    <tr><td>Hybrid RAG</td><td>故障码、手册、SOP、历史工单、图纸多源检索</td><td>答案有依据、可追溯</td></tr>
+    <tr><td>反馈层</td><td>工单结果、复发率、停机时长、专家复核</td><td>形成运维知识飞轮</td></tr>
+  </table>
+  <div class="page-num">2</div>
+</section>
+
+<!-- Slide 3: 项目背景 -->
+<section class="slide">
+  <h2>1. 项目背景：风电运维的特殊性</h2>
+  <div class="two-col">
+    <div class="card bad">
+      <h3>普通问答 Agent 的三大问题</h3>
+      <ul>
+        <li><b>只会解释，不会闭环</b>：能解释故障码，但不会拉运行曲线、查备件、生成工单</li>
+        <li><b>知识不接地</b>：没有机型、部件、现场环境和历史检修上下文</li>
+        <li><b>安全不可控</b>：可能跳过上锁挂牌、登塔许可、风速限制等强约束</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>风电场景的工业级要求</h3>
+      <ul>
+        <li><b>时效性</b>：告警后要快速判断继续观察、远程诊断、建议复位、限功率建议还是派工</li>
+        <li><b>准确性</b>：不能编造故障原因、备件型号、操作步骤</li>
+        <li><b>可追溯</b>：每个建议要能追到手册、SOP、历史工单或实时数据</li>
+        <li><b>强合规</b>：安全票、作业许可、风险点必须前置校验</li>
+      </ul>
+    </div>
+  </div>
+  <h3 style="margin-top:20px">项目目标</h3>
+  <div class="q">构建一个能处理“告警解释 + 故障定位 + 检修步骤推荐 + 备件/工具准备 + 工单闭环 + 复盘学习”的工业级风电运维智导 Agent。</div>
+  <div class="hl-must">
+    关键定位：LLM 只能“告诉你可能怎么做”；运维 Agent 必须“拿实时数据、查规程、拆任务、形成建议、留下工单证据”。风电场景不能只做聊天助手，必须做可审计的人机协同作业辅助系统。
+  </div>
+  <div class="page-num">3</div>
+</section>
+
+<!-- Slide 4: 七层架构 -->
+<section class="slide">
+  <h2>2. 七层架构总览：面向风电运维场景</h2>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#0f766e"/></linearGradient>
+        <linearGradient id="lg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#b45309"/></linearGradient>
+        <linearGradient id="lg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#047857"/></linearGradient>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#1e293b"/></marker>
+      </defs>
+      <rect x="40" y="20" width="180" height="50" rx="8" fill="#1e293b"/>
+      <text x="130" y="50" fill="white" font-size="17" text-anchor="middle" font-weight="bold">值班员 / 工程师</text>
+      <path d="M 130 70 L 130 100" stroke="#1e293b" stroke-width="2" marker-end="url(#arrow)"/>
+
+      <rect x="40" y="100" width="920" height="50" rx="8" fill="url(#lg1)"/>
+      <text x="60" y="130" fill="white" font-size="16" font-weight="bold">① 业务层 business/</text>
+      <text x="285" y="130" fill="white" font-size="14">告警研判 · 故障诊断 · 检修指导 · 工单闭环 · 复盘分析</text>
+
+      <rect x="40" y="160" width="450" height="50" rx="8" fill="url(#lg2)"/>
+      <text x="60" y="190" fill="white" font-size="16" font-weight="bold">② 数据层 data/</text>
+      <text x="205" y="190" fill="white" font-size="14">故障实体抽取 · 运行数据对齐 · 时序特征</text>
+
+      <rect x="510" y="160" width="450" height="50" rx="8" fill="url(#lg2)"/>
+      <text x="530" y="190" fill="white" font-size="16" font-weight="bold">③ 记忆层 memory/</text>
+      <text x="705" y="190" fill="white" font-size="14">风机画像 · 故障画像 · 班组经验</text>
+
+      <rect x="40" y="220" width="920" height="50" rx="8" fill="url(#lg1)"/>
+      <text x="60" y="250" fill="white" font-size="16" font-weight="bold">④ 模型应用层 core/</text>
+      <text x="300" y="250" fill="white" font-size="14">Planner · 诊断 Agent · RAG · 风险校验 · Prompt Routing</text>
+
+      <rect x="40" y="280" width="920" height="50" rx="8" fill="url(#lg3)"/>
+      <text x="60" y="310" fill="white" font-size="16" font-weight="bold">⑤ 工具层 tools/</text>
+      <text x="260" y="310" fill="white" font-size="14">CMS · EAM/CMMS · 备件 · 气象 · 告警 · 电子票</text>
+
+      <rect x="40" y="340" width="920" height="50" rx="8" fill="#7c3aed"/>
+      <text x="60" y="370" fill="white" font-size="16" font-weight="bold">⑥ 模型层 models/</text>
+      <text x="270" y="370" fill="white" font-size="14">LLM · 多模态识图 · 时序异常检测 · 故障分类模型 · Reranker</text>
+
+      <rect x="40" y="400" width="920" height="50" rx="8" fill="#ec4899"/>
+      <text x="60" y="430" fill="white" font-size="16" font-weight="bold">⑦ 反馈层 feedback/</text>
+      <text x="285" y="430" fill="white" font-size="14">工单结果 · 专家复核 · 复发率 · 停机时长 · 知识库更新</text>
+    </svg>
+  </div>
+  <div class="tip"><b>分层动机一句话</b>：把“黑盒大模型回答”改成“数据先结构化、知识可追溯、工具可治理、作业有闭环”的工业系统。</div>
+  <div class="page-num">4</div>
+</section>
+
+<!-- Slide 5: 单体 vs 分层 -->
+<section class="slide">
+  <h2>2.1 单体 Agent 反例 vs 风电分层架构</h2>
+  <div class="two-col">
+    <div class="card bad">
+      <h3>单体运维 Agent</h3>
+      <div class="code">agent = create_agent(
+    llm=llm,
+    tools=[cms, eam, weather,
+           spare_parts, ticket, ...60+ tools],
+    system_prompt="你是风电运维专家..."
+)
+
+# 问题：
+# 1. 工具太多，模型容易选错
+# 2. 安全规则被埋在 Prompt 里
+# 3. 实时数据、知识库、工单逻辑互相耦合</div>
+    </div>
+    <div class="card good">
+      <h3>七层风电运维架构</h3>
+      <div class="code"># 业务层：接收告警/人工提问
+case = WindOpsBusiness.process(query, turbine_id)
+
+# 数据层：标准化故障实体和运行窗口
+case = normalizer.enrich(case, operating_window, cms_signal)
+
+# 记忆层：取风机画像和类似故障
+context = memory.search(turbine_id, fault_code, symptom)
+
+# 模型应用层：Planner 拆解诊断路径
+plan = planner.plan(case, context, allowed_tools)
+
+# 工具层：按权限、安全票和重试策略调用系统
+result = executor.run(plan)</div>
+    </div>
+  </div>
+  <div class="hl-hot">风电改造重点：安全约束不能只放 Prompt，要在数据层和工具层做硬校验，例如风速、作业票、停机状态、控制类操作权限。助手默认只输出建议，控制系统执行必须走人工确认和既有权限链路。</div>
+  <div class="page-num">5</div>
+</section>
+
+<!-- Slide 6: 数据层 -->
+<section class="slide">
+  <h2>3. 数据层 · 故障 Query 改写与实体对齐</h2>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 1000 250" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#475569"/></marker></defs>
+      <rect x="10" y="88" width="185" height="78" rx="10" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+      <text x="102" y="114" text-anchor="middle" font-size="14" fill="#991b1b" font-weight="bold">原始现场描述</text>
+      <text x="102" y="140" text-anchor="middle" font-size="12" fill="#7f1d1d">“3号机又报变桨24V”</text>
+
+      <path d="M 200 127 L 235 127" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+      <rect x="240" y="40" width="230" height="170" rx="10" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/>
+      <text x="355" y="66" text-anchor="middle" font-size="14" fill="#115e59" font-weight="bold">FaultQueryRewriter</text>
+      <text x="355" y="92" text-anchor="middle" font-size="12" fill="#1e293b">① 风机/部件实体识别</text>
+      <text x="355" y="114" text-anchor="middle" font-size="12" fill="#1e293b">② 故障码标准化</text>
+      <text x="355" y="136" text-anchor="middle" font-size="12" fill="#1e293b">③ 运行时间窗注入</text>
+      <text x="355" y="158" text-anchor="middle" font-size="12" fill="#1e293b">④ 机型/厂家术语映射</text>
+      <text x="355" y="184" text-anchor="middle" font-size="11" fill="#991b1b">兜底：无法对齐则进入人工确认</text>
+
+      <path d="M 475 127 L 515 127" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+      <rect x="520" y="70" width="245" height="115" rx="10" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+      <text x="642" y="100" text-anchor="middle" font-size="14" fill="#065f46" font-weight="bold">结构化故障 Case</text>
+      <text x="642" y="126" text-anchor="middle" font-size="12" fill="#064e3b">WTG-003 / 变桨系统 / 24V 电源</text>
+      <text x="642" y="148" text-anchor="middle" font-size="12" fill="#064e3b">近30分钟电压波动 + 停机状态</text>
+      <text x="642" y="170" text-anchor="middle" font-size="12" fill="#064e3b">机型: X / 控制器版本: Y</text>
+
+      <path d="M 770 127 L 810 127" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+      <rect x="815" y="88" width="170" height="78" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="900" y="116" text-anchor="middle" font-size="14" fill="#92400e" font-weight="bold">下游诊断 Agent</text>
+      <text x="900" y="142" text-anchor="middle" font-size="11" fill="#78350f">检索更准 · 工具更稳</text>
+    </svg>
+  </div>
+  <div class="two-col">
+    <div class="card">
+      <h3>为什么必须前置改写</h3>
+      <ul>
+        <li>现场口语和厂家术语不一致：变桨 24V、pitch 24V、控制柜低压可能指向同一类问题</li>
+        <li>风机编号、部件、告警码、时间窗缺一项，RAG 和工具调用都会漂移</li>
+        <li>风况、功率、转速、温度、电压等实时状态决定诊断路径</li>
+      </ul>
+    </div>
+    <div class="card warn">
+      <h3>三道兜底</h3>
+      <ul>
+        <li>实体置信度低：先追问，不直接下结论</li>
+        <li>CMS/告警平台超时：使用最近缓存并标注数据时间</li>
+        <li>危险操作：缺少作业票、风速超限、权限不足时强制阻断</li>
+      </ul>
+    </div>
+  </div>
+  <div class="page-num">6</div>
+</section>
+
+<!-- Slide 7: 记忆机制 -->
+<section class="slide">
+  <h2>3.1 记忆机制 · 从用户画像改为风机/故障画像</h2>
+  <table>
+    <tr><th>维度</th><th>原通用 Agent 项目</th><th>风电运维改造</th><th>作用</th></tr>
+    <tr><td>长期画像</td><td>对象特征、约束条件、历史记录</td><td>风机机型、控制器版本、改造记录、易损部件、历史故障模式</td><td>同一告警在不同机型上走不同诊断路径</td></tr>
+    <tr><td>短期记忆</td><td>本轮查询、临时待办、近期对话</td><td>当前告警窗口、临时限功率、近期复位、当天风况、班组交接记录</td><td>避免重复操作和漏看关联告警</td></tr>
+    <tr><td>程序性记忆</td><td>成功处置路径沉淀为 Skill</td><td>高频故障处置路径沉淀为诊断 SOP Skill</td><td>把老师傅经验产品化</td></tr>
+    <tr><td>轨迹记忆</td><td>State/Thought/Tool/Observation 进入审核池</td><td>诊断步骤、工具调用、专家修正、最终工单结果</td><td>先用于复盘、质检和规则优化，通过治理后再进入训练数据集</td></tr>
+  </table>
+  <div class="card good">
+    <h3>核心调用</h3>
+    <div class="code"># 自动记忆：风机长期画像
+memory.add("WTG-003 变桨柜 24V 电源模块 2026-06 更换过", scope="turbine")
+
+# 意图检索：类似故障案例
+context = memory.search(
+    query="WTG-003 变桨24V低压，近30分钟电压波动",
+    filters={"model": "机型X", "component": "pitch"}
+)
+
+# 轨迹沉淀：诊断过程进入复盘/质检池
+trace.store(case_id, plan, tool_calls, expert_feedback, work_order_result)</div>
+  </div>
+  <div class="hl-must">记忆 Update/Delete 的风电规则：部件更换、控制器升级、参数整定属于 Update；临时限电、临时旁路、短期天气影响应设置 TTL，到期自动失效，不能永久污染风机画像。</div>
+  <div class="page-num">7</div>
+</section>
+
+<!-- Slide 8: 四层融合记忆 -->
+<section class="slide">
+  <h2>3.1++ 最终方案：四层运维记忆融合架构</h2>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 1000 390" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="mlg4" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#115e59"/></linearGradient>
+        <linearGradient id="mlg3" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f59e0b"/><stop offset="1" stop-color="#b45309"/></linearGradient>
+        <linearGradient id="mlg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#047857"/></linearGradient>
+        <linearGradient id="mlg1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ef4444"/><stop offset="1" stop-color="#7c2d12"/></linearGradient>
+        <marker id="mar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#475569"/></marker>
+      </defs>
+      <rect x="115" y="20" width="770" height="58" rx="8" fill="url(#mlg4)" stroke="#115e59" stroke-width="2"/>
+      <text x="140" y="46" fill="white" font-size="15" font-weight="bold">L4 资产长期画像（永久层）</text>
+      <text x="140" y="64" fill="white" font-size="11">风机台账 · 改造记录 · 历史缺陷 · 高风险部件 · 厂家版本差异</text>
+
+      <rect x="115" y="88" width="770" height="58" rx="8" fill="url(#mlg3)" stroke="#b45309" stroke-width="2"/>
+      <text x="140" y="114" fill="white" font-size="15" font-weight="bold">L3 场站/项目上下文（场景层）</text>
+      <text x="140" y="132" fill="white" font-size="11">风场地形 · 季节风况 · 班组能力 · 常用备件 · 场站 SOP 与安全红线</text>
+
+      <rect x="115" y="156" width="770" height="58" rx="8" fill="url(#mlg2)" stroke="#047857" stroke-width="2"/>
+      <text x="140" y="182" fill="white" font-size="15" font-weight="bold">L2 当前故障工作记忆（短期层）</text>
+      <text x="140" y="200" fill="white" font-size="11">告警窗口 · 实时曲线 · 当前作业票 · 控制建议审批状态 · 班组交接备注</text>
+
+      <rect x="115" y="224" width="770" height="58" rx="8" fill="url(#mlg1)" stroke="#7c2d12" stroke-width="2"/>
+      <text x="140" y="250" fill="white" font-size="15" font-weight="bold">L1 Agent 调用轨迹（数据飞轮层）</text>
+      <text x="140" y="268" fill="white" font-size="11">诊断 plan · 工具调用 · 观察结果 · 专家改判 · 工单闭环标签</text>
+
+      <rect x="320" y="305" width="360" height="60" rx="10" fill="#1e293b" stroke="#475569" stroke-width="2"/>
+      <text x="500" y="331" text-anchor="middle" fill="#fbbf24" font-size="14" font-weight="bold">Memory Router</text>
+      <text x="500" y="351" text-anchor="middle" fill="white" font-size="11">按故障类型 + 风机 + 作业阶段拼接最小必要上下文</text>
+      <path d="M 500 282 L 500 303" stroke="#475569" stroke-width="2" marker-end="url(#mar)"/>
+    </svg>
+  </div>
+  <table>
+    <tr><th>Token 超预算时</th><th>优先保留</th><th>可裁剪</th></tr>
+    <tr><td>安全作业阶段</td><td>安全票、风速、作业状态、SOP 强约束</td><td>历史相似案例摘要</td></tr>
+    <tr><td>故障诊断阶段</td><td>当前故障窗口、机型版本、故障码手册</td><td>低相似度工单</td></tr>
+    <tr><td>复盘阶段</td><td>完整轨迹、专家修正、停机时长、备件结果</td><td>实时曲线原始点位，仅保留特征</td></tr>
+  </table>
+  <div class="page-num">8</div>
+</section>
+
+<!-- Slide 9: 动态更新 -->
+<section class="slide">
+  <h2>3.2 画像动态更新：从用户行为改为工单闭环</h2>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 1000 260" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#475569"/></marker></defs>
+      <rect x="20" y="98" width="155" height="64" rx="8" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/>
+      <text x="98" y="125" text-anchor="middle" font-size="14" font-weight="bold" fill="#115e59">诊断 Agent</text>
+      <text x="98" y="145" text-anchor="middle" font-size="11" fill="#475569">只读画像，不直写台账</text>
+      <path d="M 180 130 L 235 130" stroke="#475569" stroke-width="2" marker-end="url(#b)"/>
+      <rect x="240" y="98" width="130" height="64" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="305" y="125" text-anchor="middle" font-size="14" font-weight="bold" fill="#92400e">事件总线</text>
+      <text x="305" y="145" text-anchor="middle" font-size="11" fill="#78350f">告警/工单/专家反馈</text>
+      <path d="M 375 130 L 430 130" stroke="#475569" stroke-width="2" marker-end="url(#b)"/>
+      <rect x="435" y="40" width="190" height="76" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="530" y="70" text-anchor="middle" font-size="14" font-weight="bold" fill="#5b21b6">旁路抽取服务</text>
+      <text x="530" y="91" text-anchor="middle" font-size="11" fill="#5b21b6">提取故障原因/措施/备件</text>
+      <rect x="435" y="145" width="190" height="76" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <text x="530" y="174" text-anchor="middle" font-size="14" font-weight="bold" fill="#991b1b">短期状态缓存</text>
+      <text x="530" y="195" text-anchor="middle" font-size="11" fill="#7f1d1d">当前告警/复位/限功率</text>
+      <path d="M 630 78 L 680 108" stroke="#475569" stroke-width="2" marker-end="url(#b)"/>
+      <path d="M 630 183 L 680 153" stroke="#475569" stroke-width="2" marker-end="url(#b)"/>
+      <rect x="685" y="98" width="165" height="64" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+      <text x="768" y="124" text-anchor="middle" font-size="14" font-weight="bold" fill="#065f46">长期风机画像</text>
+      <text x="768" y="145" text-anchor="middle" font-size="11" fill="#064e3b">置信度 + 时间衰减</text>
+      <path d="M 855 130 L 890 130" stroke="#475569" stroke-width="2" marker-end="url(#b)"/>
+      <rect x="895" y="98" width="90" height="64" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+      <text x="940" y="136" text-anchor="middle" font-size="13" font-weight="bold" fill="#713f12">资产台账</text>
+    </svg>
+  </div>
+  <div class="two-col">
+    <div class="card bad">
+      <h3>不让 Agent 同步直写资产台账</h3>
+      <ul>
+        <li>一次幻觉可能污染长期设备履历</li>
+        <li>工单未验收前，故障原因只是候选结论</li>
+        <li>实时链路不能被写库和审批拖慢</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>异步抽取 + 专家/工单确认</h3>
+      <ul>
+        <li>实时层：当前告警和复位状态秒级更新</li>
+        <li>批处理：工单关闭后更新长期画像</li>
+        <li>置信度：专家确认、备件更换、复发情况共同加权</li>
+      </ul>
+    </div>
+  </div>
+  <div class="page-num">9</div>
+</section>
+
+<!-- Slide 10: 冷启动 -->
+<section class="slide">
+  <h2>3.3 冷启动：新风场 / 新机型 / 新故障怎么办</h2>
+  <div class="three-col">
+    <div class="card">
+      <h3>① 台账 Onboarding</h3>
+      <p>先导入风机台账、机型、部件 BOM、控制器版本、质保边界和安全规程。</p>
+      <p class="muted">最小可用画像来自 CMDB/EAM，而不是靠聊天慢慢积累。</p>
+    </div>
+    <div class="card">
+      <h3>② Look-alike 机群迁移</h3>
+      <p>按机型、部件批次、地形风况、运行年限匹配相似风机群。</p>
+      <p class="muted">新风机没有历史，也能借鉴同批次同机型经验。</p>
+    </div>
+    <div class="card">
+      <h3>③ 专家规则兜底</h3>
+      <p>对高风险故障优先用厂家手册、SOP 和专家审核路径。</p>
+      <p class="muted">新型故障不自动给确定结论，输出“排查路径 + 证据缺口”。</p>
+    </div>
+  </div>
+  <div class="card warn" style="margin-top:28px;">
+    <p><b>更新频率控制</b></p>
+    <ul>
+      <li><b>实时流</b>：告警、限功率、停复机、复位结果，秒级进入工作记忆</li>
+      <li><b>小时级批处理</b>：关联多告警、抽取趋势特征、合并相似事件</li>
+      <li><b>工单级沉淀</b>：只有工单验收/专家确认后，才更新长期故障画像</li>
+    </ul>
+  </div>
+  <div class="page-num">10</div>
+</section>
+
+<!-- Slide 11: Planner -->
+<section class="slide">
+  <h2>4. Planner 子智能体 · 风电多步诊断为什么必须拆</h2>
+  <div class="two-col">
+    <div class="card bad">
+      <h3>单体 ReAct 的崩溃模式</h3>
+      <ul>
+        <li><b>工具乱调</b>：还没确认风机状态就给出复位或控制类建议</li>
+        <li><b>漏安全检查</b>：直接给登塔/开柜步骤，未校验风速、票证、停机状态</li>
+        <li><b>诊断跳步</b>：只凭故障码下结论，不看关联告警和曲线</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>Plan-and-Execute 改造</h3>
+      <ul>
+        <li><b>Planner</b>：生成诊断路径，不直接执行危险操作</li>
+        <li><b>Safety Gate</b>：每个步骤前校验权限和安全前置条件</li>
+        <li><b>Executor</b>：严格按 plan 调工具，输出证据和下一步</li>
+      </ul>
+    </div>
+  </div>
+  <div class="code">Plan 示例：
+1. 查询 WTG-003 近30分钟告警和停机状态
+2. 拉取变桨 24V 电压、充电器状态、柜内温度曲线
+3. 检索同机型“变桨24V低压”SOP 与历史工单
+4. 判断是否满足“建议远程复位”的前置条件；不满足则生成现场排查清单
+5. 检查备件库存：24V 电源模块、保险、端子、万用表
+6. 生成工单草稿、证据清单和安全风险提示</div>
+  <div class="page-num">11</div>
+</section>
+
+<!-- Slide 12: Plan Flow -->
+<section class="slide">
+  <h2>4.1 风电 Plan-and-Execute 流程</h2>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 1000 340" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#475569"/></marker></defs>
+      <rect x="20" y="135" width="125" height="70" rx="8" fill="#1e293b"/>
+      <text x="82" y="164" text-anchor="middle" fill="white" font-size="14" font-weight="bold">告警/提问</text>
+      <text x="82" y="184" text-anchor="middle" fill="white" font-size="11">故障码 + 风机ID</text>
+      <path d="M 150 170 L 195 170" stroke="#475569" stroke-width="2" marker-end="url(#c)"/>
+      <rect x="200" y="70" width="225" height="200" rx="12" fill="#ecfeff" stroke="#0f766e" stroke-width="3"/>
+      <text x="312" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#115e59">Planner Agent</text>
+      <text x="312" y="122" text-anchor="middle" font-size="12" fill="#115e59">低温度 · 只输出结构化计划</text>
+      <text x="312" y="154" text-anchor="middle" font-size="11" fill="#475569">输入：结构化 Case</text>
+      <text x="312" y="174" text-anchor="middle" font-size="11" fill="#475569">+ 风机画像 + RAG 证据</text>
+      <text x="312" y="204" text-anchor="middle" font-size="11" fill="#475569">输出：steps / tools / risk</text>
+      <text x="312" y="224" text-anchor="middle" font-size="11" fill="#475569">+ 所需权限 + 终止条件</text>
+      <path d="M 430 170 L 475 170" stroke="#475569" stroke-width="2" marker-end="url(#c)"/>
+      <rect x="480" y="70" width="210" height="200" rx="10" fill="#1e293b"/>
+      <text x="500" y="100" fill="#fde68a" font-size="13" font-family="monospace">{ plan_json }</text>
+      <text x="500" y="130" fill="#e2e8f0" font-size="11" font-family="monospace">check_operating_data()</text>
+      <text x="500" y="152" fill="#e2e8f0" font-size="11" font-family="monospace">query_cms()</text>
+      <text x="500" y="174" fill="#e2e8f0" font-size="11" font-family="monospace">retrieve_sop()</text>
+      <text x="500" y="196" fill="#e2e8f0" font-size="11" font-family="monospace">safety_gate()</text>
+      <text x="500" y="218" fill="#e2e8f0" font-size="11" font-family="monospace">create_work_order()</text>
+      <path d="M 695 170 L 740 170" stroke="#475569" stroke-width="2" marker-end="url(#c)"/>
+      <rect x="745" y="70" width="230" height="200" rx="12" fill="#f0fdf4" stroke="#10b981" stroke-width="3"/>
+      <text x="860" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#065f46">Executor + Safety Gate</text>
+      <text x="860" y="132" text-anchor="middle" font-size="11" fill="#475569">按计划调用 CMS/EAM/告警平台</text>
+      <text x="860" y="154" text-anchor="middle" font-size="11" fill="#475569">每步校验证据、权限、安全条件</text>
+      <text x="860" y="188" text-anchor="middle" font-size="11" fill="#475569">输出：诊断结论</text>
+      <text x="860" y="208" text-anchor="middle" font-size="11" fill="#475569">处置建议 + 备件清单</text>
+      <text x="860" y="228" text-anchor="middle" font-size="11" fill="#475569">工单草稿 + 引用证据</text>
+      <rect x="20" y="292" width="955" height="34" rx="8" fill="#fef3c7"/>
+      <text x="500" y="314" text-anchor="middle" font-size="14" fill="#92400e" font-weight="bold">收益：诊断路径可解释 · 高风险建议可拦截 · 工单证据留痕 · 专家可复核</text>
+    </svg>
+  </div>
+  <div class="page-num">12</div>
+</section>
+
+<!-- Slide 13: Tool Calling -->
+<section class="slide">
+  <h2>4.2 Tool Calling：运维系统调用必须结构化</h2>
+  <div class="two-col">
+    <div class="card bad">
+      <h3>文本解析式 ReAct</h3>
+      <div class="code">Thought: 我需要查运行数据
+Action: get_operating_data
+Action Input: 3号机 24V
+
+# 风险：
+# 文本稍有变化就解析失败
+# 参数缺字段：风机ID、点位、时间窗
+# 危险操作难以加权限拦截</div>
+    </div>
+    <div class="card good">
+      <h3>结构化 Tool Calling</h3>
+      <div class="code">{
+  "tool_calls": [{
+    "name": "get_operating_timeseries",
+    "arguments": {
+      "turbine_id": "WTG-003",
+      "points": ["pitch_24v_voltage", "pitch_charger_state"],
+      "window": "last_30m"
+    }
+  }]
+}</div>
+    </div>
+  </div>
+  <table>
+    <tr><th>工具类型</th><th>示例</th><th>关键约束</th></tr>
+    <tr><td>只读诊断工具</td><td>CMS、历史告警、工单检索、运行数据</td><td>必须带风机 ID、时间窗、数据时间戳</td></tr>
+    <tr><td>建议生成工具</td><td>工单草稿、备件清单、排查清单</td><td>输出为草稿，需人工确认</td></tr>
+    <tr><td>高风险控制类能力</td><td>远程复位、启停机、参数调整</td><td>不由助手直接执行；助手只生成建议和风险依据，执行走原控制系统权限、电子票和二次确认</td></tr>
+  </table>
+  <div class="hl-must">风电场景的 Tool Calling 不只是“格式稳定”，更是“权限边界”。所有可能影响设备状态的能力必须从工具注册表中标记为高风险，默认禁用直连执行，只允许输出建议、校验项和审计记录。</div>
+  <div class="page-num">13</div>
+</section>
+
+<!-- Slide 14: 自研框架 -->
+<section class="slide">
+  <h2>4.3 Agent 框架：轻量可控，替代黑盒编排</h2>
+  <div class="two-col">
+    <div class="card bad">
+      <h3>直接套通用框架的问题</h3>
+      <ul>
+        <li>工具链路太黑，现场事故复盘时难以解释每一步依据</li>
+        <li>安全门、权限、票证、审计日志很难嵌入默认链路</li>
+        <li>时序数据、知识库、工单系统混在一个 Agent 中，测试困难</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>自研最小可控内核</h3>
+      <ul>
+        <li><b>StateGraph</b>：Case → Plan → Evidence → Recommendation → WorkOrder</li>
+        <li><b>ToolRegistry</b>：所有工具声明权限、超时、降级策略</li>
+        <li><b>SafetyGate</b>：风速、停机、票证、权限、二次确认</li>
+        <li><b>TraceLogger</b>：每步证据、参数、模型输出全留痕</li>
+      </ul>
+    </div>
+  </div>
+  <div class="code">class WindOpsAgent:
+    def run(case):
+        case = data_layer.normalize(case)
+        memory_ctx = memory_router.build(case)
+        evidence = rag.retrieve(case, memory_ctx)
+        plan = planner.plan(case, evidence)
+        safe_plan = safety_gate.validate(plan)
+        result = executor.execute(safe_plan)
+        feedback.log(case, plan, result)</div>
+  <div class="page-num">14</div>
+</section>
+
+<!-- Slide 15: RAG -->
+<section class="slide">
+  <h2>5. 混合 RAG · 单一向量检索不适合故障诊断</h2>
+  <div class="two-col">
+    <div class="card bad">
+      <h3>只用向量检索的问题</h3>
+      <ul>
+        <li>故障码、点位名、备件号属于精确匹配，向量相似可能漏召回</li>
+        <li>厂家手册、SOP、工单、图纸粒度不同，单一路径难以排序</li>
+        <li>历史工单有噪声，不能和官方规程同等可信</li>
+      </ul>
+    </div>
+    <div class="card good">
+      <h3>三层漏斗改造</h3>
+      <ul>
+        <li><b>L1 语义缓存</b>：高频故障问答、标准 SOP、常见告警解释</li>
+        <li><b>L2 混合召回</b>：BM25 精确匹配 + 向量语义召回 + 图谱邻接</li>
+        <li><b>L3 Rerank + 证据分级</b>：官方手册优先，历史工单作为补充</li>
+      </ul>
+    </div>
+  </div>
+  <div class="q">风电 RAG 的核心不是“找相似文本”，而是“找到可执行、可追溯、符合机型和安全条件的证据”。</div>
+  <div class="page-num">15</div>
+</section>
+
+<!-- Slide 16: RAG Funnel -->
+<section class="slide">
+  <h2>5.1 风电 Hybrid RAG 三层漏斗</h2>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 1000 360" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#475569"/></marker></defs>
+      <rect x="70" y="25" width="860" height="55" rx="10" fill="#1e293b"/>
+      <text x="500" y="58" text-anchor="middle" fill="white" font-size="17" font-weight="bold">结构化故障 Case：WTG-003 / 变桨24V / 近30分钟电压波动 / 机型X</text>
+      <path d="M 500 80 L 500 105" stroke="#475569" stroke-width="2" marker-end="url(#r)"/>
+      <rect x="170" y="105" width="660" height="58" rx="8" fill="#dcfce7" stroke="#10b981" stroke-width="2"/>
+      <text x="500" y="130" text-anchor="middle" fill="#065f46" font-size="15" font-weight="bold">L1 语义缓存</text>
+      <text x="500" y="150" text-anchor="middle" fill="#064e3b" font-size="12">高频故障解释 / 标准处置卡 / 已验证 FAQ，毫秒级返回</text>
+      <path d="M 500 163 L 500 188" stroke="#475569" stroke-width="2" marker-end="url(#r)"/>
+      <rect x="120" y="188" width="760" height="72" rx="8" fill="#ecfeff" stroke="#0f766e" stroke-width="2"/>
+      <text x="500" y="214" text-anchor="middle" fill="#115e59" font-size="15" font-weight="bold">L2 多路召回</text>
+      <text x="500" y="236" text-anchor="middle" fill="#334155" font-size="12">BM25：故障码/备件号/点位名 · 向量：症状语义 · 图谱：部件-故障-措施-备件</text>
+      <path d="M 500 260 L 500 285" stroke="#475569" stroke-width="2" marker-end="url(#r)"/>
+      <rect x="170" y="285" width="660" height="58" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="500" y="310" text-anchor="middle" fill="#92400e" font-size="15" font-weight="bold">L3 Rerank + 证据分级</text>
+      <text x="500" y="330" text-anchor="middle" fill="#78350f" font-size="12">官方手册 &gt; 场站 SOP &gt; 专家知识 &gt; 已关闭工单 &gt; 未验证经验</text>
+    </svg>
+  </div>
+  <table>
+    <tr><th>知识源</th><th>检索策略</th><th>输出时如何使用</th></tr>
+    <tr><td>厂家手册 / 故障码表</td><td>故障码、机型、控制器版本精确匹配</td><td>作为诊断与操作步骤主证据</td></tr>
+    <tr><td>场站 SOP / 安全规程</td><td>部件、作业类型、安全条件匹配</td><td>作为作业约束和安全提醒</td></tr>
+    <tr><td>历史工单</td><td>故障现象、部件、相似曲线召回</td><td>作为经验参考，必须标注“历史案例”</td></tr>
+    <tr><td>图纸 / BOM / 备件库</td><td>部件图谱和备件号关联</td><td>生成备件、工具、测点清单</td></tr>
+  </table>
+  <div class="page-num">16</div>
+</section>
+
+<!-- Slide 17: 工具高可用 -->
+<section class="slide">
+  <h2>6. 工具层高可用 · 运维系统的柔性降级</h2>
+  <div class="three-col">
+    <div class="card">
+      <h3>实时系统</h3>
+      <ul>
+        <li>运行数据点位</li>
+        <li>CMS 振动</li>
+        <li>告警平台</li>
+        <li>气象塔 / 预报</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>业务系统</h3>
+      <ul>
+        <li>EAM/CMMS 工单</li>
+        <li>备件库存</li>
+        <li>人员排班</li>
+        <li>电子工作票</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>知识系统</h3>
+      <ul>
+        <li>厂家手册</li>
+        <li>场站 SOP</li>
+        <li>历史工单</li>
+        <li>专家规则库</li>
+      </ul>
+    </div>
+  </div>
+  <div class="code">@enterprise_retry(timeout=2, retries=3, fallback="use_last_valid_snapshot")
+def get_operating_timeseries(turbine_id, points, window):
+    ...
+
+@safety_required(checks=["work_ticket", "wind_speed", "stop_state", "permission"])
+def build_remote_reset_suggestion(turbine_id, fault_code):
+    # 只生成复位建议和风险依据；不直连控制系统执行
+    ...</div>
+  <div class="card good">
+    <h3>关键洞察：柔性可用</h3>
+    <p>运行数据或工单系统短暂不可用时，助手不能“瞎编”。它应明确告诉用户数据时间、缺失项和可执行的保守下一步，例如“当前无法读取最新 CMS，建议先按 10:35 快照做电源检查，不执行远程复位”。</p>
+  </div>
+  <div class="page-num">17</div>
+</section>
+
+<!-- Slide 18: 模型路由 -->
+<section class="slide">
+  <h2>7. 模型层 · 训推分离的风电模型路由</h2>
+  <div class="q">原课件的模型路由思想保留，但风电场景要把“简单 FAQ、复杂诊断、时序异常、多模态巡检、专家评分”拆开，不能所有请求都走一个大模型。</div>
+  <table>
+    <tr><th>任务类型</th><th>推荐模型/模块</th><th>触发场景</th><th>原因</th></tr>
+    <tr><td>标准 FAQ / 故障码解释</td><td>小模型 + 语义缓存</td><td>“303804 是什么故障”</td><td>高频、低风险、低延迟</td></tr>
+    <tr><td>多步故障诊断</td><td>强推理 LLM + Planner</td><td>多告警、多系统、多部件关联</td><td>需要拆任务和证据整合</td></tr>
+    <tr><td>时序异常识别</td><td>专用时序模型 / 规则引擎</td><td>电压波动、温度爬升、振动趋势</td><td>数值趋势不应完全交给 LLM</td></tr>
+    <tr><td>巡检图片/视频</td><td>多模态模型</td><td>叶片裂纹、渗油、柜内烧蚀、端子松动</td><td>图像证据进入诊断链</td></tr>
+    <tr><td>专家复核/Judge</td><td>异步评审模型 + 专家规则</td><td>工单关闭、答案抽检、知识入库</td><td>进入反馈飞轮</td></tr>
+  </table>
+  <div class="hl-hot">训推一致性重点：故障标签体系、机型术语、SOP 版本、点位映射必须和线上一致；否则训练集学到的“变桨24V”到线上可能对应错点位。</div>
+  <div class="page-num">18</div>
+</section>
+
+<!-- Slide 19: 调用链路 -->
+<section class="slide">
+  <h2>8. 整体调用链路串讲</h2>
+  <div class="svg-wrap">
+    <svg viewBox="0 0 1000 280" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 Z" fill="#475569"/></marker></defs>
+      <rect x="10" y="120" width="105" height="50" rx="6" fill="#1e293b"/>
+      <text x="63" y="150" fill="white" text-anchor="middle" font-size="13" font-weight="bold">值班员</text>
+      <path d="M 120 145 L 150 145" stroke="#475569" stroke-width="2" marker-end="url(#f)"/>
+      <rect x="155" y="120" width="120" height="50" rx="6" fill="#ccfbf1" stroke="#0f766e" stroke-width="2"/>
+      <text x="215" y="142" text-anchor="middle" font-size="12" font-weight="bold" fill="#115e59">业务层</text>
+      <text x="215" y="160" text-anchor="middle" font-size="10" fill="#475569">告警研判</text>
+      <path d="M 280 145 L 310 145" stroke="#475569" stroke-width="2" marker-end="url(#f)"/>
+      <rect x="315" y="50" width="145" height="50" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="388" y="72" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">数据层</text>
+      <text x="388" y="90" text-anchor="middle" font-size="10" fill="#78350f">故障标准化</text>
+      <rect x="315" y="115" width="145" height="50" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="388" y="137" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">记忆层</text>
+      <text x="388" y="155" text-anchor="middle" font-size="10" fill="#78350f">风机/故障画像</text>
+      <rect x="315" y="180" width="145" height="50" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+      <text x="388" y="202" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">RAG</text>
+      <text x="388" y="220" text-anchor="middle" font-size="10" fill="#78350f">手册/SOP/工单</text>
+      <path d="M 465 75 L 505 130" stroke="#475569" stroke-width="2" marker-end="url(#f)"/>
+      <path d="M 465 140 L 505 145" stroke="#475569" stroke-width="2" marker-end="url(#f)"/>
+      <path d="M 465 205 L 505 162" stroke="#475569" stroke-width="2" marker-end="url(#f)"/>
+      <rect x="510" y="120" width="120" height="50" rx="6" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+      <text x="570" y="142" text-anchor="middle" font-size="12" font-weight="bold" fill="#5b21b6">Planner</text>
+      <text x="570" y="160" text-anchor="middle" font-size="10" fill="#5b21b6">诊断计划</text>
+      <path d="M 635 145 L 665 145" stroke="#475569" stroke-width="2" marker-end="url(#f)"/>
+      <rect x="670" y="120" width="125" height="50" rx="6" fill="#d1fae5" stroke="#10b981" stroke-width="2"/>
+      <text x="733" y="142" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">Executor</text>
+      <text x="733" y="160" text-anchor="middle" font-size="10" fill="#064e3b">调工具+安全门</text>
+      <path d="M 800 145 L 830 145" stroke="#475569" stroke-width="2" marker-end="url(#f)"/>
+      <rect x="835" y="50" width="150" height="50" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <text x="910" y="72" text-anchor="middle" font-size="12" font-weight="bold" fill="#991b1b">工具层</text>
+      <text x="910" y="90" text-anchor="middle" font-size="10" fill="#7f1d1d">CMS/EAM/告警平台</text>
+      <rect x="835" y="115" width="150" height="50" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <text x="910" y="137" text-anchor="middle" font-size="12" font-weight="bold" fill="#991b1b">模型层</text>
+      <text x="910" y="155" text-anchor="middle" font-size="10" fill="#7f1d1d">生成建议</text>
+      <rect x="835" y="180" width="150" height="50" rx="6" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+      <text x="910" y="202" text-anchor="middle" font-size="12" font-weight="bold" fill="#991b1b">反馈层</text>
+      <text x="910" y="220" text-anchor="middle" font-size="10" fill="#7f1d1d">工单/专家复核</text>
+    </svg>
+  </div>
+  <div class="tip"><b>例子</b>：值班员问“3号机变桨24V主电源开关怎么处理？”链路为：故障实体对齐 → 拉取 24V 电压/充电器/温度曲线 → 检索机型 SOP 和历史工单 → Planner 拆成远程确认、现场排查、安全校验、备件准备 → Executor 生成带证据的处置建议和工单草稿。</div>
+  <div class="page-num">19</div>
+</section>
+
+<!-- Slide 20: 业务收益 -->
+<section class="slide">
+  <h2>9. 试点收益指标：从商业转化改为运维效果</h2>
+  <div class="three-col">
+    <div class="card good">
+      <h3>运维指标</h3>
+      <div class="kpi good">MTTR 目标 -10%~20%</div>
+      <div class="kpi good">一次修复率目标 +5%~12%</div>
+      <div class="kpi good">重复故障率目标 -5%~10%</div>
+    </div>
+    <div class="card">
+      <h3>资产指标</h3>
+      <div class="kpi">可利用率目标 +0.1~0.3pp</div>
+      <div class="kpi">非计划停机目标 -5%~10%</div>
+      <div class="kpi">限功率时长目标 -3%~8%</div>
+    </div>
+    <div class="card warn">
+      <h3>工程指标</h3>
+      <div class="kpi warn">只读问答 P95 &lt;2s</div>
+      <div class="kpi warn">关键结论引用率 &gt;90%</div>
+      <div class="kpi bad">高风险直连执行 0 次</div>
+    </div>
+  </div>
+  <h3 style="margin-top:28px">归因方式</h3>
+  <ul>
+    <li><b>MTTR 改善</b>：Planner 拆诊断路径 + 工具辅助拉曲线 + SOP 直接命中</li>
+    <li><b>一次修复率提升</b>：风机画像 + 相似工单 + 备件清单减少现场往返</li>
+    <li><b>重复故障率下降</b>：工单复盘进入长期故障画像，识别根因而非只复位</li>
+    <li><b>安全风险下降</b>：Safety Gate 对高风险建议做前置校验，控制类执行仍走原权限系统</li>
+  </ul>
+  <div class="hl-must">这些数字是试点目标，不是上线承诺。上线时要用分场站灰度或前后对照验证：同机型、同风况、同故障类型分组，避免把季节风况、备件供应、班组经验变化误认为助手收益。</div>
+  <div class="page-num">20</div>
+</section>
+
+<!-- Slide 21: 落地路线 -->
+<section class="slide">
+  <h2>10. 落地实施路线：每一步都对应原课件模块</h2>
+  <table>
+    <tr><th>阶段</th><th>建设内容</th><th>对应 01_lecture1 模块</th><th>验收标准</th></tr>
+    <tr><td>Phase 0</td><td>梳理机型、故障码、SOP、历史工单、运行数据点位字典</td><td>数据层 / RAG 数据准备</td><td>知识源版本化，点位和部件实体可对齐</td></tr>
+    <tr><td>Phase 1</td><td>做只读问答：故障码解释、SOP 检索、引用证据</td><td>Hybrid RAG 三层漏斗</td><td>关键结论引用率 &gt;90%，无编造手册条款</td></tr>
+    <tr><td>Phase 2</td><td>接入 CMS/告警平台，形成结构化故障 Case</td><td>Query 改写 / 数据层前置</td><td>风机、部件、故障码、时间窗自动识别</td></tr>
+    <tr><td>Phase 3</td><td>引入 Planner + Executor，辅助生成诊断路径、证据清单和工单草稿</td><td>Plan-and-Execute / Tool Calling</td><td>多步任务可解释，控制类动作只给建议不直连执行</td></tr>
+    <tr><td>Phase 4</td><td>建设四层记忆，沉淀风机画像和故障经验</td><td>Mem0 / OpenClaw / Hermes 融合记忆</td><td>相似故障召回准确，临时状态不过期污染</td></tr>
+    <tr><td>Phase 5</td><td>反馈飞轮：专家复核、工单结果、复发率进入审核池，治理后再进入训练集</td><td>反馈层 / 数据治理 / 后训练闭环</td><td>可量化改善 MTTR、重复故障率和知识库命中率</td></tr>
+  </table>
+  <div class="page-num">21</div>
+</section>
+
+<!-- Slide 22: 小结 -->
+<section class="slide">
+  <h2>11. 小结：三条主线</h2>
+  <div class="three-col">
+    <div class="card">
+      <h3>① 分层即可控</h3>
+      <p>风电运维不能靠一个 Prompt 包打天下，要把实时数据、知识检索、工具执行、安全审计拆成独立层。</p>
+    </div>
+    <div class="card">
+      <h3>② 前置即准确</h3>
+      <p>先把故障码、风机、部件、时间窗、风况和点位对齐，再让模型诊断，能显著降低幻觉。</p>
+    </div>
+    <div class="card">
+      <h3>③ 闭环即进化</h3>
+      <p>工单结果、专家修正、复发情况先进入审核池和知识治理流程，通过质检后再进入记忆和训练集，智导助手才会越用越贴合场站。</p>
+    </div>
+  </div>
+  <div class="q" style="margin-top:28px;">
+    最终形态：不是“风电知识问答机器人”，而是“有数据、有证据、有安全门、有工单闭环的运维决策辅助系统”。
+  </div>
+  <div class="page-num">22</div>
+</section>
+
+<!-- Slide 23: 结束 -->
+<section class="slide cover">
+  <h1>技术路线完成</h1>
+  <div class="subtitle">面向风电运维智导助手的完整技术路线</div>
+  <div>
+    <span class="chip">故障诊断</span>
+    <span class="chip">安全门</span>
+    <span class="chip">证据引用</span>
+    <span class="chip">工单闭环</span>
+    <span class="chip">知识飞轮</span>
+  </div>
+</section>
+
+</div>
+
+<div class="nav">
+  <button onclick="prev()">上一页</button>
+  <span id="indicator" style="background:white; color:#1e293b; padding:6px 14px; border-radius:20px; font-size:14px;">1</span>
+  <button onclick="next()">下一页</button>
+</div>
+
+<script>
+let idx = 0;
+const slides = document.querySelectorAll('.slide');
+const ind = document.getElementById('indicator');
+function show(i) {
+  slides.forEach(s => s.classList.remove('active'));
+  idx = (i + slides.length) % slides.length;
+  slides[idx].classList.add('active');
+  ind.textContent = (idx + 1) + ' / ' + slides.length;
+  slides[idx].scrollTop = 0;
+}
+function next() { show(idx + 1); }
+function prev() { show(idx - 1); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') next();
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') prev();
+});
+</script>
+</body>
+</html>
