@@ -12,16 +12,17 @@ const root = fileURLToPath(new URL('..', import.meta.url))
 const runner = join(root, 'scripts', 'run-lmstudio-claude.mjs')
 const windriseBin = join(root, 'bin', 'windrise')
 const localKnowledgeProject = join(root, '风机故障码')
+const windWikiProject = join(root, 'wind-llmwiki')
 
 await step('default local knowledge project is discovered', async () => {
   const { stdout } = await runRunner(['/llmwiki path'])
-  assertIncludes(stdout, '风机故障码')
-  assertIncludes(stdout, localKnowledgeProject)
+  assertIncludes(stdout, 'wind-llmwiki')
+  assertIncludes(stdout, windWikiProject)
 })
 
 await step('local knowledge search returns evidence', async () => {
   const { stdout } = await runRunner(['/llmwiki search 风速仪 --limit 1'])
-  assertIncludes(stdout, 'Matches for "风速仪"')
+  assertIncludes(stdout, '按故障描述「风速仪」')
   assertIncludes(stdout, '风速仪')
 })
 
@@ -51,12 +52,14 @@ await step('explicit LLMWIKI_PROJECT can be a text corpus', async () => {
     ...process.env,
     LLMWIKI_PROJECT: localKnowledgeProject,
   })
-  assertIncludes(stdout, 'Matches for "风速仪"')
+  assertIncludes(stdout, '按故障描述「风速仪」')
 })
 
 await step('windrise bin uses repository-relative paths', async () => {
   const { stdout } = await runBin(['tree'])
-  assertIncludes(stdout, 'HW2S2000')
+  assertIncludes(stdout, 'wiki/')
+  assertIncludes(stdout, 'wiki/faults/')
+  assertIncludes(stdout, 'wiki/models/')
 })
 
 await step('windrise bin preserves launch directory for local knowledge', async () => {
@@ -75,7 +78,7 @@ await step('windrise bin preserves launch directory for local knowledge', async 
 
 await step('windrise bin search uses local knowledge', async () => {
   const { stdout } = await runBin(['search', '风速仪'])
-  assertIncludes(stdout, 'Matches for "风速仪"')
+  assertIncludes(stdout, '按故障描述「风速仪」')
 })
 
 await step('windrise bin answers built-in wind farm model mapping by site', async () => {
@@ -83,9 +86,10 @@ await step('windrise bin answers built-in wind farm model mapping by site', asyn
     LMSTUDIO_BASE_URL: 'http://127.0.0.1:9',
   })
   assertIncludes(stdout, '新华风电场')
-  assertIncludes(stdout, '三一 SE8715')
-  assertIncludes(stdout, '华仪 HW2/S1500(87)')
-  assertIncludes(stdout, '运达 WD88-1500A')
+  assertIncludes(stdout, '三一 SE8715系列（具体型号：SE8715')
+  assertIncludes(stdout, '华仪 HW2-S2000系列')
+  assertIncludes(stdout, 'HW2/S1500(87)')
+  assertIncludes(stdout, '运达 WD1500系列（具体型号：WD88-1500A')
   assertNotIncludes(stdout, '联网搜索')
 })
 
@@ -145,7 +149,7 @@ async function runRunner(args, env = process.env) {
           ANTHROPIC_MODEL_PROVIDER:
             env.ANTHROPIC_MODEL_PROVIDER || 'lmstudio',
           LMSTUDIO_BASE_URL: env.LMSTUDIO_BASE_URL || 'http://127.0.0.1:1234',
-          LMSTUDIO_MODEL: env.LMSTUDIO_MODEL || 'qwen3.5-9b-coder',
+          LMSTUDIO_MODEL: env.LMSTUDIO_MODEL || 'qwen/qwen3.5-9b',
         },
         maxBuffer: 20 * 1024 * 1024,
         timeout: 120_000,
@@ -173,7 +177,7 @@ async function runBin(args, options = {}) {
           env.LMSTUDIO_BASE_URL ||
           process.env.LMSTUDIO_BASE_URL ||
           'http://127.0.0.1:1234',
-        LMSTUDIO_MODEL: env.LMSTUDIO_MODEL || process.env.LMSTUDIO_MODEL || 'qwen3.5-9b-coder',
+        LMSTUDIO_MODEL: env.LMSTUDIO_MODEL || process.env.LMSTUDIO_MODEL || 'qwen/qwen3.5-9b',
       },
       maxBuffer: 20 * 1024 * 1024,
       timeout: 120_000,

@@ -24,6 +24,7 @@ export type LLMWikiProjectResolution = {
     | 'LLMWIKI_PROJECT'
     | 'LLMWIKI_DIR'
     | 'cwd'
+    | 'bundled'
     | 'app-state'
     | 'local-knowledge'
     | 'none'
@@ -79,6 +80,11 @@ export async function resolveLLMWikiProject(
   const cwdProject = await findLLMWikiProjectFromCwd()
   if (cwdProject) {
     return { project: cwdProject, source: 'cwd' }
+  }
+
+  const bundledProject = await findBundledLLMWikiProjectFromCwd()
+  if (bundledProject) {
+    return { project: bundledProject, source: 'bundled' }
   }
 
   const projects = await loadLLMWikiProjectsFromAppState()
@@ -191,6 +197,21 @@ function normalizeConfiguredProjectPath(configuredPath: string): string {
   return basename(absolutePath) === '.llm-wiki'
     ? dirname(absolutePath)
     : absolutePath
+}
+
+async function findBundledLLMWikiProjectFromCwd(
+  startDir = getCwd(),
+): Promise<LLMWikiProject | null> {
+  let dir = resolve(startDir)
+  while (true) {
+    const candidate = join(dir, 'wind-llmwiki')
+    if (await isLLMWikiProject(candidate)) {
+      return { name: 'wind-llmwiki', path: candidate }
+    }
+    const parent = dirname(dir)
+    if (parent === dir) return null
+    dir = parent
+  }
 }
 
 async function findLocalKnowledgeProjectFromCwd(

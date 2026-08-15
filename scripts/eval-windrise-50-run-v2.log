@@ -1,0 +1,91 @@
+生成 50 条测试（覆盖 13 个风场）
+
+[1/50] 八面 ZC01 ... 结构化 10005
+[2/50] 富荣 SH01 ... 结构化
+[3/50] 良井子 MY01# ... node:internal/errors:998
+  const err = new Error(message);
+              ^
+
+Error: Command failed: /Users/zinger/claude_code_src/hn/.venv/bin/python -c 
+import importlib.util, json, os, re, sys
+os.chdir("/Users/zinger/claude_code_src/hn")
+spec = importlib.util.spec_from_file_location('srv', "/Users/zinger/claude_code_src/hn/dify_web_server_.py")
+mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mod)
+query = sys.argv[1]
+answer, route = mod.build_windrise_response_payload(query, [])
+ids = mod.extract_windrise_turbine_ids_from_text(query)
+slots = mod.build_effective_windrise_slots_for_query(query, [])
+codes = re.findall(r'\b(\d{4,6})\b', answer or '')
+top_code = ''
+m = re.search(r'\*\*(\d+)｜([^*]+)\*\*', answer or '')
+if m:
+    top_code = m.group(1)
+    top_name = m.group(2).strip()
+else:
+    top_name = ''
+print(json.dumps({
+    'reason': route.get('reason', ''),
+    'turbine_ids': ids,
+    'slot_turbine': slots.get('turbine_id', ''),
+    'slot_farm': slots.get('farm', ''),
+    'slot_brand': slots.get('brand', ''),
+    'top_code': top_code,
+    'top_name': top_name,
+    'codes': codes[:5],
+    'structured_header': bool(re.search(r'维修处理建议|原因分析|复位说明', answer or '')),
+    'answer_head': '\n'.join((answer or '').splitlines()[:6]),
+    'need_more': '需要补充定位条件' in (answer or ''),
+    'no_match': mod.is_windrise_no_match_answer(answer or ''),
+    'record_count': len(re.findall(r'匹配到\s*(\d+)\s*条', answer or '')) and int(re.search(r'匹配到\s*(\d+)\s*条', answer or '').group(1)) if re.search(r'匹配到\s*(\d+)\s*条', answer or '') else 0,
+}, ensure_ascii=False))
+ 良井子风场MY01风机SC_变流器过功率触发故障，怎么办
+
+    at genericNodeError (node:internal/errors:998:15)
+    at wrappedFn (node:internal/errors:543:14)
+    at ChildProcess.exithandler (node:child_process:417:12)
+    at ChildProcess.emit (node:events:509:20)
+    at maybeClose (node:internal/child_process:1108:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:305:5) {
+  code: null,
+  killed: true,
+  signal: 'SIGTERM',
+  cmd: '/Users/zinger/claude_code_src/hn/.venv/bin/python -c \n' +
+    'import importlib.util, json, os, re, sys\n' +
+    'os.chdir("/Users/zinger/claude_code_src/hn")\n' +
+    `spec = importlib.util.spec_from_file_location('srv', "/Users/zinger/claude_code_src/hn/dify_web_server_.py")\n` +
+    'mod = importlib.util.module_from_spec(spec)\n' +
+    'spec.loader.exec_module(mod)\n' +
+    'query = sys.argv[1]\n' +
+    'answer, route = mod.build_windrise_response_payload(query, [])\n' +
+    'ids = mod.extract_windrise_turbine_ids_from_text(query)\n' +
+    'slots = mod.build_effective_windrise_slots_for_query(query, [])\n' +
+    "codes = re.findall(r'\\b(\\d{4,6})\\b', answer or '')\n" +
+    "top_code = ''\n" +
+    "m = re.search(r'\\*\\*(\\d+)｜([^*]+)\\*\\*', answer or '')\n" +
+    'if m:\n' +
+    '    top_code = m.group(1)\n' +
+    '    top_name = m.group(2).strip()\n' +
+    'else:\n' +
+    "    top_name = ''\n" +
+    'print(json.dumps({\n' +
+    "    'reason': route.get('reason', ''),\n" +
+    "    'turbine_ids': ids,\n" +
+    "    'slot_turbine': slots.get('turbine_id', ''),\n" +
+    "    'slot_farm': slots.get('farm', ''),\n" +
+    "    'slot_brand': slots.get('brand', ''),\n" +
+    "    'top_code': top_code,\n" +
+    "    'top_name': top_name,\n" +
+    "    'codes': codes[:5],\n" +
+    "    'structured_header': bool(re.search(r'维修处理建议|原因分析|复位说明', answer or '')),\n" +
+    "    'answer_head': '\\n'.join((answer or '').splitlines()[:6]),\n" +
+    "    'need_more': '需要补充定位条件' in (answer or ''),\n" +
+    "    'no_match': mod.is_windrise_no_match_answer(answer or ''),\n" +
+    "    'record_count': len(re.findall(r'匹配到\\s*(\\d+)\\s*条', answer or '')) and int(re.search(r'匹配到\\s*(\\d+)\\s*条', answer or '').group(1)) if re.search(r'匹配到\\s*(\\d+)\\s*条', answer or '') else 0,\n" +
+    '}, ensure_ascii=False))\n' +
+    ' 良井子风场MY01风机SC_变流器过功率触发故障，怎么办',
+  stdout: '',
+  stderr: ''
+}
+
+Node.js v26.0.0

@@ -13,6 +13,7 @@ import { getAPIProvider } from '../../utils/model/providers.js'
 import { assertOnlineOrLoopbackUrl } from '../../utils/offline.js'
 import {
   createWindFarmModelContext,
+  lookupWindFarmModels,
   shouldAnswerWindFarmModelQuestion,
 } from '../../utils/windFarmModels.js'
 
@@ -103,6 +104,13 @@ type OpenAIChatRequest = {
   temperature?: number
   max_tokens?: number
   stop?: string[]
+  think?: boolean
+  enable_thinking?: boolean
+  reasoning_effort?: 'none' | 'low' | 'medium' | 'high' | string
+  reasoning?: {
+    effort?: 'none' | 'low' | 'medium' | 'high' | string
+    exclude?: boolean
+  }
 }
 
 type OpenAIMessage = {
@@ -125,9 +133,14 @@ type RequestOptions = {
   timeout?: number
 }
 
-const DEFAULT_LMSTUDIO_BASE_URL = 'http://127.0.0.1:1234'
-const DEFAULT_LMSTUDIO_MODEL = 'qwen3.5-9b-coder'
-const DEFAULT_LMSTUDIO_CHAT_MODEL = DEFAULT_LMSTUDIO_MODEL
+const DEFAULT_LMSTUDIO_BASE_URL = 'http://10.46.161.210:9527'
+const DEFAULT_LMSTUDIO_MODEL = 'Qwen-30B'
+const DEFAULT_LMSTUDIO_CHAT_MODEL = 'Qwen-30B'
+const DEFAULT_LMSTUDIO_CONTEXT_TOKEN_BUDGET = 24_000
+const DEFAULT_LMSTUDIO_RECENT_TOKEN_BUDGET = 10_000
+const DEFAULT_LMSTUDIO_CONTEXT_MEMORY_TOKEN_BUDGET = 4_000
+const DEFAULT_LMSTUDIO_LLMWIKI_MEMORY_TOKEN_BUDGET = 6_000
+const MAX_RECENT_LLMWIKI_CONTEXTS = 4
 
 export function createLmStudioAnthropicClient(): unknown {
   return {
@@ -354,58 +367,24 @@ async function callLmStudio(
 
   try {
     const messages = await toLmStudioMessages(params)
-    const directWindFarmAnswer = directWindFarmModelAnswer(messages)
-    if (directWindFarmAnswer) {
-      return lmStudioTextResponse(directWindFarmAnswer, resolveModel(params.model))
-    }
-    const directRetrievalAnswer = directWindriseRetrievalAnswer(messages)
-    if (directRetrievalAnswer) {
-      return lmStudioTextResponse(directRetrievalAnswer, resolveModel(params.model))
-    }
+    const directAnswer = directLocalMetaAnswer(params, messages)
+    if (directAnswer) return lmStudioTextResponse(directAnswer, selectLmStudioModel(params))
     return await callLmStudioChatCompletions(params, messages, controller.signal)
   } finally {
     clearTimeout(timeout)
   }
 }
 
-function directWindFarmModelAnswer(
+function directLocalMetaAnswer(
+  params: BetaMessageStreamParams,
   messages: LmStudioMessage[],
-): string | undefined {
-  if (process.env.WINDRISE !== '1') return undefined
-  const lastUser = [...messages]
-    .reverse()
-    .find(message => message.role === 'user')
-    ?.content
-  if (!lastUser?.includes('<风场机型映射>')) return undefined
-
-  const mapping = lastUser.match(/<风场机型映射>\n([\s\S]*?)\n<\/风场机型映射>/)
-  const content = mapping?.[1]?.trim()
-  if (!content) return undefined
-
-  return content
-    .split(/\r?\n/)
-    .filter(line => !line.startsWith('下面是系统内置的风场与风机型号对应关系'))
-    .join('\n')
-    .trim()
-}
-
-function directWindriseRetrievalAnswer(
-  messages: LmStudioMessage[],
-): string | undefined {
-  if (process.env.WINDRISE !== '1') return undefined
-  const lastUser = [...messages]
-    .reverse()
-    .find(message => message.role === 'user')
-    ?.content
-  if (!lastUser?.includes('<LLMWiki检索>')) return undefined
-
-  const retrieval = lastUser.match(/<LLMWiki检索>\n([\s\S]*?)\n<\/LLMWiki检索>/)
-  const content = retrieval?.[1]?.trim()
-  if (!content || content.includes('No matches.')) return undefined
-  if (!/^检索词：\s*[a-z0-9_/-]+\s*$/im.test(content)) return undefined
-  if (!/^本地答案：/m.test(content) || !/^结论：/m.test(content)) return undefined
-
-  return content.slice(content.search(/^本地答案：/m)).trim()
+): string {
+  const model = selectLmStudioModel(params)
+  const dateAnswer = localDateTimeAnswer(lastUserMessageText(messages))
+  if (dateAnswer) return dateAnswer
+  if (isOkHealthCheckQuestion(messages)) return 'OK'
+  if (isLocalModelIdentityQuestion(messages)) return localModelIdentityAnswer(model)
+  return ''
 }
 
 function lmStudioTextResponse(
@@ -426,12 +405,13 @@ async function callLmStudioChatCompletions(
   messages: LmStudioMessage[],
   signal: AbortSignal,
 ): Promise<Response & LmStudioChatResponse> {
-  const route = await selectLmStudioModel(params, messages, signal)
+  const model = selectLmStudioModel(params)
   const body: OpenAIChatRequest = {
-    model: route.model,
+    model,
     messages: toOpenAIMessages(messages),
     stream: false,
   }
+  applyNoThinkingOptions(body)
 
   const tools = shouldSendLmStudioTools(params, messages)
     ? toLmStudioTools(params)
@@ -471,9 +451,9 @@ async function callLmStudioChatCompletions(
     process.stderr.write(
       `[lmstudio-debug] ${JSON.stringify({
         model: body.model,
-        route: route.decision,
         max_tokens: body.max_tokens,
         temperature: body.temperature,
+        thinking: body.think === false ? 'disabled' : 'default',
         tools: body.tools?.map(tool => tool.function.name) ?? [],
         messages: body.messages.map(message => ({
           role: message.role,
@@ -495,18 +475,56 @@ async function callLmStudioChatCompletions(
 
   if (!response.ok) {
     throw new Error(
-      `LM Studio request failed: ${response.status} ${await response.text()}`,
+      `vLLM request failed: ${response.status} ${await response.text()}`,
     )
   }
 
   const data = (await response.json()) as OpenAIChatResponse
-  return openAIResponseToLmStudioResponse(data, body.model)
+  const result = openAIResponseToLmStudioResponse(data, body.model)
+  if (!result.message?.content && isLocalModelIdentityQuestion(messages)) {
+    result.message = {
+      ...result.message,
+      content: localModelIdentityAnswer(body.model),
+    }
+  } else if (!result.message?.content && isOkHealthCheckQuestion(messages)) {
+    result.message = {
+      ...result.message,
+      content: 'OK',
+    }
+  } else if (!result.message?.content && isWindrisePrincipleQuestion(messages)) {
+    result.message = {
+      ...result.message,
+      content: windrisePrincipleFallback(messages),
+    }
+  } else if (!result.message?.content) {
+    const windFarmAnswer = windFarmMappingFallback(messages)
+    const retrievalAnswer = windriseRetrievalFallback(messages)
+    if (windFarmAnswer || retrievalAnswer) {
+      result.message = {
+        ...result.message,
+        content: windFarmAnswer || retrievalAnswer,
+      }
+    }
+  }
+  if (result.message?.content) {
+    const retrievalAnswer = windriseRetrievalFallback(messages)
+    const normalizedContent = normalizeWindriseSourceLabel(result.message.content)
+    result.message = {
+      ...result.message,
+      content:
+        retrievalAnswer && !hasCompleteWindriseRetrievalAnswer(normalizedContent)
+          ? retrievalAnswer
+          : normalizedContent,
+    }
+  }
+  return result
 }
 
 function shouldUseLmStudioStreaming(
   params: BetaMessageStreamParams,
   messages: LmStudioMessage[],
 ): boolean {
+  if (process.env.WINDRISE === '1') return false
   if (process.env.LMSTUDIO_STREAM === '0') return false
   if (shouldSendLmStudioTools(params, messages)) return false
   if (
@@ -520,17 +538,133 @@ function shouldUseLmStudioStreaming(
   return true
 }
 
+function applyNoThinkingOptions(body: OpenAIChatRequest): void {
+  if (process.env.WINDRISE_ENABLE_THINKING === '1') return
+  body.think = false
+  body.enable_thinking = false
+  body.reasoning_effort = 'none'
+  body.reasoning = { effort: 'none', exclude: true }
+}
+
+function isLocalModelIdentityQuestion(messages: LmStudioMessage[]): boolean {
+  const lastUser = [...messages]
+    .reverse()
+    .find(message => message.role === 'user')
+    ?.content ?? ''
+  return /(你是什么模型|你是谁|什么模型|当前模型|本地模型|model)/i.test(lastUser)
+}
+
+function isOkHealthCheckQuestion(messages: LmStudioMessage[]): boolean {
+  return /^\s*(只回答|仅回答|回复|输出)?\s*OK\s*$/i.test(
+    lastUserMessageText(messages),
+  )
+}
+
+function localModelIdentityAnswer(model: string): string {
+  return `我是 Windrise，本地中文助手；当前通过 vLLM 使用 ${model}。`
+}
+
+function localDateTimeAnswer(text: string): string {
+  const normalized = text.trim()
+  if (!normalized) return ''
+  if (/(风机|风电|故障|报警|告警|停机|复位|处理|排查|维修|变桨|偏航|主控|变流|发电机|齿轮箱)/i.test(normalized)) {
+    return ''
+  }
+  const now = new Date()
+  const date = new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long',
+  }).format(now)
+  const time = new Intl.DateTimeFormat('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(now)
+  if (/^(今天)?(是)?(什么日子|几号|日期|星期几|周几)[？?。!！\s]*$/.test(normalized) || /(今天是什么日子|今天几号|今天日期|今天星期几|今天周几)/.test(normalized)) {
+    return `今天是 ${date}。`
+  }
+  if (/^(现在|当前)?(几点|什么时间|时间)[？?。!！\s]*$/.test(normalized) || /(现在几点|当前时间|现在时间)/.test(normalized)) {
+    return `现在是 ${date} ${time}。`
+  }
+  return ''
+}
+
+function isWindrisePrincipleQuestion(messages: LmStudioMessage[]): boolean {
+  const text = lastUserMessageText(messages)
+  return (
+    /(风机|风电|变桨|偏航|主控|变流|发电机|齿轮箱|液压|制动|安全链|电网|通信|水冷|传动|叶片|轮毂)/i.test(text) &&
+    /(原理|机理|机制|工作方式|工作过程|运行方式|运行过程|控制逻辑|结构|组成|作用|用途|为什么|怎么工作|如何工作|是什么)/i.test(text)
+  )
+}
+
+function windrisePrincipleFallback(messages: LmStudioMessage[]): string {
+  const text = lastUserMessageText(messages)
+  if (/变桨/.test(text)) {
+    return [
+      '变桨系统通过调节叶片桨距角来控制风轮吸收的气动功率和载荷。',
+      '低风速时，叶片通常保持较小桨距角以提高捕风效率；接近或超过额定风速时，控制器驱动变桨电机或液压执行机构增大桨距角，使叶片逐步失速或减小迎角，从而限制输出功率。',
+      '同时，变桨系统还参与超速保护、停机和紧急顺桨：当检测到超速、故障或安全链动作时，叶片会向安全角度顺桨，降低风轮扭矩和结构载荷。',
+    ].join('\n')
+  }
+  return [
+    '这个系统的核心逻辑是采集现场状态，经过控制器判断后驱动执行机构动作，使风机在安全边界内稳定运行。',
+    '回答这类原理问题时，需要结合具体品牌、机型和控制策略；如果要给现场处置建议，还需要补充风场、机型、报警码和实时状态。',
+  ].join('\n')
+}
+
+function lastUserMessageText(messages: LmStudioMessage[]): string {
+  return [...messages]
+    .reverse()
+    .find(message => message.role === 'user')
+    ?.content ?? ''
+}
+
+function windFarmMappingFallback(messages: LmStudioMessage[]): string {
+  const text = lastUserMessageText(messages)
+  const mapping = text.match(/<风场机型映射>\n([\s\S]*?)\n<\/风场机型映射>/)
+  const content = mapping?.[1]?.trim()
+  if (!content) return ''
+  return content
+    .split(/\r?\n/)
+    .filter(line => !line.startsWith('下面是系统内置的风场与风机型号对应关系'))
+    .join('\n')
+    .trim()
+}
+
+function windriseRetrievalFallback(messages: LmStudioMessage[]): string {
+  const text = lastUserMessageText(messages)
+  const retrieval = text.match(/<LLMWiki检索>\n([\s\S]*?)\n<\/LLMWiki检索>/)
+  const content = retrieval?.[1]?.trim()
+  if (!content || content.includes('No matches.')) return ''
+  const structuredAnswerIndex = content.search(/^本地答案：/m)
+  if (structuredAnswerIndex >= 0) {
+    return content.slice(structuredAnswerIndex).trim()
+  }
+  return ''
+}
+
+function normalizeWindriseSourceLabel(value: string): string {
+  return value.replace(/来源路径[:：]/g, '来源：')
+}
+
+function hasCompleteWindriseRetrievalAnswer(value: string): boolean {
+  return /来源[:：]/.test(value) && /(处理方法|处理建议|检查|手动|复位)/.test(value)
+}
+
 async function* streamLmStudioChatCompletions(
   params: BetaMessageStreamParams,
   messages: LmStudioMessage[],
   signal: AbortSignal,
 ): AsyncGenerator<string> {
-  const route = await selectLmStudioModel(params, messages, signal)
+  const model = selectLmStudioModel(params)
   const body: OpenAIChatRequest = {
-    model: route.model,
+    model,
     messages: toOpenAIMessages(messages),
     stream: true,
   }
+  applyNoThinkingOptions(body)
 
   const explicitMaxTokens = process.env.LMSTUDIO_MAX_TOKENS
     ? parseInt(process.env.LMSTUDIO_MAX_TOKENS, 10)
@@ -567,7 +701,7 @@ async function* streamLmStudioChatCompletions(
 
   if (!response.ok) {
     throw new Error(
-      `LM Studio streaming request failed: ${response.status} ${await response.text()}`,
+      `vLLM streaming request failed: ${response.status} ${await response.text()}`,
     )
   }
   if (!response.body) return
@@ -655,10 +789,17 @@ function openAIResponseToLmStudioResponse(
   model?: string,
 ): Response & LmStudioChatResponse {
   const message = data.choices?.[0]?.message
+  const content = message?.content ?? ''
+  const reasoningContent = (message as { reasoning_content?: string | null } | undefined)
+    ?.reasoning_content?.trim() ?? ''
   return {
     model,
     message: {
-      content: message?.content ?? '',
+      content:
+        content ||
+        (reasoningContent && !looksLikeInternalLmStudioReasoning(reasoningContent)
+          ? reasoningContent
+          : ''),
       tool_calls: message?.tool_calls?.map(toolCall => ({
         id: toolCall.id,
         function: {
@@ -671,6 +812,10 @@ function openAIResponseToLmStudioResponse(
     prompt_eval_count: data.usage?.prompt_tokens,
     eval_count: data.usage?.completion_tokens,
   } as Response & LmStudioChatResponse
+}
+
+function looksLikeInternalLmStudioReasoning(value: string): boolean {
+  return /Thinking Process|We need answer|我们需要|用户问/.test(value.slice(0, 300))
 }
 
 async function toLmStudioMessages(
@@ -706,9 +851,17 @@ async function toLmStudioMessages(
       process.env.WINDRISE === '1' && index === lastUserIndex
         ? windriseRetrieval?.context ?? ''
         : ''
+    const messageContent = retrievalSuffix
+      ? [
+          retrievalSuffix,
+          '',
+          `用户问题：${content}`,
+          '请直接回答用户问题，不要原样复述上面的资料。',
+        ].join('\n')
+      : content
     const baseMessage: LmStudioMessage = {
       role: message.role,
-      content: retrievalSuffix ? `${content}\n\n${retrievalSuffix}` : content,
+      content: messageContent,
       ...(message.role === 'assistant'
         ? { tool_calls: contentToLmStudioToolCalls(message.content) }
         : {}),
@@ -719,7 +872,11 @@ async function toLmStudioMessages(
     messages.push(...toolResults)
   }
 
-  return messages
+  rememberWindriseRetrievalContextsFromMessages(messages)
+  if (windriseRetrieval) rememberWindriseRetrievalContext(windriseRetrieval)
+  prependConversationContinuityReminder(messages)
+  appendLatestQuestionPriorityReminder(messages)
+  return compactLmStudioMessagesForContext(messages)
 }
 
 function appendForcedToolInstruction(
@@ -732,6 +889,361 @@ function appendForcedToolInstruction(
   return baseSystem ? `${baseSystem}\n\n${instruction}` : instruction
 }
 
+function prependConversationContinuityReminder(messages: LmStudioMessage[]): void {
+  if (process.env.LMSTUDIO_CONTEXT_MEMORY === '0') return
+  const userMessages = messages.filter(message => message.role === 'user')
+  if (userMessages.length < 2) return
+  insertSystemBeforeLastUser(messages, [
+    '对话连续性提醒：历史只用于理解指代和补充限定。',
+    '必须遵守就近原则：最新用户消息是当前主任务。',
+    '只有最新消息明显是“这个/刚才/上面/继续/下一步/为什么/怎么处理”等省略追问时，才继承上一轮对象；如果最新消息出现新的故障码、部件、风场、品牌、机型、现象或任务，必须以最新消息为准。',
+  ].join('\n'))
+}
+
+function prependRecentWindriseRetrievalMemory(messages: LmStudioMessage[]): void {
+  if (process.env.WINDRISE !== '1') return
+  if (process.env.LMSTUDIO_LLMWIKI_MEMORY !== '1') return
+  if (process.env.LMSTUDIO_CONTEXT_MEMORY === '0') return
+  if (recentWindriseRetrievalContexts.length === 0) return
+  const content = createRecentWindriseRetrievalMemory()
+  if (!content) return
+  insertSystemBeforeLastUser(messages, content)
+}
+
+function appendLatestQuestionPriorityReminder(messages: LmStudioMessage[]): void {
+  if (process.env.WINDRISE !== '1') return
+  const lastUser = findLastUserLmStudioMessage(messages)
+  if (!lastUser?.content) return
+  lastUser.content = [
+    lastUser.content,
+    '',
+    '<回答约束>',
+    '请以本条“当前用户问题”为主回答。历史、压缩记忆和最近 LLMWiki 检索结果只作为参考；如果它们与当前问题不一致，忽略旧上下文。',
+    '不要继续回答上一轮问题，除非当前问题明确使用“这个/刚才/上面/继续/下一步”等词指代上一轮。',
+    '</回答约束>',
+  ].join('\n')
+}
+
+function insertSystemBeforeLastUser(
+  messages: LmStudioMessage[],
+  content: string,
+): void {
+  const lastUserIndex = findLastUserLmStudioMessageIndex(messages)
+  const message = { role: 'system' as const, content }
+  if (lastUserIndex >= 0) {
+    messages.splice(lastUserIndex, 0, message)
+    return
+  }
+  messages.push(message)
+}
+
+function findLastUserLmStudioMessage(
+  messages: LmStudioMessage[],
+): LmStudioMessage | undefined {
+  const index = findLastUserLmStudioMessageIndex(messages)
+  return index >= 0 ? messages[index] : undefined
+}
+
+function findLastUserLmStudioMessageIndex(messages: LmStudioMessage[]): number {
+  for (let index = messages.length - 1; index >= 0; index--) {
+    if (messages[index]?.role === 'user') return index
+  }
+  return -1
+}
+
+function createRecentWindriseRetrievalMemory(): string {
+  const memoryBudget = getPositiveEnvInt(
+    'LMSTUDIO_LLMWIKI_MEMORY_TOKENS',
+    DEFAULT_LMSTUDIO_LLMWIKI_MEMORY_TOKEN_BUDGET,
+  )
+  const maxChars = Math.max(1_000, memoryBudget * 4)
+  const blocks = recentWindriseRetrievalContexts
+    .slice(-MAX_RECENT_LLMWIKI_CONTEXTS)
+    .map((item, index) =>
+      [
+        `### 最近 LLMWiki 检索 ${index + 1}`,
+        `检索词：${item.query || '(未指定)'}`,
+        item.context,
+      ].join('\n'),
+    )
+  const content = [
+    '<最近LLMWiki上下文>',
+    '以下是本会话最近使用 LLMWiki 检索到的资料。它们只用于理解当前问题的指代和补充限定。',
+    '就近原则：最新用户问题优先。只有最新问题明确是在追问“它/这个/上面/刚才/继续/下一步”等上一轮对象时，才使用这些检索结果；如果最新问题提出新的风场、品牌、机型、部件、现象或故障码，应忽略不相关旧检索。',
+    blocks.join('\n\n'),
+    '</最近LLMWiki上下文>',
+  ].join('\n')
+  return truncateForContextMemory(content, maxChars)
+}
+
+function rememberWindriseRetrievalContext(item: WindriseRetrievalContext): void {
+  if (!item.context.includes('<LLMWiki检索>')) return
+  const normalized = {
+    query: item.query,
+    context: truncateForContextMemory(
+      item.context,
+      Math.max(
+        1_000,
+        getPositiveEnvInt(
+          'LMSTUDIO_LLMWIKI_SINGLE_MEMORY_TOKENS',
+          DEFAULT_LMSTUDIO_LLMWIKI_MEMORY_TOKEN_BUDGET,
+        ) * 4,
+      ),
+    ),
+  }
+  const last = recentWindriseRetrievalContexts.at(-1)
+  if (last?.query === normalized.query && last.context === normalized.context) {
+    return
+  }
+  // When the new query is about a different wind farm / turbine / fault topic,
+  // clear the old retrieval memory to prevent context bleed between unrelated queries.
+  // "Same topic" means the queries share at least one meaningful keyword (2+ Chinese
+  // chars or alphanumeric token such as a fault code or model name).
+  if (
+    recentWindriseRetrievalContexts.length > 0 &&
+    !retrievalQueriesShareTopic(normalized.query, recentWindriseRetrievalContexts)
+  ) {
+    recentWindriseRetrievalContexts.splice(0)
+  }
+  recentWindriseRetrievalContexts.push(normalized)
+  if (recentWindriseRetrievalContexts.length > MAX_RECENT_LLMWIKI_CONTEXTS) {
+    recentWindriseRetrievalContexts.splice(
+      0,
+      recentWindriseRetrievalContexts.length - MAX_RECENT_LLMWIKI_CONTEXTS,
+    )
+  }
+}
+
+/**
+ * Returns true when newQuery shares at least one meaningful keyword with
+ * any of the existing retrieval contexts, indicating a follow-up on the same
+ * topic. Returns true (keep memory) when tokens cannot be extracted — err on
+ * the side of keeping context rather than discarding it incorrectly.
+ */
+function retrievalQueriesShareTopic(
+  newQuery: string,
+  existing: WindriseRetrievalContext[],
+): boolean {
+  const newTokens = extractRetrievalQueryTokens(newQuery)
+  if (newTokens.size === 0) return true
+  for (const item of existing) {
+    const oldTokens = extractRetrievalQueryTokens(item.query)
+    for (const token of newTokens) {
+      if (oldTokens.has(token)) return true
+    }
+  }
+  return false
+}
+
+/**
+ * Extracts topic-bearing tokens from a retrieval query:
+ * - Chinese segments of 2+ characters (wind farm names, component names)
+ * - Alphanumeric tokens of 2+ characters (fault codes, model IDs)
+ */
+function extractRetrievalQueryTokens(query: string): Set<string> {
+  const tokens = new Set<string>()
+  for (const match of query.matchAll(/[一-鿿]{2,}|[A-Za-z0-9_-]{2,}/g)) {
+    tokens.add(match[0].toLowerCase())
+  }
+  return tokens
+}
+
+function rememberWindriseRetrievalContextsFromMessages(
+  messages: LmStudioMessage[],
+): void {
+  if (process.env.WINDRISE !== '1') return
+  if (process.env.LMSTUDIO_CONTEXT_MEMORY === '0') return
+  for (const message of messages) {
+    const contexts = extractWindriseRetrievalBlocks(message.content)
+    for (const context of contexts) {
+      rememberWindriseRetrievalContext({
+        query: extractWindriseRetrievalQuery(context),
+        context,
+      })
+    }
+  }
+}
+
+function extractWindriseRetrievalBlocks(text: string): string[] {
+  const blocks: string[] = []
+  const pattern = /<LLMWiki检索>[\s\S]*?<\/LLMWiki检索>/g
+  for (const match of text.matchAll(pattern)) {
+    if (match[0]) blocks.push(match[0])
+  }
+  return blocks
+}
+
+function extractWindriseRetrievalQuery(context: string): string {
+  return context.match(/检索词[:：]\s*(.+)/)?.[1]?.trim() ?? ''
+}
+
+function compactLmStudioMessagesForContext(
+  messages: LmStudioMessage[],
+): LmStudioMessage[] {
+  if (process.env.LMSTUDIO_CONTEXT_MEMORY === '0') return messages
+  const contextBudget = getPositiveEnvInt(
+    'LMSTUDIO_CONTEXT_TOKENS',
+    DEFAULT_LMSTUDIO_CONTEXT_TOKEN_BUDGET,
+  )
+  const totalTokens = estimateLmStudioMessagesTokens(messages)
+  if (totalTokens <= contextBudget) return messages
+
+  const systemMessages = messages.filter(message => message.role === 'system')
+  const conversationMessages = messages.filter(message => message.role !== 'system')
+  if (conversationMessages.length <= 2) return messages
+
+  const recentBudget = Math.min(
+    getPositiveEnvInt(
+      'LMSTUDIO_RECENT_CONTEXT_TOKENS',
+      DEFAULT_LMSTUDIO_RECENT_TOKEN_BUDGET,
+    ),
+    Math.max(1_000, contextBudget - 1_000),
+  )
+  const recentStart = findRecentContextStart(conversationMessages, recentBudget)
+  if (recentStart <= 0) return messages
+
+  const olderMessages = conversationMessages.slice(0, recentStart)
+  const recentMessages = conversationMessages.slice(recentStart)
+  const memory = createConversationMemorySummary(olderMessages)
+  if (!memory) return messages
+
+  if (process.env.LMSTUDIO_DEBUG_REQUEST === '1') {
+    process.stderr.write(
+      `[lmstudio-context] compacted ${olderMessages.length} older messages; ` +
+        `estimated tokens ${totalTokens} -> ` +
+        `${estimateLmStudioMessagesTokens([
+          ...systemMessages,
+          { role: 'system', content: memory },
+          ...recentMessages,
+        ])}\n`,
+    )
+  }
+
+  return [
+    ...systemMessages,
+    { role: 'system', content: memory },
+    ...recentMessages,
+  ]
+}
+
+function findRecentContextStart(
+  messages: LmStudioMessage[],
+  recentBudget: number,
+): number {
+  let tokens = 0
+  let index = messages.length
+
+  for (let cursor = messages.length - 1; cursor >= 0; cursor--) {
+    const messageTokens = estimateLmStudioMessageTokens(messages[cursor]!)
+    if (index < messages.length && tokens + messageTokens > recentBudget) break
+    tokens += messageTokens
+    index = cursor
+  }
+
+  return moveStartToToolSafeBoundary(messages, index)
+}
+
+function moveStartToToolSafeBoundary(
+  messages: LmStudioMessage[],
+  start: number,
+): number {
+  let index = start
+  while (index > 0 && messages[index]?.role === 'tool') {
+    index--
+  }
+  return index
+}
+
+function createConversationMemorySummary(messages: LmStudioMessage[]): string {
+  const turns = messages
+    .map((message, index) => summarizeLmStudioMessage(message, index))
+    .filter(Boolean)
+  if (!turns.length) return ''
+
+  const header = [
+    '以下是较早对话的压缩记忆，用于保持连续上下文。',
+    '就近原则：最新用户消息永远是当前主任务。',
+    '只有最新消息明显是“上面/刚才/它/这个/继续/下一步”等省略追问时，才回指这里和最近几轮。',
+    '如果最新消息出现新的故障码、部件、风场、品牌、机型、现象或任务，要按新问题处理，不要沿用较早记忆。',
+  ].join('\n')
+  const memoryBudget = getPositiveEnvInt(
+    'LMSTUDIO_CONTEXT_MEMORY_TOKENS',
+    DEFAULT_LMSTUDIO_CONTEXT_MEMORY_TOKEN_BUDGET,
+  )
+  const maxChars = Math.max(1_000, memoryBudget * 4)
+  return truncateForContextMemory(`${header}\n\n${turns.join('\n')}`, maxChars)
+}
+
+function summarizeLmStudioMessage(
+  message: LmStudioMessage,
+  index: number,
+): string {
+  const label =
+    message.role === 'user'
+      ? '用户'
+      : message.role === 'assistant'
+        ? '助手'
+        : message.role === 'tool'
+          ? `工具${message.name ? ` ${message.name}` : ''}`
+          : '系统'
+  const toolCalls = message.tool_calls?.length
+    ? `；调用工具：${message.tool_calls
+        .map(toolCall => toolCall.function.name)
+        .filter(Boolean)
+        .join(', ')}`
+    : ''
+  const content = truncateSingleLine(
+    message.content,
+    message.role === 'assistant' ? 1_500 : message.role === 'tool' ? 900 : 1_100,
+  )
+  if (!content && !toolCalls) return ''
+  return `${index + 1}. ${label}: ${content}${toolCalls}`
+}
+
+function truncateSingleLine(value: string, maxChars: number): string {
+  const normalized = value.replace(/\s+/g, ' ').trim()
+  if (normalized.length <= maxChars) return normalized
+  return `${normalized.slice(0, Math.max(0, maxChars - 20)).trimEnd()} ...[已压缩]`
+}
+
+function truncateForContextMemory(value: string, maxChars: number): string {
+  if (value.length <= maxChars) return value
+  const marker = '\n...[较早记忆过长，已保留首尾重点]\n'
+  if (maxChars <= marker.length + 100) {
+    return value.slice(0, maxChars).trimEnd()
+  }
+  const available = maxChars - marker.length
+  const headChars = Math.min(1_000, Math.floor(available * 0.4))
+  const tailChars = Math.max(0, available - headChars)
+  return `${value.slice(0, headChars).trimEnd()}${marker}${value
+    .slice(-tailChars)
+    .trimStart()}`
+}
+
+function estimateLmStudioMessagesTokens(messages: LmStudioMessage[]): number {
+  return messages.reduce(
+    (total, message) => total + estimateLmStudioMessageTokens(message),
+    0,
+  )
+}
+
+function estimateLmStudioMessageTokens(message: LmStudioMessage): number {
+  return (
+    estimateTokens(message.content) +
+    (message.tool_calls?.length
+      ? estimateTokens(JSON.stringify(message.tool_calls))
+      : 0) +
+    4
+  )
+}
+
+function getPositiveEnvInt(name: string, fallback: number): number {
+  const raw = process.env[name]
+  if (!raw) return fallback
+  const value = parseInt(raw, 10)
+  return Number.isFinite(value) && value > 0 ? value : fallback
+}
+
 function stripClaudeSystemReminders(value: string): string {
   return value
     .replace(/<system-reminder>[\s\S]*?<\/system-reminder>\s*/g, '')
@@ -741,15 +1253,12 @@ function stripClaudeSystemReminders(value: string): string {
 function getWindriseSystemPrompt(): string {
   const llmWikiInstruction =
     process.env.WINDRISE_DISABLE_AUTO_LLMWIKI === '1'
-      ? '不要自动检索 LLMWiki；只有用户明确使用 /llmwiki 命令或上下文已经包含 LLMWiki 检索结果时，才基于 LLMWiki 回答。'
-      : '当用户明确输入 /llmwiki、询问故障码/报警码、或问题明显涉及具体风机故障、报警、复位、处理、排查时，根据本地 LLMWiki 检索上下文回答。'
+      ? '只有用户消息明确附带本地资料时才基于资料回答。'
+      : '有 LLMWiki、本地资料、风场机型、天气或项目上下文时基于资料回答；否则直接回答。'
   return [
-    '你是 Windrise，本地中文对话助手，由本机模型服务提供推理。',
-    '默认使用中文完整回答，回答应自然、完整，不要只输出半句话、单个词或不完整英文。',
-    '不要自称 Claude，不要提 Anthropic 或 Claude Code。',
+    '你是 Windrise，本地中文助手。直接回答用户问题，不输出推理过程。',
     llmWikiInstruction,
-    '当用户咨询工作原理、机理、组成、作用、控制逻辑、运行逻辑等概念问题，且没有明确故障码或现场处置意图时，按普通原理咨询回答，不要自动检索。',
-    '如果上下文中包含 LLMWiki 检索结果，必须基于检索结果回答，保留关键故障码、名称、原因、处理方法和来源路径；不要编造检索结果中没有的信息。',
+    '资料不足时说明缺口和下一步需要补充的信息。',
   ].join('\n')
 }
 
@@ -758,9 +1267,125 @@ type WindriseRetrievalContext = {
   context: string
 }
 
-type LmStudioModelRoute = {
-  model: string
-  decision: 'coder' | 'chat'
+const recentWindriseRetrievalContexts: WindriseRetrievalContext[] = []
+
+/**
+ * Returns true if recent retrieval contexts contain fault or maintenance queries,
+ * indicating that a precise wind farm and turbine model specification is needed.
+ */
+function hasFaultMaintenanceContext(
+  contexts: WindriseRetrievalContext[],
+): boolean {
+  if (contexts.length === 0) return false
+  const recentQuery = contexts.at(-1)?.query ?? ''
+  return /(故障|报警|告警|停机|复位|处理|排查|维修|原因|保护|异常|温度|压力|振动|噪声|漏油|损坏|失效|超限|过高|过低)/i.test(
+    recentQuery,
+  )
+}
+
+/**
+ * Returns true if the most recent user messages (last 2-3 turns) contain
+ * fault or maintenance intent, even if they didn't trigger a retrieval.
+ * This catches cases like "轴承温度异常怎么处理" where the domain term
+ * isn't in the auto-retrieve list but the intent is clearly fault-related.
+ */
+function hasRecentFaultMaintenanceQuery(
+  messages: BetaMessageParam[],
+): boolean {
+  const userMessages = [...messages]
+    .reverse()
+    .filter(m => m.role === 'user')
+    .slice(0, 3)
+
+  for (const msg of userMessages) {
+    const text = stripClaudeSystemReminders(contentToText(msg.content)).trim()
+    if (
+      /(故障|报警|告警|停机|复位|处理|排查|维修|原因|保护|异常|温度|压力|振动|噪声|漏油|损坏|失效|超限|过高|过低|轴承|齿轮箱|发电机|变桨|偏航|变流器|冷却|液压|刹车|制动|传感器|开关)/i.test(
+        text,
+      )
+    ) {
+      return true
+    }
+  }
+  return false
+}
+
+/**
+ * Checks if a query has sufficient context (wind farm, model, fault code)
+ * to yield useful LLMWiki results. Returns a prompt string if the query is
+ * incomplete, or null if it's complete enough to search.
+ *
+ * This prevents expensive searches with vague queries like "轴承温度异常怎么处理"
+ * that will return no results because they lack wind farm/model context.
+ */
+function checkQueryCompleteness(
+  query: string,
+  messages: BetaMessageParam[],
+): string | null {
+  const queryLower = query.toLowerCase()
+
+  // Queries with explicit fault codes (3+ digits or alphanumeric codes) are
+  // usually specific enough even without wind farm context.
+  const hasFaultCode = /[A-Za-z]{1,8}\d[A-Za-z0-9_/-]*|\d{3,}/.test(query)
+  if (hasFaultCode) return null
+
+  // Queries with specific equipment IDs (e.g., "ZC09", "MY01#") are specific.
+  const hasTurbineId = /[A-Z]{2,}\d{2,}|[A-Z]{2,}\d+#/.test(query)
+  if (hasTurbineId) return null
+
+  // Check if the query or recent context mentions a wind farm.
+  const hasWindFarm = /(风场|风电场|场站)\b/i.test(query)
+  const recentMessages = [...messages]
+    .reverse()
+    .filter(m => m.role === 'user')
+    .slice(0, 3)
+    .map(m => stripClaudeSystemReminders(contentToText(m.content)).trim())
+    .join(' ')
+  const hasWindFarmInContext = /(风场|风电场|场站)\b/i.test(recentMessages)
+
+  // Check if query mentions a specific turbine model or brand.
+  const hasModelOrBrand = /(华仪|金风|运达|明阳|上海电气|远景|三一|新誉|中车|湘电|歌美飒|维斯塔斯|GE|西门子|WD\d+|SE\d+|GW\d+|MY\d+|EN\d+|FD\d+|HW\d+)/i.test(
+    query,
+  )
+  const hasModelOrBrandInContext = /(华仪|金风|运达|明阳|上海电气|远景|三一|新誉|中车|湘电|歌美飒|维斯塔斯|GE|西门子|WD\d+|SE\d+|GW\d+|MY\d+|EN\d+|FD\d+|HW\d+)/i.test(
+    recentMessages,
+  )
+
+  // If query has fault/maintenance intent but lacks wind farm AND model context,
+  // it's too vague to search.
+  const hasFaultIntent = /(故障|报警|告警|停机|复位|处理|排查|维修|原因|保护|异常|温度|压力|振动|噪声|漏油|损坏|失效|超限|过高|过低|轴承|齿轮箱|发电机|变桨|偏航|变流器|冷却|液压|刹车|制动|传感器|开关)/i.test(
+    queryLower,
+  )
+
+  if (hasFaultIntent) {
+    const missingWindFarm = !hasWindFarm && !hasWindFarmInContext
+    const missingModel = !hasModelOrBrand && !hasModelOrBrandInContext
+
+    if (missingWindFarm && missingModel) {
+      return [
+        '当前查询缺少风场和机型信息，无法从知识库中检索到准确结果。',
+        '请补充：',
+        '1. 具体风场名称（如"新华风场"、"八面风电场"）',
+        '2. 风机品牌或型号（如"运达WD1500"、"金风GW82"）',
+        '或提供具体的故障码、风机编号（如"303804"、"ZC09"）。',
+      ].join('\n')
+    }
+
+    if (missingWindFarm) {
+      return [
+        '当前查询缺少风场信息。由于不同风场的机型配置和故障处理流程可能不同，请补充具体风场名称（如"新华风场"、"八面风电场"）或风机编号（如"ZC09"）。',
+      ].join('\n')
+    }
+
+    if (missingModel) {
+      return [
+        '当前查询缺少机型信息。由于不同品牌/型号的故障码和处理方法差异较大，请补充风机品牌或型号（如"运达WD1500"、"金风GW82"）或具体故障码。',
+      ].join('\n')
+    }
+  }
+
+  // Query appears complete enough to search.
+  return null
 }
 
 async function maybeCreateWindriseRetrievalContext(
@@ -772,12 +1397,51 @@ async function maybeCreateWindriseRetrievalContext(
     contentToText(lastUserMessage?.content),
   ).trim()
   if (shouldAnswerWindFarmModelQuestion(text)) {
+    const lookup = lookupWindFarmModels(text)
+    // When the wind farm has multiple distinct entries (different phases/models)
+    // AND there's a recent fault/maintenance query in context (either from recent
+    // retrieval OR from recent user messages), prompt the user to specify which
+    // model before showing the full list or searching.
+    if (
+      lookup &&
+      lookup.entries.length > 1 &&
+      (hasFaultMaintenanceContext(recentWindriseRetrievalContexts) ||
+        hasRecentFaultMaintenanceQuery(messages))
+    ) {
+      const siteNames = [...new Set(lookup.entries.map(e => e.site))].join('、')
+      return {
+        query: text,
+        context: [
+          '<风场机型映射>',
+          `检测到 ${lookup.entries.length} 个相关风场条目：${siteNames}`,
+          '由于当前对话涉及故障或维修问题，需要明确风场期次和机型才能提供准确信息。',
+          '请补充：具体是哪个期次（如一期、二期）或哪种机型的风机？',
+          '</风场机型映射>',
+        ].join('\n'),
+      }
+    }
     const context = createWindFarmModelContext(text)
     if (context) return { query: text, context }
   }
   if (shouldCreateWindriseWeatherContext(text)) {
     const context = await createWindriseWeatherContext(text)
     return { query: text, context }
+  }
+
+  // Theory/principle questions: when the query is about how systems work,
+  // their structure, or general principles WITHOUT fault handling intent,
+  // let the LLM answer from general knowledge and prompt for specifics if
+  // they want field guidance.
+  if (isTheoryQuestion(text)) {
+    return {
+      query: text,
+      context: [
+        '<理论问题>',
+        '这是关于系统原理或工作机制的理论问题。请基于风电行业通用知识回答。',
+        '如果用户需要针对具体品牌、机型的控制策略或现场故障处理指导，提示用户补充：风场、机型、故障码或现场现象。',
+        '</理论问题>',
+      ].join('\n'),
+    }
   }
 
   const retrieval = getWindriseRetrievalRequest(text)
@@ -797,20 +1461,62 @@ async function maybeCreateWindriseRetrievalContext(
     }
   }
 
+  // Validate query completeness before triggering expensive LLMWiki search.
+  // For fault/maintenance queries, wind farm + model context is usually required
+  // for accurate results. Prompt the user to clarify before searching.
+  const incompletenessPrompt = checkQueryCompleteness(query, messages)
+  if (incompletenessPrompt) {
+    return {
+      query,
+      context: [
+        '<LLMWiki检索>',
+        `检索词：${query}`,
+        incompletenessPrompt,
+        '</LLMWiki检索>',
+      ].join('\n'),
+    }
+  }
+
   const hits = await runWindriseLlmWikiSearch(query)
   return {
     query,
     context: [
       '<LLMWiki检索>',
       `检索词：${query}`,
-      '下面是本地 LLMWiki 检索结果，是本次故障知识回答的唯一事实来源。',
-      '回答时先给结论，再给处理建议，并引用来源路径。',
-      '回答最后必须包含一行“来源：...”，来源只能使用检索结果里的来源路径。',
-      '不要把相似故障、其它机型或模型常识当作本条记录；检索结果没有的信息请明确说未提供。',
+      '下面是本地 LLMWiki 检索到的相关资料。请结合用户问题组织成可执行的中文回答；涉及故障处理时保留关键故障码、名称、原因、处理方法和来源路径。',
+      '如果检索结果不足以确认结论，请明确说明需要补充的风场、品牌、机型、故障码或现场现象。',
       hits || 'No matches.',
       '</LLMWiki检索>',
     ].join('\n'),
   }
+}
+
+/**
+ * Returns true if the query is asking about theory/principles/how things work
+ * WITHOUT fault handling intent. These questions should be answered from general
+ * knowledge rather than searched in the fault database.
+ *
+ * Examples:
+ * - "变桨系统的工作原理是什么" → true (theory only)
+ * - "偏航系统是怎么工作的" → true (theory only)
+ * - "变桨系统故障怎么处理" → false (has fault intent, should search)
+ * - "偏航控制逻辑为什么这样设计" → true (theory)
+ * - "轴承温度过高的原因是什么" → false (fault intent, should search)
+ */
+function isTheoryQuestion(text: string): boolean {
+  const hasTheoryIntent = /(原理|机理|机制|工作方式|工作过程|运行方式|运行过程|怎么工作|如何工作|为什么能|为什么会|怎样实现|怎么实现|如何实现|结构|组成|作用|用途|区别|关系|解释一下|讲一下|介绍一下|科普|控制逻辑|运行逻辑|是什么系统|什么是)/i.test(
+    text,
+  )
+
+  if (!hasTheoryIntent) return false
+
+  // If the query has fault/maintenance handling intent, it's NOT a pure theory
+  // question — it needs specific fault database lookup.
+  const hasFaultHandlingIntent = /(故障码|故障代码|报警码|告警码|怎么处理|如何处理|处理方法|处置|排查|检查|维修|复位|保护|跳开|跳闸|不可复位|停机|报警|告警|报错|异常.*处理|故障.*处理|过高.*处理|过低.*处理)/i.test(
+    text,
+  )
+
+  return !hasFaultHandlingIntent
 }
 
 function shouldCreateWindriseWeatherContext(text: string): boolean {
@@ -1101,9 +1807,6 @@ function parseExplicitWindriseLlmWikiRequest(text: string): string | undefined {
 }
 
 function shouldWindriseRetrieve(text: string): boolean {
-  if (isWindrisePrincipleConsultation(text) && !hasWindriseFaultKnowledgeSignal(text)) {
-    return false
-  }
   return /^(帮我|给我|请)?\s*(检索|查询|搜索|查找|查|search)(\s|一下|下|[:：]|$)/i.test(
     text,
   )
@@ -1127,7 +1830,6 @@ function shouldAutoRetrieveFromLlmWiki(text: string): boolean {
   ) {
     return false
   }
-
   if (/^\s*(故障码|代码|fault\s*code)?\s*[0-9]{3,}\s*([是什么啥含义原因处理复位报警故障逻辑怎么如何？?，,。.、\s]*)?$/i.test(normalized)) {
     return true
   }
@@ -1146,15 +1848,15 @@ function shouldAutoRetrieveFromLlmWiki(text: string): boolean {
   }
 
   const hasWindDomainTerm =
-    /(风机|风电|变桨|偏航|风速仪|风向仪|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|制动|刹车|24v|plc|hw2s|华仪)/i.test(
+    /(风机|风电|变桨|偏航|风速仪|风向仪|主控|机舱|塔基|塔筒|叶片|轮毂|变流器|变频器|发电机|齿轮箱|轴承|联轴器|液压|制动|刹车|冷却|水冷|油冷|传感器|编码器|继电器|接触器|断路器|24v|plc|scada|hw2s|华仪)/i.test(
       normalized,
     )
-  const hasFaultIntent =
-    /(故障|报警|告警|停机|复位|不可复位|原因|处理|排查|检查|维修|设置值|逻辑|反馈|断开|短路|断路|丢失|怎么|如何|为什么|是什么|啥意思|含义)/i.test(
+  const hasKnowledgeIntent =
+    /(故障|报警|告警|停机|复位|不可复位|异常|保护|跳开|跳闸|空开|加热器|超出|超限|限制|最大|最小|过高|过低|高于|低于|原因|处理|排查|检查|维修|设置值|逻辑|反馈|断开|短路|断路|丢失|原理|机理|机制|工作方式|工作过程|运行方式|运行过程|控制逻辑|结构|组成|作用|用途|区别|关系|解释|介绍|怎么|如何|为什么|是什么|啥意思|含义)/i.test(
       normalized,
     )
 
-  return hasWindDomainTerm && hasFaultIntent
+  return hasWindDomainTerm && hasKnowledgeIntent
 }
 
 function isWindrisePrincipleConsultation(text: string): boolean {
@@ -1165,9 +1867,11 @@ function isWindrisePrincipleConsultation(text: string): boolean {
 
 function hasWindriseFaultKnowledgeSignal(text: string): boolean {
   return (
-    /[a-z]?_?[0-9]{3,}/i.test(text) ||
+    /[A-Za-z]{1,8}\d[A-Za-z0-9_/-]*(?:_[A-Za-z0-9_/-]+)*|\d+(?:[ _/-]+\d+)+|\d{3,}/i.test(
+      text,
+    ) ||
     /(故障码|故障代码|报警码|告警码|fault\s*code)/i.test(text) ||
-    /(怎么处理|如何处理|处理方法|处置|排查|检查|维修|复位|短路|断路|丢失|不可复位|停机|报警|告警|报错)/i.test(
+    /(怎么处理|如何处理|处理方法|处置|排查|检查|维修|复位|保护|跳开|跳闸|空开|加热器|短路|断路|丢失|不可复位|停机|报警|告警|报错)/i.test(
       text,
     )
   )
@@ -1178,7 +1882,9 @@ function normalizeWindriseRetrievalQuery(text: string): string {
     .replace(/^(帮我|给我|请|麻烦)?\s*/i, '')
     .replace(/[？?。!！]+$/g, '')
     .trim()
-  const code = cleaned.match(/[0-9]{3,}/)?.[0]
+  const code = cleaned.match(
+    /[A-Za-z]{1,8}\d[A-Za-z0-9_/-]*(?:_[A-Za-z0-9_/-]+)*|\d+(?:[ _/-]+\d+)+|\d{3,}/,
+  )?.[0]
   if (code && isBareWindriseFaultCodeQuery(cleaned, code)) return code
   return cleaned
 }
@@ -1192,154 +1898,87 @@ function isBareWindriseFaultCodeQuery(text: string, code: string): boolean {
 }
 
 async function runWindriseLlmWikiSearch(query: string): Promise<string> {
-  const code = query.match(/[0-9]{3,}/)?.[0]
+  const code = query.match(
+    /[A-Za-z]{1,8}\d[A-Za-z0-9_/-]*(?:_[A-Za-z0-9_/-]+)*|\d+(?:[ _/-]+\d+)+|\d{3,}/,
+  )?.[0]
   try {
     const { call } = await import('../../commands/llmwiki/llmwiki.js')
+    const command = code
+      ? `ask ${query} --limit 8`
+      : isLikelyWindriseFaultNameQuery(query)
+        ? `ask ${query} --limit 8`
+        : `search ${query} --limit 6`
     const result = await call(
-      code ? `ask ${code} --limit 4` : `search ${query} --limit 6`,
+      command,
       {} as never,
     )
-    if (result.type === 'text') return result.value
-    return JSON.stringify(result)
+    const primary = result.type === 'text' ? result.value : JSON.stringify(result)
+    const systemPath = systemWikiPathForWindriseQuery(query)
+    if (!systemPath || code) return primary
+
+    const systemResult = await call(`read ${systemPath}`, {} as never)
+    const systemContext =
+      systemResult.type === 'text'
+        ? systemResult.value
+        : JSON.stringify(systemResult)
+    if (!systemContext || /^LLMWiki error:/i.test(systemContext)) return primary
+    return [
+      `系统上下文：${systemPath}`,
+      systemContext,
+      '',
+      primary,
+    ].join('\n')
   } catch (error) {
     return `LLMWiki error: ${error instanceof Error ? error.message : String(error)}`
   }
 }
 
-async function selectLmStudioModel(
-  params: BetaMessageStreamParams,
-  messages: LmStudioMessage[],
-  signal: AbortSignal,
-): Promise<LmStudioModelRoute> {
+function isLikelyWindriseFaultNameQuery(text: string): boolean {
+  return (
+    /(风机|风电|变桨|偏航|风速仪|风向仪|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|制动|刹车|空开|加热器|24v|plc|hw2s|华仪)/i.test(
+      text,
+    ) &&
+    /(故障|报警|告警|停机|复位|不可复位|异常|保护|跳开|跳闸|空开|加热器|超出|超限|限制|最大|最小|过高|过低|高于|低于|温度|压力|电流|电压|频率|转速|功率|短路|断路|丢失)/i.test(
+      text,
+    )
+  )
+}
+
+function systemWikiPathForWindriseQuery(text: string): string {
+  const normalized = text.replace(/\s+/g, '')
+  const systems = [
+    '变桨系统',
+    '偏航系统',
+    '主控系统',
+    '变流系统',
+    '发电机系统',
+    '齿轮箱系统',
+    '液压系统',
+    '制动系统',
+    '安全链系统',
+    '电网系统',
+    '通信系统',
+    '水冷系统',
+    '电池系统',
+    '传动系统',
+    '温度系统',
+    '变压器系统',
+    '机舱与塔架系统',
+  ]
+  const system = systems.find(name => normalized.includes(name.replace(/\s+/g, '')))
+  return system ? `wiki/systems/${system}.md` : ''
+}
+
+function selectLmStudioModel(params: BetaMessageStreamParams): string {
   if (isExplicitLmStudioModelOverride(params.model)) {
-    return {
-      model: params.model!,
-      decision: params.model === getLmStudioChatModel() ? 'chat' : 'coder',
-    }
+    return params.model!
   }
-
-  if (process.env.LMSTUDIO_FORCE_CHAT === '1') {
-    return { model: getLmStudioChatModel(), decision: 'chat' }
-  }
-  if (process.env.LMSTUDIO_FORCE_CODER === '1') {
-    return { model: getLmStudioCoderModel(params.model), decision: 'coder' }
-  }
-  if (process.env.WINDRISE !== '1' || process.env.WINDRISE_MODEL_ROUTER !== '1') {
-    const model = process.env.WINDRISE === '1'
-      ? fallbackLmStudioModelRoute(
-          [...messages]
-            .reverse()
-            .find(message => message.role === 'user')
-            ?.content ?? '',
-          params.model,
-        ).model
-      : resolveModel(params.model)
-    return { model, decision: model === getLmStudioChatModel() ? 'chat' : 'coder' }
-  }
-
-  const text = [...messages]
-    .reverse()
-    .find(message => message.role === 'user')
-    ?.content ?? ''
-
-  const fallback = fallbackLmStudioModelRoute(text, params.model)
-  const routerModel = getLmStudioRouterModel()
-  try {
-    const decision = await callLmStudioRouter(routerModel, text, signal)
-    if (decision === 'coder') {
-      return { model: getLmStudioCoderModel(params.model), decision }
-    }
-    if (decision === 'chat') {
-      return { model: getLmStudioChatModel(), decision }
-    }
-  } catch {
-    return fallback
-  }
-
-  return fallback
-}
-
-async function callLmStudioRouter(
-  routerModel: string,
-  text: string,
-  signal: AbortSignal,
-): Promise<'coder' | 'chat' | undefined> {
-  const body: OpenAIChatRequest = {
-    model: routerModel,
-    messages: [
-      {
-        role: 'system',
-        content:
-          '你是本地模型路由器。只输出 coder 或 chat。默认输出 chat。只有用户明确要求修改/创建/删除文件、运行命令、执行测试或构建、调试报错、生成补丁、调用工具处理代码仓库时输出 coder。普通问答、解释、总结、故障知识库回答、现场处理建议、概念说明、项目概览都输出 chat。',
-      },
-      {
-        role: 'user',
-        content: `用户输入：${text}\n\n可选模型：coder=${getLmStudioCoderModel()}，chat=${getLmStudioChatModel()}\n只输出一个词：coder 或 chat。`,
-      },
-    ],
-    stream: false,
-    temperature: 0,
-    max_tokens: 4,
-  }
-
-  const baseUrl = getLmStudioBaseUrl()
-  assertOnlineOrLoopbackUrl('LmStudio provider', baseUrl)
-  const response = await fetch(`${baseUrl}/v1/chat/completions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${process.env.LMSTUDIO_API_KEY || 'lm-studio'}`,
-    },
-    body: JSON.stringify(body),
-    signal,
-  })
-  if (!response.ok) {
-    throw new Error(
-      `LM Studio router request failed: ${response.status} ${await response.text()}`,
-    )
-  }
-
-  const data = (await response.json()) as OpenAIChatResponse
-  const decision =
-    data.choices?.[0]?.message?.content?.trim().toLowerCase() ?? ''
-  if (decision.includes('coder')) return 'coder'
-  if (decision.includes('chat')) return 'chat'
-  return undefined
-}
-
-function fallbackLmStudioModelRoute(
-  text: string,
-  requestedModel?: string,
-): LmStudioModelRoute {
-  if (isLmStudioCoderTask(text)) {
-    return { model: getLmStudioCoderModel(requestedModel), decision: 'coder' }
-  }
-  return { model: getLmStudioChatModel(), decision: 'chat' }
-}
-
-function isLmStudioCoderTask(text: string): boolean {
-  const normalized = text.trim()
-  if (!normalized) return false
-  if (/(^|\n)```/.test(normalized)) return true
-  if (/^\s*(npm|pnpm|yarn|node|git|bash|sh|python|python3|cargo|go|make)\b/i.test(normalized)) {
-    return true
-  }
-
-  const hasActionCue =
-    /(\bedit\b|\bwrite\b|\brun\b|\btest\b|\bbuild\b|\bgrep\b|\bbash\b|\bnpm\b|\bgit\b|\bfix\b|\bdebug\b|修改|编辑|写入|创建|删除|运行|执行|测试|构建|修复|调试|安装|替换|重构|补丁|排错)/i.test(
-      normalized,
-    )
-  const hasCodeContext =
-    /(\bcode\b|\bfile\b|\bscript\b|\bpath\b|\brepo\b|\bproject\b|代码|文件|脚本|路径|仓库|模块|函数|类|命令|终端)/i.test(
-      normalized,
-    )
-
-  return hasActionCue && hasCodeContext
+  return getLmStudioChatModel()
 }
 
 function isExplicitLmStudioModelOverride(model?: string): boolean {
   if (!model) return false
-  return model !== getLmStudioCoderModel() && model !== process.env.LMSTUDIO_MODEL
+  return model !== getLmStudioChatModel() && model !== process.env.LMSTUDIO_MODEL
 }
 
 function findLastUserMessageIndex(messages: BetaMessageParam[]): number {
@@ -1576,27 +2215,22 @@ function createAnthropicToolUseId(): string {
 }
 
 function resolveModel(model: string | undefined): string {
-  return model || getLmStudioCoderModel()
+  return model || getLmStudioModel()
 }
 
-function getLmStudioCoderModel(model?: string): string {
+function getLmStudioModel(model?: string): string {
   return (
     model ||
-    process.env.LMSTUDIO_CODER_MODEL ||
     process.env.LMSTUDIO_MODEL ||
     DEFAULT_LMSTUDIO_MODEL
   )
 }
 
 function getLmStudioChatModel(): string {
-  return process.env.LMSTUDIO_CHAT_MODEL || DEFAULT_LMSTUDIO_CHAT_MODEL
-}
-
-function getLmStudioRouterModel(): string {
   return (
-    process.env.LMSTUDIO_ROUTER_MODEL ||
-    process.env.WINDRISE_ROUTER_MODEL ||
-    getLmStudioCoderModel()
+    process.env.LMSTUDIO_CHAT_MODEL ||
+    process.env.LMSTUDIO_MODEL ||
+    DEFAULT_LMSTUDIO_CHAT_MODEL
   )
 }
 

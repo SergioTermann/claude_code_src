@@ -1,0 +1,127 @@
+\relax 
+\citation{yang2009wind}
+\citation{schlechtingen2013wind}
+\citation{bangalore2015artificial}
+\citation{shao2018novel}
+\citation{chen2020fault}
+\citation{li2022graph}
+\citation{li2025llmyoloms}
+\citation{wang2025wtfaultllm}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}Wind Turbine Fault Diagnosis}{1}{}\protected@file@percent }
+\citation{grieves2017digital,tao2019digital,barricelli2019survey}
+\citation{liu2021digital}
+\citation{peng2024graphragSurvey}
+\citation{razaq2026llmkgfaultreview}
+\citation{lewis2020rag}
+\citation{zhao2024ragSurvey}
+\citation{asai2023selfrag}
+\citation{yan2024crag}
+\citation{edge2024graphrag}
+\citation{ma2026fdrkgllm}
+\citation{lan2025kgllmhvdc}
+\citation{es2023ragas}
+\citation{yao2023react}
+\citation{openai2023gpt4technical}
+\citation{grattafiori2024llama3}
+\citation{qwen2024qwen25}
+\citation{deepseek2025r1}
+\citation{openai2023gpt4v,anthropic2024claude,google2023gemini,qwen2023vl}
+\citation{li2025llmyoloms}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}Digital Twins and Industrial Knowledge Representation}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Retrieval-Augmented LLMs}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Recent Large Language Models for Industrial Reasoning}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {III}System Design}{2}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}Architecture Overview}{2}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Proposed system architecture. Local O\&M documents are transformed into structured knowledge before they are used by the LLM. The LLM performs strategy control and answer organization, while retrieved local evidence supplies the factual basis.}}{3}{}\protected@file@percent }
+\newlabel{fig:system_architecture}{{1}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Knowledge Construction Pipeline}{3}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Knowledge construction flow from local document ingestion to graph, mechanism, index, and wiki outputs.}}{3}{}\protected@file@percent }
+\newlabel{fig:knowledge_build_flow}{{2}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Domain Relationship Model}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Fault-Mechanism Templates}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Mechanism-Enhanced Reasoning Graph}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}LLM Strategy Chain for Troubleshooting}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IV}Implementation}{4}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Local Knowledge Assets}{4}{}\protected@file@percent }
+\citation{lewis2020rag,zhao2024ragSurvey}
+\citation{asai2023selfrag,yan2024crag}
+\citation{edge2024graphrag}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Current knowledge-base scale. Counts are shown on a logarithmic axis to make document, graph, and mechanism resources comparable.}}{5}{}\protected@file@percent }
+\newlabel{fig:knowledge_scale}{{3}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}Retrieval and Answer Generation}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Local and Intranet Deployment}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {V}Case Studies and Evaluation}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Evaluation Perspective}{5}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Knowledge-Base Scale}{5}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Knowledge-Base Scale}}{5}{}\protected@file@percent }
+\newlabel{tab:scale}{{I}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Mechanism-Graph Evaluation}{5}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Mechanism-Enhanced Reasoning Graph Statistics}}{6}{}\protected@file@percent }
+\newlabel{tab:mechanism_graph}{{II}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Ablation and Case-Level Analysis}{6}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Mechanism-enhanced reasoning graph as a single closed diagnostic chain. The figure combines the fault-to-mechanism path, the counterfactual hypothesis branch, and the closure gains over a traditional fault-evidence-action profile.}}{6}{}\protected@file@percent }
+\newlabel{fig:mechanism_ablation}{{4}{6}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Composition of the mechanism-enhanced reasoning graph. Node groups are arranged radially around the mechanism core to show how mechanism layers, propagation steps, observables, tests, barriers, hypotheses, evidence, counterfactual tests, and decision rules contribute to the graph.}}{7}{}\protected@file@percent }
+\newlabel{fig:mechanism_composition}{{5}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-E}}Representative Troubleshooting Cases}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-F}}Comparison with Plain RAG}{7}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Per-case mechanism quality after graph enrichment. Each bar is one fault case, coloured by hypothesis type, showing that all evaluated cases obtain a complete mechanism-verification-prevention chain.}}{7}{}\protected@file@percent }
+\newlabel{fig:case_quality}{{6}{7}}
+\@writefile{toc}{\contentsline {section}{\numberline {VI}Discussion}{7}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Why Structured Local Knowledge Matters}{7}{}\protected@file@percent }
+\citation{es2023ragas,zhao2024ragSurvey}
+\citation{edge2024graphrag,peng2024graphragSurvey}
+\citation{asai2023selfrag,yan2024crag}
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Representative Evidence-Grounded Fault Cases}}{8}{}\protected@file@percent }
+\newlabel{tab:cases}{{III}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Ablation matrix comparing the traditional fault-evidence-action profile with the mechanism-enhanced reasoning graph. The mechanism layer adds prevention closure, hypothesis discrimination, and a normalized mechanism path-depth measure while preserving validation closure.}}{8}{}\protected@file@percent }
+\newlabel{fig:ablation_matrix}{{7}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Relation-density distribution in the mechanism-enhanced reasoning graph. Explanation, validation, prevention, and discrimination links jointly form the structural basis for auditable multi-hop troubleshooting.}}{8}{}\protected@file@percent }
+\newlabel{fig:relation_density}{{8}{8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Auditability and Human Review}{8}{}\protected@file@percent }
+\bibstyle{IEEEtran}
+\bibdata{references}
+\bibcite{yang2009wind}{1}
+\bibcite{schlechtingen2013wind}{2}
+\bibcite{bangalore2015artificial}{3}
+\bibcite{shao2018novel}{4}
+\bibcite{chen2020fault}{5}
+\bibcite{li2022graph}{6}
+\bibcite{li2025llmyoloms}{7}
+\bibcite{wang2025wtfaultllm}{8}
+\bibcite{grieves2017digital}{9}
+\bibcite{tao2019digital}{10}
+\bibcite{barricelli2019survey}{11}
+\bibcite{liu2021digital}{12}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Mechanism-archetype coverage across representative fault cases. The distribution shows that the reasoning graph does not rely on a single generic fault category, but spans hydraulic, mechanical, electrical, sensing, communication, and protection-chain mechanisms.}}{9}{}\protected@file@percent }
+\newlabel{fig:archetype_coverage}{{9}{9}}
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Functional Comparison with Plain Chunk-Based RAG}}{9}{}\protected@file@percent }
+\newlabel{tab:plainrag}{{IV}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Limitations}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Conclusion}{9}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{9}{}\protected@file@percent }
+\bibcite{peng2024graphragSurvey}{13}
+\bibcite{razaq2026llmkgfaultreview}{14}
+\bibcite{lewis2020rag}{15}
+\bibcite{zhao2024ragSurvey}{16}
+\bibcite{asai2023selfrag}{17}
+\bibcite{yan2024crag}{18}
+\bibcite{edge2024graphrag}{19}
+\bibcite{ma2026fdrkgllm}{20}
+\bibcite{lan2025kgllmhvdc}{21}
+\bibcite{es2023ragas}{22}
+\bibcite{yao2023react}{23}
+\bibcite{openai2023gpt4technical}{24}
+\bibcite{grattafiori2024llama3}{25}
+\bibcite{qwen2024qwen25}{26}
+\bibcite{deepseek2025r1}{27}
+\bibcite{openai2023gpt4v}{28}
+\bibcite{anthropic2024claude}{29}
+\bibcite{google2023gemini}{30}
+\bibcite{qwen2023vl}{31}
+\@writefile{toc}{\contentsline {section}{Biographies}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{Yehong Dong}{10}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{Shuai Hao}{10}{}\protected@file@percent }
+\gdef \@abspage@last{10}

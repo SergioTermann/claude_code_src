@@ -18,6 +18,17 @@ export function assertOnlineFeature(featureName: string): void {
 export function isLoopbackUrl(url: string): boolean {
   try {
     const hostname = new URL(url).hostname.toLowerCase()
+    const ipv4 = hostname.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)
+    if (ipv4) {
+      const first = Number(ipv4[1])
+      const second = Number(ipv4[2])
+      return (
+        first === 10 ||
+        (first === 172 && second >= 16 && second <= 31) ||
+        (first === 192 && second === 168) ||
+        first === 127
+      )
+    }
     return (
       hostname === 'localhost' ||
       hostname === '127.0.0.1' ||
@@ -33,6 +44,6 @@ export function isLoopbackUrl(url: string): boolean {
 export function assertOnlineOrLoopbackUrl(featureName: string, url: string): void {
   if (!isOfflineMode() || isLoopbackUrl(url)) return
   throw new Error(
-    `${featureName} can only access localhost URLs in offline/local-model mode.`,
+    `${featureName} can only access localhost or private LAN URLs in offline/local-model mode.`,
   )
 }

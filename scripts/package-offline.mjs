@@ -163,7 +163,7 @@ bin/windrise doctor
 
 - Node.js compatible with this recovered source tree
 - Local LM Studio service on a loopback URL
-- The configured model, default: \`qwen3.5:9b\`
+- The configured model, default: \`qwen/qwen3.5-9b\`
 
 No remote Claude, Anthropic, or non-loopback LM Studio endpoint is required for the local workflow.
 `

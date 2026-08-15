@@ -1,0 +1,20 @@
+[Unit]
+Description=Windrise Web Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/opt/windrise-ubuntu
+ExecStart=/opt/windrise-ubuntu/run_web_ubuntu.sh
+Restart=always
+RestartSec=3
+Environment=APP_HOST=0.0.0.0
+Environment=APP_PORT=5002
+Environment=WINDRISE_MODEL_MODE=vllm
+Environment=LMSTUDIO_BASE_URL=http://10.46.161.210:9527
+Environment=LMSTUDIO_MODEL=Qwen-30B
+
+[Install]
+WantedBy=multi-user.target

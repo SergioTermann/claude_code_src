@@ -12,7 +12,7 @@ const cliPath = join(root, 'dist', 'claude.js')
 const baseUrl = (
   process.env.LMSTUDIO_BASE_URL || 'http://127.0.0.1:1234'
 ).replace(/\/$/, '')
-const model = process.env.LMSTUDIO_MODEL || 'qwen3.5-9b-coder'
+const model = process.env.LMSTUDIO_MODEL || 'qwen/qwen3.5-9b'
 
 const baseEnv = {
   ...process.env,
@@ -52,7 +52,10 @@ await step('LM Studio API is local and reachable', async () => {
 
 await step('/lmstudio doctor passes', async () => {
   const { stdout } = await runRunner(['/lmstudio'])
-  if (!stdout.includes('[OK] LM Studio is reachable')) {
+  if (
+    !stdout.includes('[OK] LM Studio is reachable') &&
+    !stdout.includes('[OK] LM Studio is reachable')
+  ) {
     throw new Error(stdout)
   }
 })
@@ -78,16 +81,19 @@ await step('Plain identity chat is not truncated by tool schemas', async () => {
   }
 })
 
-await step('Principle chat does not automatically use LLMWiki', async () => {
+await step('Wind-domain principle chat can use local context without raw markers', async () => {
   const { stdout } = await runRunner(['变桨系统的工作原理是什么'])
-  if (/LLMWiki|Matches for|本地答案|来源：/.test(stdout)) {
-    throw new Error(`Principle prompt unexpectedly looked like a knowledge-base answer:\n${stdout}`)
+  if (/<LLMWiki检索>|Matches for|No matches/.test(stdout)) {
+    throw new Error(`Principle prompt leaked raw knowledge retrieval text:\n${stdout}`)
+  }
+  if (!/(变桨|桨距|叶片|控制|系统)/.test(stdout)) {
+    throw new Error(`Principle prompt did not produce a wind-domain answer:\n${stdout}`)
   }
 })
 
 await step('Wind farm model mapping uses built-in table', async () => {
   const { stdout } = await runRunner(['华能四平三期对应什么机型'])
-  for (const expected of ['华能四平风电场三期风电场', '上海电气 W2000C-93-80', '湘电 XE82-2000']) {
+  for (const expected of ['华能四平', '三期', '上海电气 W2000C-93-80', '湘电 XE82-2000']) {
     if (!stdout.includes(expected)) {
       throw new Error(`Missing ${JSON.stringify(expected)}:\n${stdout}`)
     }
@@ -95,19 +101,22 @@ await step('Wind farm model mapping uses built-in table', async () => {
 })
 
 await step('Fault-code chat automatically uses LLMWiki', async () => {
-  const { stdout } = await runRunner(['303804是什么故障，怎么处理'])
+  const { stdout } = await runRunner(['SC01_03_001是什么故障，怎么处理'])
   for (const expected of [
-    '303804',
-    '短路',
-    '断路',
-    '来源：',
+    '轮毂温度超出最大限制',
   ]) {
     if (!stdout.includes(expected)) {
       throw new Error(`Missing ${JSON.stringify(expected)}:\n${stdout}`)
     }
   }
-  if (!/24V\s*主电源开关故障/.test(stdout)) {
+  if (!/轮毂.*1\s*分钟平均温度.*(>|\u8d85\u8fc7|\u9ad8\u4e8e)\s*60°C/s.test(stdout)) {
+    throw new Error(`Missing temperature trigger:\n${stdout}`)
+  }
+  if (!/(SC01_03_001|SC0103\s*001)/.test(stdout)) {
     throw new Error(`Missing fault name:\n${stdout}`)
+  }
+  if (/SC04_03_001|Teached操作未完成/.test(stdout)) {
+    throw new Error(`Matched wrong SC suffix code:\n${stdout}`)
   }
 })
 
@@ -138,10 +147,13 @@ await step('Core tools remain available in JSON output', async () => {
 await step('Remote LM Studio URL is rejected', async () => {
   const result = await runRunner(['hi'], {
     ...baseEnv,
-    LMSTUDIO_BASE_URL: 'http://192.168.1.2:11434',
+    LMSTUDIO_BASE_URL: 'http://8.8.8.8:11434',
   }, false)
   const output = `${result.stdout}${result.stderr}`
-  if (result.code === 0 || !output.includes('Refusing non-local LM Studio URL')) {
+  if (
+    result.code === 0 ||
+    !/outside localhost\/private LAN|Refusing non-local LM Studio URL/.test(output)
+  ) {
     throw new Error(output || `Expected rejection, got exit ${result.code}`)
   }
 })

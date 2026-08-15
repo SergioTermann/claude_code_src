@@ -1,0 +1,11 @@
+### 数据来源
+
+华能洮北风电场明阳风机故障码.csv
+
+---
+
+| 故障代码 | Unnamed: 1 | 故障描述 | 等级 | 报警属性 |
+| --- | --- | --- | --- | --- |
+| JL TB 1 XXX YX487 | SC04 01 003 | 箱变MCB未合闸 | 3 | 2 |
+| JL TB 1 XXX YX488 | gbMAIN WECStop | 机组停机 | 3 | 2 |
+| JL TB 1 XXX YX489 | gbMAIN WE cinService | 机组维护 | 1 | 0 |

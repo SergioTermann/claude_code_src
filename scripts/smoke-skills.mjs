@@ -58,7 +58,7 @@ const { stdout } = await execFileAsync(
       ANTHROPIC_MODEL_PROVIDER:
         process.env.ANTHROPIC_MODEL_PROVIDER || 'lmstudio',
       LMSTUDIO_BASE_URL: 'http://127.0.0.1:9',
-      LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'qwen3.5-9b-coder',
+      LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'qwen/qwen3.5-9b',
     },
     maxBuffer: 20 * 1024 * 1024,
     timeout: 120_000,
@@ -76,7 +76,7 @@ const { stdout: windriseSkills } = await execFileAsync(windriseBin, ['skills'], 
     ANTHROPIC_MODEL_PROVIDER:
       process.env.ANTHROPIC_MODEL_PROVIDER || 'lmstudio',
     LMSTUDIO_BASE_URL: 'http://127.0.0.1:9',
-    LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'qwen3.5-9b-coder',
+    LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'qwen/qwen3.5-9b',
   },
   maxBuffer: 20 * 1024 * 1024,
   timeout: 120_000,
@@ -95,7 +95,7 @@ const { stdout: doctorOutput } = await execFileAsync(
       ANTHROPIC_MODEL_PROVIDER:
         process.env.ANTHROPIC_MODEL_PROVIDER || 'lmstudio',
       LMSTUDIO_BASE_URL: 'http://127.0.0.1:9',
-      LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'qwen3.5-9b-coder',
+      LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'qwen/qwen3.5-9b',
     },
     maxBuffer: 20 * 1024 * 1024,
     timeout: 120_000,

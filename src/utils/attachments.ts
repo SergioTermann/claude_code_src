@@ -130,6 +130,7 @@ import { filterDeniedAgents } from './permissions/permissions.js'
 import { getSubscriptionType } from './auth.js'
 import { mcpInfoFromString } from '../services/mcp/mcpStringUtils.js'
 import {
+  getSessionMemoryPath,
   matchingRuleForInput,
   pathInAllowedWorkingPath,
 } from './permissions/filesystem.js'
@@ -232,6 +233,9 @@ import { isAgentSwarmsEnabled } from './agentSwarmsEnabled.js'
 import { findRelevantMemories } from '../memdir/findRelevantMemories.js'
 import { memoryAge, memoryFreshnessText } from '../memdir/memoryAge.js'
 import { getAutoMemPath, isAutoMemoryEnabled } from '../memdir/paths.js'
+import { isSessionMemoryEmpty } from '../services/SessionMemory/prompts.js'
+import { getSessionMemoryContent } from '../services/SessionMemory/sessionMemoryUtils.js'
+import { roughTokenCountEstimation } from '../services/tokenEstimation.js'
 import { getAgentMemoryDir } from '../tools/AgentTool/agentMemory.js'
 import {
   readUnreadMessages,
@@ -275,6 +279,8 @@ const MAX_MEMORY_LINES = 200
 // most-relevant memory still surfaces: the frontmatter + opening context
 // is usually what matters.
 const MAX_MEMORY_BYTES = 4096
+const MAX_SESSION_MEMORY_ATTACHMENT_TOKENS = 6000
+const MEMORY_PREFETCH_FIRST_REQUEST_WAIT_MS = 700
 
 export const RELEVANT_MEMORIES_CONFIG = {
   // Per-turn cap (5 × 4KB = 20KB) bounds a single injection, but over a
@@ -2352,6 +2358,54 @@ export type MemoryPrefetch = {
   [Symbol.dispose](): void
 }
 
+function isMainConversationSource(querySource?: QuerySource): boolean {
+  return (
+    querySource?.startsWith('repl_main_thread') === true ||
+    querySource === 'sdk'
+  )
+}
+
+function truncateSessionMemoryForAttachment(content: string): string {
+  const tokenCount = roughTokenCountEstimation(content)
+  if (tokenCount <= MAX_SESSION_MEMORY_ATTACHMENT_TOKENS) {
+    return content.trim()
+  }
+
+  const ratio = MAX_SESSION_MEMORY_ATTACHMENT_TOKENS / tokenCount
+  const targetChars = Math.max(1000, Math.floor(content.length * ratio))
+  const truncated = content.slice(0, targetChars)
+  const cutAt = truncated.lastIndexOf('\n')
+  const body = truncated.slice(0, cutAt > 0 ? cutAt : targetChars).trim()
+
+  return `${body}\n\n> Session memory was truncated for context budget. Use the memory file path if more detail is needed.`
+}
+
+export async function getCurrentSessionMemoryAttachment(
+  querySource?: QuerySource,
+): Promise<Attachment[]> {
+  if (!isMainConversationSource(querySource)) {
+    return []
+  }
+
+  const content = await getSessionMemoryContent().catch(() => null)
+  if (!content?.trim()) {
+    return []
+  }
+  if (await isSessionMemoryEmpty(content)) {
+    return []
+  }
+
+  const trimmed = truncateSessionMemoryForAttachment(content)
+  return [
+    {
+      type: 'current_session_memory' as const,
+      content: trimmed,
+      path: getSessionMemoryPath(),
+      tokenCount: roughTokenCountEstimation(trimmed),
+    },
+  ]
+}
+
 /**
  * Starts the relevant memory search as an async prefetch.
  * Extracts the last real user prompt from messages (skipping isMeta system
@@ -2421,6 +2475,49 @@ export function startRelevantMemoryPrefetch(
     handle.settledAt = Date.now()
   })
   return handle
+}
+
+export async function collectMemoryPrefetchAttachments(
+  prefetch: MemoryPrefetch | undefined,
+  readFileState: FileStateCache,
+  consumedOnIteration: number,
+  options?: { waitMs?: number },
+): Promise<Attachment[]> {
+  if (!prefetch || prefetch.consumedOnIteration !== -1) {
+    return []
+  }
+
+  if (prefetch.settledAt === null) {
+    const waitMs = options?.waitMs ?? 0
+    if (waitMs <= 0) {
+      return []
+    }
+
+    let timeout: NodeJS.Timeout | undefined
+    const ready = await Promise.race([
+      prefetch.promise.then(() => true),
+      new Promise<boolean>(resolve => {
+        timeout = setTimeout(() => resolve(false), waitMs)
+      }),
+    ])
+    if (timeout) {
+      clearTimeout(timeout)
+    }
+    if (!ready && prefetch.settledAt === null) {
+      return []
+    }
+  }
+
+  const attachments = filterDuplicateMemoryAttachments(
+    await prefetch.promise,
+    readFileState,
+  )
+  prefetch.consumedOnIteration = consumedOnIteration
+  return attachments
+}
+
+export function getMemoryPrefetchFirstRequestWaitMs(): number {
+  return MEMORY_PREFETCH_FIRST_REQUEST_WAIT_MS
 }
 
 type ToolResultBlock = {

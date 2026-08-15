@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-08-03T08:43:33.866Z",
+  "category": "sm",
+  "total": 1082,
+  "passed": 1082,
+  "failed": 0,
+  "elapsedMs": 115517,
+  "byKind": {
+    "sm": {
+      "passed": 1082,
+      "failed": 0
+    }
+  },
+  "failures": []
+}

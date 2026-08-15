@@ -10,6 +10,7 @@ import { getIsRemoteMode } from '../../bootstrap/state.js'
 import { getSystemPrompt } from '../../constants/prompts.js'
 import { getSystemContext, getUserContext } from '../../context.js'
 import type { CanUseToolFn } from '../../hooks/useCanUseTool.js'
+import { isAutoMemoryEnabled } from '../../memdir/paths.js'
 import type { Tool, ToolUseContext } from '../../Tool.js'
 import { FILE_EDIT_TOOL_NAME } from '../../tools/FileEditTool/constants.js'
 import {
@@ -78,7 +79,10 @@ import {
  * Uses cached gate value - returns immediately without blocking.
  */
 function isSessionMemoryGateEnabled(): boolean {
-  return getFeatureValue_CACHED_MAY_BE_STALE('tengu_session_memory', false)
+  return (
+    isAutoMemoryEnabled() &&
+    getFeatureValue_CACHED_MAY_BE_STALE('tengu_session_memory', true)
+  )
 }
 
 /**
@@ -275,7 +279,7 @@ const extractSessionMemory = sequential(async function (
   const { messages, toolUseContext, querySource } = context
 
   // Only run session memory on main REPL thread
-  if (querySource !== 'repl_main_thread') {
+  if (!querySource?.startsWith('repl_main_thread')) {
     // Don't log this - it's expected for subagents, teammates, etc.
     return
   }
@@ -356,7 +360,7 @@ const extractSessionMemory = sequential(async function (
  */
 export function initSessionMemory(): void {
   if (getIsRemoteMode()) return
-  // Session memory is used for compaction, so respect auto-compact settings
+  // Session memory feeds both ordinary query context and compaction.
   const autoCompactEnabled = isAutoCompactEnabled()
 
   // Log initialization state (ant-only to avoid noise in external logs)
@@ -364,10 +368,6 @@ export function initSessionMemory(): void {
     logEvent('tengu_session_memory_init', {
       auto_compact_enabled: autoCompactEnabled,
     })
-  }
-
-  if (!autoCompactEnabled) {
-    return
   }
 
   // Register hook unconditionally - gate check happens lazily when hook runs

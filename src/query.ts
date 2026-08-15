@@ -57,8 +57,10 @@ import {
 import { generateToolUseSummary } from './services/toolUseSummary/toolUseSummaryGenerator.js'
 import { prependUserContext, appendSystemContext } from './utils/api.js'
 import {
+  collectMemoryPrefetchAttachments,
   createAttachmentMessage,
-  filterDuplicateMemoryAttachments,
+  getCurrentSessionMemoryAttachment,
+  getMemoryPrefetchFirstRequestWaitMs,
   getAttachmentMessages,
   startRelevantMemoryPrefetch,
 } from './utils/attachments.js'
@@ -362,7 +364,13 @@ async function* queryLoop(
       queryTracking,
     }
 
-    let messagesForQuery = [...getMessagesAfterCompactBoundary(messages)]
+    let messagesForQuery = getMessagesAfterCompactBoundary(messages).filter(
+      m =>
+        !(
+          m.type === 'attachment' &&
+          m.attachment.type === 'current_session_memory'
+        ),
+    )
 
     let tracking = autoCompactTracking
 
@@ -546,6 +554,34 @@ async function* queryLoop(
     toolUseContext = {
       ...toolUseContext,
       messages: messagesForQuery,
+    }
+
+    if (turnCount === 1) {
+      const sessionMemoryAttachments =
+        await getCurrentSessionMemoryAttachment(querySource)
+      const persistedMemoryAttachments = await collectMemoryPrefetchAttachments(
+        pendingMemoryPrefetch,
+        toolUseContext.readFileState,
+        0,
+        { waitMs: getMemoryPrefetchFirstRequestWaitMs() },
+      )
+      for (const attachment of sessionMemoryAttachments) {
+        messagesForQuery.push(createAttachmentMessage(attachment))
+      }
+      for (const attachment of persistedMemoryAttachments) {
+        const msg = createAttachmentMessage(attachment)
+        yield msg
+        messagesForQuery.push(msg)
+      }
+      if (
+        sessionMemoryAttachments.length > 0 ||
+        persistedMemoryAttachments.length > 0
+      ) {
+        toolUseContext = {
+          ...toolUseContext,
+          messages: messagesForQuery,
+        }
+      }
     }
 
     const assistantMessages: AssistantMessage[] = []
@@ -1596,21 +1632,17 @@ async function* queryLoop(
     // iterations) filters out memories the model already Read/Wrote/Edited
     // — including in earlier iterations, which the per-iteration
     // toolUseBlocks array would miss.
-    if (
-      pendingMemoryPrefetch &&
-      pendingMemoryPrefetch.settledAt !== null &&
-      pendingMemoryPrefetch.consumedOnIteration === -1
-    ) {
-      const memoryAttachments = filterDuplicateMemoryAttachments(
-        await pendingMemoryPrefetch.promise,
+    {
+      const memoryAttachments = await collectMemoryPrefetchAttachments(
+        pendingMemoryPrefetch,
         toolUseContext.readFileState,
+        turnCount - 1,
       )
-      for (const memAttachment of memoryAttachments) {
-        const msg = createAttachmentMessage(memAttachment)
+      for (const attachment of memoryAttachments) {
+        const msg = createAttachmentMessage(attachment)
         yield msg
         toolResults.push(msg)
       }
-      pendingMemoryPrefetch.consumedOnIteration = turnCount - 1
     }
 
 

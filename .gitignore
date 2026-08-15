@@ -1,5 +1,36 @@
+# 依赖与构建产物
 node_modules/
 dist/
 .claude-code-packed/
-npm-debug.log*
+*.pyc
+**/__pycache__/
+hn/.venv*/
+**/.venv*/
+
+# 系统与临时文件
 .DS_Store
+npm-debug.log*
+.manual-pdf-tmp/
+
+# 部署产物（体积过大，无法推送到 GitHub）
+offline-dist/
+runtime-dist/
+
+# 超大生成产物（可由 build 脚本重新生成）
+wind-llmwiki/graph/knowledge-graph.json
+wind-llmwiki/graph/triples.jsonl
+
+# 密钥与实时用户库（勿提交）
+.env
+**/.env
+hn/.env
+hn/chat_users.db*
+hn/bootstrap_admin_credentials.txt
+hn/flask_secret_key
+hn/.windrise_build_id
+hn/dify_webserver_project_py313_minimal/chat_users.db*
+hn/dify_webserver_project_py313_minimal/flask_secret_key
+
+# SQLite 临时文件（保留 .db 本体）
+chat_users.db-shm
+chat_users.db-wal

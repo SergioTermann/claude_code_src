@@ -1,0 +1,120 @@
+生成 50 条测试（覆盖 13 个风场）
+
+[1/50] 八面 ZC01 ... 结构化故障答复
+[2/50] 富荣 SH01 ... 路由:knowledge_first_device_issue
+[3/50] 良井子 MY01# ... 路由:slot_fault_code_candidates
+[4/50] 前进 S01 ... 结构化故障答复
+[5/50] 什花道 SY01 ... 命中故障码 5
+[6/50] 四平 C01# ... 路由:knowledge_first_device_issue
+[7/50] 洮北 01# ... 路由:explicit_fault_code_exact_lookup
+[8/50] 同发 A01# ... 命中故障码 2
+[9/50] 团结 HY01# ... 路由:knowledge_first_device_issue
+[10/50] 向荣 Z01 ... 路由:slot_fault_code_candidates
+[11/50] 新华 A01# ... 路由:knowledge_first_device_issue
+[12/50] 裕民 CL01 ... 命中故障码 5008
+[13/50] 镇赉 H01# ... 路由:slot_fault_code_candidates
+[14/50] 八面 ZC02 ... 路由:slot_fault_code_candidates
+[15/50] 富荣 SH02 ... 路由:knowledge_first_device_issue
+[16/50] 良井子 MY02# ... 路由:slot_fault_code_candidates
+[17/50] 前进 S02 ... 命中故障码 5
+[18/50] 什花道 SY02 ... 路由:knowledge_first_device_issue
+[19/50] 四平 C02# ... 路由:knowledge_first_device_issue
+[20/50] 洮北 02# ... 路由:explicit_fault_code_exact_lookup
+[21/50] 同发 A02# ... 路由:slot_fault_code_candidates
+[22/50] 团结 HY02# ... 命中故障码 110102
+[23/50] 向荣 Z02 ... 路由:slot_fault_code_candidates
+[24/50] 新华 A02# ... 路由:knowledge_first_device_issue
+[25/50] 裕民 CL02 ... 命中故障码 102
+[26/50] 镇赉 H02# ... 命中故障码 2
+[27/50] 八面 ZC03 ... 路由:slot_fault_code_candidates
+[28/50] 富荣 SH03 ... 路由:knowledge_first_device_issue
+[29/50] 良井子 MY03# ... 路由:slot_fault_code_candidates
+[30/50] 前进 S03 ... 路由:knowledge_first_device_issue
+[31/50] 什花道 SY03 ... 结构化故障答复
+[32/50] 四平 C03# ... 路由:knowledge_first_device_issue
+[33/50] 洮北 03# ... 路由:explicit_fault_code_exact_lookup
+[34/50] 同发 A03# ... 命中故障码 2
+[35/50] 团结 HY03# ... 结构化故障答复
+[36/50] 向荣 Z03 ... 路由:explicit_fault_code_exact_lookup
+[37/50] 新华 A03# ... 路由:knowledge_first_device_issue
+[38/50] 裕民 CL03 ... 命中故障码 111
+[39/50] 镇赉 H03# ... 路由:slot_fault_code_candidates
+[40/50] 八面 ZC04 ... 路由:explicit_fault_code_exact_lookup
+[41/50] 富荣 SH04 ... 路由:knowledge_first_device_issue
+[42/50] 良井子 MY04# ... 路由:slot_fault_code_candidates
+[43/50] 前进 S04 ... 结构化故障答复
+[44/50] 什花道 SY04 ... 路由:slot_fault_code_candidates
+[45/50] 四平 C04# ... 路由:knowledge_first_device_issue
+[46/50] 洮北 04# ... 路由:explicit_fault_code_exact_lookup
+[47/50] 同发 A04# ... 路由:slot_fault_code_candidates
+[48/50] 团结 HY04# ... 路由:slot_fault_code_candidates
+[49/50] 向荣 Z04 ... 结构化故障答复
+[50/50] 新华 A04# ... 命中故障码 5
+
+============================================================
+风场+编号 50 条批量测试统计
+============================================================
+总计: 50  成功(有故障码/结构化答复): 50  失败(需补充/无匹配): 0
+成功率: 100.0%
+
+按结果类型:
+  路由:knowledge_first_device_issue: 14
+  路由:slot_fault_code_candidates: 14
+  结构化故障答复: 6
+  路由:explicit_fault_code_exact_lookup: 6
+  命中故障码 5: 3
+  命中故障码 2: 3
+  命中故障码 5008: 1
+  命中故障码 110102: 1
+  命中故障码 102: 1
+  命中故障码 111: 1
+
+按路由 reason:
+  knowledge_first_device_issue: 17
+  slot_fault_code_candidates: 14
+  explicit_fault_name_or_action_lookup: 12
+  explicit_fault_code_exact_lookup: 7
+
+按风场:
+  八面: 4/4 成功
+  富荣: 4/4 成功
+  良井子: 4/4 成功
+  前进: 4/4 成功
+  什花道: 4/4 成功
+  四平: 4/4 成功
+  洮北: 4/4 成功
+  同发: 4/4 成功
+  团结: 4/4 成功
+  向荣: 4/4 成功
+  新华: 4/4 成功
+  裕民: 3/3 成功
+  镇赉: 3/3 成功
+
+失败/需补充定位 明细:
+  (无)
+
+成功样例 (前 10 条):
+  #1 八面 ZC01 | - 
+      查询: 八面风场ZC01风机塔基24V断路器脱扣报警故障，怎么处理
+  #2 富荣 SH01 | - 
+      查询: 富荣风场SH01风机A3柜模块X20BC_1故障故障，如何处理
+  #3 良井子 MY01# | - 
+      查询: 良井子风场MY01风机SC_变流器过功率触发故障，怎么办
+  #4 前进 S01 | - 
+      查询: 前进风场S01风机风速仪故障停机故障，怎么处理
+  #5 什花道 SY01 | 5 机舱振动超限
+      查询: 什花道风场SY01风机机舱振动超限故障，如何处理
+  #6 四平 C01# | - 
+      查询: 四平风场C01风机Safety SystemOver Speed Trip故障，怎么办
+  #7 洮北 01# | - 
+      查询: 洮北风场01号风机模块出错故障，怎么处理
+  #8 同发 A01# | 2 SS-1 急停按钮按下
+      查询: 同发风场A01风机叶片2处于故障状态故障，如何处理
+  #9 团结 HY01# | - 
+      查询: 团结风场HY01风机塔底控制柜温度超限故障，怎么办
+  #10 向荣 Z01 | - 
+      查询: 向荣风场Z01风机塔基Manual触发故障，怎么处理
+
+详细结果已写入:
+  /Users/zinger/claude_code_src/scripts/eval-windrise-50-results.json
+  /Users/zinger/claude_code_src/scripts/eval-windrise-50-report.txt

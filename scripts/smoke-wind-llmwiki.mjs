@@ -61,7 +61,7 @@ await step('llmwiki resolves the generated project', async () => {
 await step('wind farm model knowledge is searchable', async () => {
   const { stdout } = await runLlmwiki('/llmwiki search 新华 SE8715 --limit 3')
   assertIncludes(stdout, '新华')
-  assertIncludes(stdout, '三一 SE8715')
+  assertIncludes(stdout, '三一SE8715系列')
 })
 
 await step('fault code knowledge is searchable from copied fault index', async () => {

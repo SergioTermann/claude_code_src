@@ -17,8 +17,8 @@ type LmStudioModelsResponse = {
   data?: Array<{ id?: string }>
 }
 
-const DEFAULT_LMSTUDIO_BASE_URL = 'http://127.0.0.1:1234'
-const DEFAULT_LMSTUDIO_MODEL = 'qwen3.5-9b-coder'
+const DEFAULT_LMSTUDIO_BASE_URL = 'http://10.46.161.210:9527'
+const DEFAULT_LMSTUDIO_MODEL = 'Qwen-30B'
 
 export const call: LocalCommandCall = async args => {
   const command = args.trim().toLowerCase() || 'doctor'
@@ -45,8 +45,8 @@ function helpText(): string {
     '  /lmstudio skills',
     '',
     'Environment:',
-    '  LMSTUDIO_BASE_URL    LM Studio server URL',
-    '  LMSTUDIO_MODEL       LM Studio model name',
+    '  LMSTUDIO_BASE_URL    vLLM OpenAI-compatible base URL',
+    '  LMSTUDIO_MODEL       vLLM served model name',
     '  WINDRISE_ENABLE_NETWORK  Enable web search/fetch in Windrise',
     '  WINDRISE_DISABLE_AUTO_LLMWIKI  Disable automatic LLMWiki retrieval',
     '  LLMWIKI_PROJECT      LLMWiki project root or text knowledge directory',
@@ -56,14 +56,14 @@ function helpText(): string {
 
 function renderSkills(): string {
   return [
-    'Local LM Studio / Windrise skills',
+    'Local vLLM / Windrise skills',
     '',
     '- /windfault [fault code or fault description]',
     '  Diagnose wind turbine fault codes using local LLMWiki/fault-code records.',
     '  Aliases: /wind-fault, /faultcode, /fault-code',
     '',
     '- /lmstudiolocal [diagnostic question]',
-    '  Diagnose local LM Studio provider, offline mode, loopback URL, and local smoke checks.',
+    '  Diagnose local vLLM provider, offline mode, model URL, and local smoke checks.',
     '  Aliases: /lmstudio-local, /offline-lmstudio, /local-lmstudio',
     '',
     '- /localverify [what changed]',
@@ -85,7 +85,7 @@ async function renderDoctor(): Promise<string> {
     process.env.LMSTUDIO_BASE_URL || DEFAULT_LMSTUDIO_BASE_URL
   ).replace(/\/$/, '')
   const model = process.env.LMSTUDIO_MODEL || DEFAULT_LMSTUDIO_MODEL
-  const providerName = 'LM Studio'
+  const providerName = 'vLLM'
   const lines = [
     'Local model / Windrise doctor',
     '',
@@ -111,14 +111,14 @@ async function renderDoctor(): Promise<string> {
 
 async function checkLmStudio(baseUrl: string, model: string): Promise<string[]> {
   try {
-    assertOnlineOrLoopbackUrl('LM Studio doctor', baseUrl)
+    assertOnlineOrLoopbackUrl('vLLM doctor', baseUrl)
     const response = await fetch(`${baseUrl}/v1/models`, {
       signal: AbortSignal.timeout(3_000),
     })
     if (!response.ok) {
       return [
-        fail(`LM Studio API returned ${response.status} ${response.statusText}`),
-        hint('Start the LM Studio local server or set LMSTUDIO_BASE_URL to the running server.'),
+        fail(`vLLM API returned ${response.status} ${response.statusText}`),
+        hint('Start vLLM or set LMSTUDIO_BASE_URL to the running OpenAI-compatible server.'),
       ]
     }
 
@@ -129,7 +129,7 @@ async function checkLmStudio(baseUrl: string, model: string): Promise<string[]> 
     const hasModel =
       modelNames.length === 0 || modelNames.some(name => name === model)
     return [
-      ok(`LM Studio is reachable (${modelNames.length} model(s) reported).`),
+      ok(`vLLM is reachable (${modelNames.length} model(s) reported).`),
       hasModel
         ? ok(`Model ${model} is available.`)
         : warn(
@@ -137,11 +137,11 @@ async function checkLmStudio(baseUrl: string, model: string): Promise<string[]> 
           ),
       ...(hasModel
         ? []
-        : [hint('Load the model in LM Studio or set LMSTUDIO_MODEL to the served model ID.')]),
+        : [hint('Start vLLM with the model or set LMSTUDIO_MODEL to the served model ID.')]),
     ]
   } catch (error) {
     return [
-      fail(`LM Studio is not reachable at ${baseUrl}.`),
+      fail(`vLLM is not reachable at ${baseUrl}.`),
       hint(error instanceof Error ? error.message : String(error)),
     ]
   }

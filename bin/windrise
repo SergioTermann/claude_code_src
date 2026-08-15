@@ -12,12 +12,12 @@ if [[ -n "${LLMWIKI_DIR:-}" ]]; then
   export LLMWIKI_DIR
 fi
 export ANTHROPIC_MODEL_PROVIDER="${ANTHROPIC_MODEL_PROVIDER:-lmstudio}"
-export LMSTUDIO_CODER_MODEL="${LMSTUDIO_CODER_MODEL:-${LMSTUDIO_MODEL:-qwen3.5-9b-coder}}"
-export LMSTUDIO_CHAT_MODEL="${LMSTUDIO_CHAT_MODEL:-$LMSTUDIO_CODER_MODEL}"
-export LMSTUDIO_ROUTER_MODEL="${LMSTUDIO_ROUTER_MODEL:-$LMSTUDIO_CODER_MODEL}"
-export LMSTUDIO_MODEL="${LMSTUDIO_MODEL:-$LMSTUDIO_CODER_MODEL}"
+export LMSTUDIO_CHAT_MODEL="${LMSTUDIO_CHAT_MODEL:-Qwen-30B}"
+export LMSTUDIO_MODEL="${LMSTUDIO_MODEL:-Qwen-30B}"
 export LMSTUDIO_FORCE_CHAT="${LMSTUDIO_FORCE_CHAT:-1}"
-export LMSTUDIO_BASE_URL="${LMSTUDIO_BASE_URL:-http://127.0.0.1:1234}"
+export MAX_THINKING_TOKENS="${MAX_THINKING_TOKENS:-0}"
+export WINDRISE_ENABLE_THINKING="${WINDRISE_ENABLE_THINKING:-0}"
+export LMSTUDIO_BASE_URL="${LMSTUDIO_BASE_URL:-http://10.46.161.210:9527}"
 export DISABLE_INSTALLATION_CHECKS="${DISABLE_INSTALLATION_CHECKS:-1}"
 export WINDRISE=1
 
@@ -38,7 +38,7 @@ windrise 用法:
   windrise read <路径>             读取 LLMWiki 文件
   windrise tree [路径]             查看 LLMWiki 目录树
   windrise skills                  查看本地离线 skills
-  windrise doctor                  检查本地 LM Studio / LLMWiki 状态
+  windrise doctor                  检查本地 vLLM / LLMWiki 状态
   windrise chat                    启动完整交互模式
   windrise help                    显示帮助
 
@@ -55,14 +55,35 @@ run_llmwiki() {
 search_query() {
   local query="$*"
   local code
-  code="$(printf '%s' "$query" | grep -Eo '[0-9]{3,}' | head -n 1 || true)"
+
+  code="$(extract_fault_code "$query")"
+
+  if [[ -n "$code" ]] && is_fault_code_coverage_query "$query" "$code"; then
+    run_llmwiki "/llmwiki ask $code --limit 20"
+    return
+  fi
+
+  if is_fault_code_lookup_query "$query"; then
+    run_llmwiki "/llmwiki ask $query --limit 20"
+    return
+  fi
+
+  if is_fault_name_to_code_query "$query"; then
+    run_llmwiki "/llmwiki ask $query --limit 20"
+    return
+  fi
 
   if [[ -n "$code" ]]; then
     if is_bare_fault_code_query "$query" "$code"; then
-      run_llmwiki "/llmwiki search $code --limit 8"
+      run_llmwiki "/llmwiki ask $code --limit 8"
     else
       run_llmwiki "/llmwiki ask $query --limit 8"
     fi
+    return
+  fi
+
+  if is_likely_fault_name_query "$query"; then
+    run_llmwiki "/llmwiki ask $query --limit 8"
     return
   fi
 
@@ -75,9 +96,76 @@ is_bare_fault_code_query() {
   local rest
   rest="$(printf '%s' "$query" \
     | sed "s/$code//" \
-    | sed -E 's/(故障码|故障代码|报警码|告警码|代码|fault[[:space:]]*code|是什么|啥|含义|原因|处理|复位|报警|故障|逻辑|怎么|如何|的|为|是)//Ig' \
+    | sed -E 's/(故障码|故障代码|报码|报出|报警码|告警码|代码|fault[[:space:]]*code|是什么|啥|含义|原因|处理|复位|报警|告警|故障|逻辑|怎么|如何|的|为|是|报)//Ig' \
     | sed -E 's/[？?，,。.、:：[:space:]]//g')"
   [[ -z "$rest" ]]
+}
+
+extract_fault_code() {
+  local query="$*"
+  local contextual
+  if printf '%s' "$query" | grep -Eiq '(是什么故障码|故障码是什么|故障代码是什么|是什么码|什么码|对应.*码|哪些故障码|有什么故障码|报码|告警码|报警码)' \
+    && printf '%s' "$query" | grep -Eiq '(故障|报警|告警|停机|异常|错误|问题|超限|过高|过低|高于|低于|温度|压力|电流|电压|频率|转速|功率|断开|跳开|跳闸|空开|短路|断路|丢失|通信|通讯|传感器|接近开关|超级电容|桨叶|轴[0-9]|[0-9]轴|变桨|偏航|刹车|制动|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|主断路器|断路器|主断|接触器)'; then
+    printf ''
+    return
+  fi
+  if printf '%s' "$query" | perl -ne 'exit(/^\s*\d{1,8}[\p{Han}A-Za-z].*(?:是什么故障码|故障码是什么|故障代码是什么|是什么码|什么码|对应.*码|哪些故障码|有什么故障码|报码|告警码|报警码)/i ? 0 : 1)'; then
+    printf ''
+    return
+  fi
+  contextual="$(printf '%s' "$query" | perl -ne 'if (/(?:故障码|故障代码|报码|报出|报|告警码|报警码|报警|告警|状态代码|fault\s*code|alarm\s*code)[^A-Za-z0-9]{0,8}([A-Za-z]{0,4}\d{1,8}[A-Za-z]{0,2})/i) { print $1; exit }' || true)"
+  if [[ -n "$contextual" ]]; then
+    printf '%s' "$contextual"
+    return
+  fi
+  if printf '%s' "$query" | grep -Eiq '(是什么故障|什么故障|故障|报警|告警|停机|处理|复位|原因|报码|故障码|代码|怎么|如何)' \
+    && printf '%s' "$query" | grep -Eiq '(风场|风电场|场站|机型|型号|品牌|厂家|系列|华仪|华锐|金风|歌美飒|运达|明阳|新誉|湘电|远景|三一|团结|洮北|镇赉|镇赍|同发|王玲山|良井子|新华|四平|通榆)'; then
+    contextual="$(printf '%s' "$query" | perl -ne 'if (/(?:^|[^A-Za-z0-9])(\d{1,8})(?=[^A-Za-z0-9]|$)/) { print $1; exit }' || true)"
+    if [[ -n "$contextual" ]]; then
+      printf '%s' "$contextual"
+      return
+    fi
+  fi
+  contextual="$(printf '%s' "$query" | perl -ne 'if (/^\s*(?:故障码|故障代码|报码|告警码|报警码|状态代码)?\s*(\d{1,8})(?=\s|[^A-Za-z0-9]|$).*(?:是什么故障|什么故障|故障|报警|告警|停机|处理|复位|原因|为什么|为何|为啥|怎么|如何|会报|报出|含义)/i) { print $1; exit }' || true)"
+  if [[ -n "$contextual" ]]; then
+    printf '%s' "$contextual"
+    return
+  fi
+  contextual="$(printf '%s' "$query" | perl -ne 'if (/(?:^|[^A-Za-z0-9])([A-Za-z]+\d[\w_.\/-]*\d)(?=\s|[^A-Za-z0-9]|$)/) { print $1; exit }' || true)"
+  if [[ -n "$contextual" ]]; then
+    printf '%s' "$contextual"
+    return
+  fi
+  printf '%s' "$query" | grep -Eo '[0-9]{3,}' | head -n 1 || true
+}
+
+is_fault_code_lookup_query() {
+  local query="$*"
+  is_fault_name_to_code_query "$query" && return 1
+  printf '%s' "$query" | grep -Eiq '(故障码|故障代码|报码|告警码|报警码|状态代码).*(是什么|多少|哪些|有啥|对应|查询|查|找)|(是什么|多少|哪些|有啥|对应|查询|查|找).*(故障码|故障代码|报码|告警码|报警码|状态代码)'
+}
+
+is_fault_code_coverage_query() {
+  local query="$1"
+  local code="${2:-}"
+  printf '%s' "$query" | grep -Eiq '(哪些风场|有哪些风场|哪些场站|有哪些场站|哪些机型|有哪些机型|哪些型号|有哪些型号|覆盖|分布|也有|都有)' || return 1
+  printf '%s' "$query" | grep -Eiq '(这个码|该码|这个故障码|该故障码|这个代码|该代码)' && return 0
+  if [[ -n "$code" ]] && printf '%s' "$query" | perl -ne 'BEGIN { $code = shift @ARGV } exit(/(?:故障码|故障代码|报码|告警码|报警码|状态代码)[^A-Za-z0-9]{0,8}\Q$code\E/i ? 0 : 1)' "$code"; then
+    return 0
+  fi
+  [[ -n "$code" ]] && is_bare_fault_code_query "$query" "$code"
+}
+
+is_fault_name_to_code_query() {
+  local query="$*"
+  printf '%s' "$query" | grep -Eiq '(是什么故障码|故障码是什么|故障代码是什么|是什么码|什么码|对应.*码|哪些故障码|有什么故障码)' \
+    && printf '%s' "$query" | grep -Eiq '(故障|报警|告警|停机|异常|错误|问题|超限|过高|过低|高于|低于|温度|压力|电流|电压|频率|转速|功率|断开|跳开|跳闸|空开|短路|断路|丢失|通信|通讯|传感器|接近开关|超级电容|桨叶|轴[0-9]|[0-9]轴|变桨|偏航|刹车|制动|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|主断路器|断路器|主断|接触器)'
+}
+
+is_likely_fault_name_query() {
+  local prompt="$*"
+  printf '%s' "$prompt" | grep -Eiq '(风机|风电|变桨|偏航|扭缆|纽缆|扭揽|风速仪|风向仪|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|制动|刹车|24v|plc|hw2s|华仪|主断路器|断路器|主断|接触器)' \
+    && printf '%s' "$prompt" | grep -Eiq '(故障|报警|告警|停机|复位|不可复位|异常|超出|超限|限制|最大|最小|过高|过低|偏高|偏低|高于|低于|温度|过热|发热|高温|超温|过温|压力|电流|电压|频率|转速|功率|跳开|跳闸|跳了|跳掉|跳脱|脱扣|分闸|分断|空开|断开)'
 }
 
 run_chat() {
@@ -109,7 +197,7 @@ answer_once() {
 
 is_web_query() {
   local prompt="$*"
-  if printf '%s' "$prompt" | grep -Eiq '(天气|气温|降雨|下雨|空气质量|aqi|预报|新闻|最新|current|latest|today|tomorrow|明天|后天|今天|昨天|https?://)'; then
+  if printf '%s' "$prompt" | grep -Eiq '(天气|气温|降雨|下雨|空气质量|aqi|预报|新闻|最新|current|latest|today|tomorrow|https?://)'; then
     return 0
   fi
   if printf '%s' "$prompt" | grep -Eiq '^[[:space:]]*(帮我|给我|请)?[[:space:]]*(搜索|搜一下|搜索一下|查一下|查询|查找|查)([[:space:]]|一下|下|[:：]|$)' \
@@ -127,6 +215,10 @@ is_knowledge_query() {
   if is_principle_query "$prompt" && ! has_fault_knowledge_signal "$prompt"; then
     return 1
   fi
+  if [[ -n "$(extract_fault_code "$prompt")" ]] \
+    && printf '%s' "$prompt" | grep -Eiq '(故障码|故障代码|报码|报出|报警码|告警码|报警|告警|状态代码|fault[[:space:]]*code|alarm[[:space:]]*code|^[[:space:]]*报[[:space:]]*[0-9]{1,8})'; then
+    return 0
+  fi
   if printf '%s' "$prompt" | grep -Eiq '^[[:space:]]*(故障码|代码|fault[[:space:]]*code)?[[:space:]]*[0-9]{3,}([是什么啥含义原因处理复位报警故障逻辑怎么如何？?，,。.、[:space:]]*)?$'; then
     return 0
   fi
@@ -137,8 +229,8 @@ is_knowledge_query() {
   if printf '%s' "$prompt" | grep -Eiq '(故障码|故障代码|报警码|告警码|fault[[:space:]]*code)'; then
     return 0
   fi
-  if printf '%s' "$prompt" | grep -Eiq '(风机|风电|变桨|偏航|风速仪|风向仪|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|制动|刹车|24v|plc|hw2s|华仪)' \
-    && printf '%s' "$prompt" | grep -Eiq '(故障|报警|告警|停机|复位|不可复位|原因|处理|排查|检查|维修|设置值|逻辑|反馈|断开|短路|断路|丢失|怎么|如何|为什么|是什么|啥意思|含义)'; then
+  if printf '%s' "$prompt" | grep -Eiq '(风机|风电|变桨|偏航|扭缆|纽缆|扭揽|风速仪|风向仪|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|制动|刹车|24v|plc|hw2s|华仪|主断路器|断路器|主断|接触器)' \
+    && printf '%s' "$prompt" | grep -Eiq '(故障|报警|告警|停机|复位|不可复位|异常|超出|超限|限制|最大|最小|过高|过低|偏高|偏低|高于|低于|温度|过热|发热|高温|超温|过温|压力|电流|电压|频率|转速|功率|原因|处理|排查|检查|维修|设置值|逻辑|反馈|断开|跳开|跳闸|跳了|跳掉|跳脱|脱扣|分闸|分断|空开|短路|断路|丢失|原理|机理|机制|工作方式|工作过程|运行方式|运行过程|控制逻辑|结构|组成|作用|用途|区别|关系|解释|介绍|怎么|如何|为什么|是什么|啥意思|含义)'; then
     return 0
   fi
   return 1
@@ -156,7 +248,7 @@ is_principle_query() {
 
 has_fault_knowledge_signal() {
   local prompt="$*"
-  printf '%s' "$prompt" | grep -Eiq '([A-Za-z]?_?[0-9]{3,}|故障码|故障代码|报警码|告警码|fault[[:space:]]*code|怎么处理|如何处理|处理方法|处置|排查|检查|维修|复位|短路|断路|丢失|不可复位|停机|报警|告警|报错)'
+  printf '%s' "$prompt" | grep -Eiq '([A-Za-z]?_?[0-9]{3,}|故障码|故障代码|报警码|告警码|fault[[:space:]]*code|怎么处理|如何处理|处理方法|处置|排查|检查|维修|复位|短路|断路|断路器|跳开|跳闸|跳了|跳掉|跳脱|脱扣|分闸|分断|空开|丢失|不可复位|停机|报警|告警|报错|扭缆|纽缆|扭揽|超限|过热|发热|高温|超温|过温)'
 }
 
 if [[ $# -eq 0 ]]; then

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="华能吉林新能源">
+  <rect width="96" height="96" rx="14" fill="#ffffff"/>
+  <circle cx="48" cy="48" r="34" fill="#166534"/>
+  <path d="M48 16c8 14 8 25 0 32-8-7-8-18 0-32z" fill="#f5c542"/>
+  <path d="M48 48c15-3 25 1 31 12-16 3-26-1-31-12z" fill="#f5c542"/>
+  <path d="M48 48c-7 13-16 19-29 17 8-14 17-19 29-17z" fill="#f5c542"/>
+  <circle cx="48" cy="48" r="7" fill="#ffffff"/>
+</svg>

@@ -40,10 +40,151 @@ export function applyMarkdown(
 ): string {
   configureMarked()
   return marked
-    .lexer(stripPromptXMLTags(content))
+    .lexer(normalizeMarkdownForDisplay(stripPromptXMLTags(content)))
     .map(_ => formatToken(_, theme, 0, null, null, highlight))
     .join('')
     .trim()
+}
+
+const FENCE_START_RE = /^ {0,3}(`{3,}|~{3,})/
+
+/**
+ * Accept common model-generated Markdown omissions such as `##标题`,
+ * `-项目`, and `1.步骤`. Marked follows CommonMark and requires the space;
+ * normalizing before lexing keeps the UI from showing raw markers.
+ */
+export function normalizeMarkdownForDisplay(content: string): string {
+  if (!/[#*+\-\d$\\<]/.test(content)) {
+    return content
+  }
+
+  let inFence: '`' | '~' | null = null
+  let changed = false
+  let pending: string[] = []
+  const lines: string[] = []
+
+  function flushPending(): void {
+    if (pending.length === 0) return
+    const raw = pending.join(EOL)
+    const normalized = normalizeNonFenceMarkdown(raw)
+    if (normalized !== raw) {
+      changed = true
+    }
+    lines.push(normalized)
+    pending = []
+  }
+
+  for (const line of content.split(EOL)) {
+    const fence = line.match(FENCE_START_RE)?.[1]
+    if (fence) {
+      flushPending()
+      const marker = fence[0] as '`' | '~'
+      if (inFence === null) {
+        inFence = marker
+      } else if (inFence === marker) {
+        inFence = null
+      }
+      lines.push(line)
+      continue
+    }
+
+    if (inFence !== null) {
+      lines.push(line)
+      continue
+    }
+
+    pending.push(line)
+  }
+
+  flushPending()
+
+  return changed ? lines.join(EOL) : content
+}
+
+function normalizeNonFenceMarkdown(content: string): string {
+  return normalizeMarkdownLineSpacing(normalizeMathForDisplay(content))
+}
+
+function normalizeMarkdownLineSpacing(content: string): string {
+  let inFence: '`' | '~' | null = null
+
+  return content
+    .split(EOL)
+    .map(line => {
+      const fence = line.match(FENCE_START_RE)?.[1]
+      if (fence) {
+        const marker = fence[0] as '`' | '~'
+        if (inFence === null) {
+          inFence = marker
+        } else if (inFence === marker) {
+          inFence = null
+        }
+        return line
+      }
+
+      if (inFence !== null) {
+        return line
+      }
+
+      return line
+      .replace(/^(\s{0,3}#{1,6})(?=[^\s#\d])/, '$1 ')
+      .replace(/^(\s{0,3}[-+*])(?=[^\s\d])/, '$1 ')
+      .replace(/^(\s{0,3}\d+[.)])(?=[^\s\d])/, '$1 ')
+    })
+    .join(EOL)
+}
+
+function normalizeMathForDisplay(content: string): string {
+  return content
+    .replace(/\$\$([\s\S]+?)\$\$/g, (_match, formula: string) =>
+      blockMathForDisplay(formula),
+    )
+    .replace(/\\\[([\s\S]+?)\\\]/g, (_match, formula: string) =>
+      blockMathForDisplay(formula),
+    )
+    .replace(/\\\(([\s\S]+?)\\\)/g, (_match, formula: string) =>
+      inlineMathForDisplay(formula),
+    )
+    .replace(/(^|[^\\$])\$([^\n$]+?)\$(?!\d)/g, (match, prefix: string, formula: string) => {
+      if (!isLikelyMathFormula(formula)) {
+        return match
+      }
+      return `${prefix}${inlineMathForDisplay(formula)}`
+    })
+}
+
+function blockMathForDisplay(formula: string): string {
+  const text = mathTextForDisplay(formula)
+  if (!text) return ''
+  return `${EOL}\`\`\`math${EOL}${text}${EOL}\`\`\`${EOL}`
+}
+
+function inlineMathForDisplay(formula: string): string {
+  const text = mathTextForDisplay(formula)
+  if (!text) return ''
+  return text.includes('`') ? text : `\`${text}\``
+}
+
+function mathTextForDisplay(formula: string): string {
+  return htmlToVisibleText(formula).trim()
+}
+
+function isLikelyMathFormula(formula: string): boolean {
+  return /[\\_^={}\[\]()+*/<>]|[A-Za-z]\s*[=<>+\-*/]/.test(formula)
+}
+
+function htmlToVisibleText(value: string): string {
+  return decodeBasicHtmlEntities(value.replace(/<[^>]+>/g, ''))
+}
+
+function decodeBasicHtmlEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
 }
 
 export function formatToken(
@@ -154,6 +295,9 @@ export function formatToken(
       // show it as a clickable hyperlink. In terminals that support OSC 8,
       // users see the text and can hover/click to see the URL.
       if (plainLinkText && plainLinkText !== token.href) {
+        if (!supportsHyperlinks()) {
+          return `${linkText} (${token.href})`
+        }
         return createHyperlink(token.href, linkText)
       }
       // When the display text matches the URL (or is empty), just show the URL
@@ -270,9 +414,12 @@ export function formatToken(
     case 'escape':
       // Markdown escape: \) → ), \\ → \, etc.
       return token.text
+    case 'html': {
+      const text = htmlToVisibleText(token.text)
+      return text ? linkifyIssueReferences(text) : ''
+    }
     case 'def':
     case 'del':
-    case 'html':
       // These token types are not rendered
       return ''
   }

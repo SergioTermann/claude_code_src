@@ -307,11 +307,11 @@ def slides() -> list[str]:
 
     deck.append(slide_xml([
         shape_text(2, emu(0.65), emu(0.55), emu(12.0), emu(1.0), ["LLMWiki + LM Studio 本地化集成"], 3600, COLORS["ink"], bold=True),
-        shape_text(3, emu(0.72), emu(1.55), emu(10.4), emu(0.55), ["用本机 qwen3.5:9b 替代 Claude，并接入本地项目知识库"], 1900, COLORS["muted"]),
+        shape_text(3, emu(0.72), emu(1.55), emu(10.4), emu(0.55), ["用本机 qwen/qwen3.5-9b 替代 Claude，并接入本地项目知识库"], 1900, COLORS["muted"]),
         shape_text(4, emu(0.75), emu(2.45), emu(3.7), emu(1.35), ["核心目标", "不依赖远端 Claude API，直接调用本机 LM Studio"], 1700, COLORS["ink"], COLORS["soft"], COLORS["line"], True),
         shape_text(5, emu(4.85), emu(2.45), emu(3.7), emu(1.35), ["知识增强", "LLMWiki 索引 8657 个本地文件，支持 search/read"], 1700, COLORS["ink"], COLORS["soft2"], COLORS["line"], True),
         shape_text(6, emu(8.95), emu(2.45), emu(3.35), emu(1.35), ["运行方式", "npm run run:lmstudio / npm run print:lmstudio"], 1700, COLORS["ink"], "FFF7ED", COLORS["line"], True),
-        shape_text(7, emu(0.75), emu(5.75), emu(11.7), emu(0.45), ["当前版本：Claude Code recovered 2.1.88 · 模型：LM Studio qwen3.5:9b · Wiki：/Users/zinger/111"], 1250, COLORS["muted"]),
+        shape_text(7, emu(0.75), emu(5.75), emu(11.7), emu(0.45), ["当前版本：Claude Code recovered 2.1.88 · 模型：LM Studio qwen/qwen3.5-9b · Wiki：/Users/zinger/111"], 1250, COLORS["muted"]),
     ]))
 
     deck.append(slide_xml(title_block("为什么要做这个集成", "把代码助手从远端 API 改成本地可控的知识增强助手") + [
@@ -325,7 +325,7 @@ def slides() -> list[str]:
         shape_text(5, emu(6.75), emu(1.55), emu(5.6), emu(3.9), [
             "优化方向",
             "请求转发到本机 LM Studio",
-            "默认模型 qwen3.5:9b",
+            "默认模型 qwen/qwen3.5-9b",
             "LLMWiki 作为本地知识入口",
             "命令脚本化，便于复现和演示",
         ], 1700, COLORS["ink"], COLORS["panel"], COLORS["line"], True, True),
@@ -338,7 +338,7 @@ def slides() -> list[str]:
         connector(7, emu(6.5), emu(2.43), emu(7.55), emu(2.43), COLORS["accent"]),
         shape_text(8, emu(7.55), emu(1.85), emu(2.3), emu(1.15), ["LM Studio API", "127.0.0.1:11434"], 1450, COLORS["ink"], COLORS["soft2"], COLORS["accent2"], True),
         connector(9, emu(9.85), emu(2.43), emu(10.75), emu(2.43), COLORS["accent2"]),
-        shape_text(10, emu(10.75), emu(1.85), emu(1.75), emu(1.15), ["qwen3.5:9b", "本地推理"], 1450, COLORS["ink"], "F0FDF4", COLORS["line"], True),
+        shape_text(10, emu(10.75), emu(1.85), emu(1.75), emu(1.15), ["qwen/qwen3.5-9b", "本地推理"], 1450, COLORS["ink"], "F0FDF4", COLORS["line"], True),
         shape_text(11, emu(1.0), emu(4.25), emu(3.2), emu(1.05), ["LLMWiki Command", "/llmwiki search/read"], 1450, COLORS["ink"], "FFF7ED", COLORS["line"], True),
         connector(12, emu(4.2), emu(4.78), emu(5.4), emu(4.78), COLORS["warning"]),
         shape_text(13, emu(5.4), emu(4.25), emu(3.2), emu(1.05), [".llm-wiki", "file-snapshot.json"], 1450, COLORS["ink"], COLORS["panel"], COLORS["line"], True),
@@ -370,15 +370,15 @@ def slides() -> list[str]:
         ], 1500, COLORS["ink"], COLORS["panel"], COLORS["line"], True),
         shape_text(6, emu(0.85), emu(4.35), emu(11.4), emu(1.2), [
             "可覆盖环境变量：LMSTUDIO_MODEL、LMSTUDIO_BASE_URL、LLMWIKI_PROJECT、ANTHROPIC_MODEL_PROVIDER",
-            "默认值：qwen3.5:9b / http://127.0.0.1:11434 / /Users/zinger/111 / lmstudio",
+            "默认值：qwen/qwen3.5-9b / http://127.0.0.1:11434 / /Users/zinger/111 / lmstudio",
         ], 1450, COLORS["muted"], COLORS["soft"], COLORS["line"], True),
     ]))
 
     deck.append(slide_xml(title_block("验证结果", "本地模型、成本、LLMWiki 三条链路都已跑通") + [
         shape_text(4, emu(0.75), emu(1.45), emu(3.6), emu(3.9), [
             "LM Studio 模型",
-            "lmstudio list 中存在 qwen3.5:9b",
-            "CLI 输出模型字段：qwen3.5:9b",
+            "lmstudio list 中存在 qwen/qwen3.5-9b",
+            "CLI 输出模型字段：qwen/qwen3.5-9b",
             "普通 prompt 输出：你好",
         ], 1500, COLORS["ink"], COLORS["panel"], COLORS["line"], True, True),
         shape_text(5, emu(4.85), emu(1.45), emu(3.6), emu(3.9), [
@@ -414,8 +414,8 @@ def slides() -> list[str]:
     deck.append(slide_xml(title_block("当前边界与注意事项", "本地模型能跑，但能力边界与 Claude 不完全等价") + [
         shape_text(4, emu(0.75), emu(1.45), emu(11.75), emu(4.4), [
             "UI 品牌仍然保留 Claude Code，这是产品外壳文案，不影响请求走 LM Studio",
-            "qwen3.5:9b 支持 tools/thinking，但复杂工具调用能力取决于本地模型表现",
-            "默认传 think:false，避免 thinking 流污染最终输出；可用 LMSTUDIO_THINK=1 打开",
+            "qwen/qwen3.5-9b 支持 tools/thinking，但复杂工具调用能力取决于本地模型表现",
+            "默认传 think:false，避免 thinking 流污染最终输出；可用 WINDRISE_ENABLE_THINKING=1 打开",
             "headless /llmwiki 走脚本快路径；交互式 /llmwiki 仍走 CLI 本地命令",
             "本地模型上下文、速度、质量由 LM Studio 模型文件和机器性能决定",
         ], 1550, COLORS["ink"], COLORS["panel"], COLORS["line"], True, True),

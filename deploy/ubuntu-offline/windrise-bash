@@ -1,0 +1,237 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+RUNNER="$ROOT/scripts/run-lmstudio-claude.mjs"
+CHAT="$ROOT/scripts/windrise-chat.mjs"
+PACKAGED_NODE_BIN="$ROOT/../runtime/node/bin"
+
+if [[ -x "$PACKAGED_NODE_BIN/node" ]]; then
+  export PATH="$PACKAGED_NODE_BIN:$ROOT/node_modules/.bin:$PATH"
+else
+  export PATH="$ROOT/node_modules/.bin:$PATH"
+fi
+
+export ANTHROPIC_MODEL_PROVIDER="${ANTHROPIC_MODEL_PROVIDER:-lmstudio}"
+export WINDRISE_MODEL_MODE="${WINDRISE_MODEL_MODE:-vllm}"
+export VLLM_API_URL="${VLLM_API_URL:-http://10.46.161.210:9527/v1/chat/completions}"
+export VLLM_MODEL_NAME="${VLLM_MODEL_NAME:-Qwen-30B}"
+# The current CLI provider uses legacy internal variable names. Derive them
+# from the public vLLM settings so deployers only configure VLLM_*.
+VLLM_BASE_URL="${VLLM_API_URL%/v1/chat/completions}"
+export LMSTUDIO_BASE_URL="$VLLM_BASE_URL"
+export LMSTUDIO_MODEL="$VLLM_MODEL_NAME"
+export LMSTUDIO_CHAT_MODEL="$VLLM_MODEL_NAME"
+export LMSTUDIO_FORCE_CHAT="${LMSTUDIO_FORCE_CHAT:-1}"
+export MAX_THINKING_TOKENS="${MAX_THINKING_TOKENS:-0}"
+export WINDRISE_ENABLE_THINKING="${WINDRISE_ENABLE_THINKING:-0}"
+export DISABLE_INSTALLATION_CHECKS="${DISABLE_INSTALLATION_CHECKS:-1}"
+export WINDRISE=1
+
+show_help() {
+  cat <<'EOF'
+windrise 用法:
+  windrise                         启动 Windrise 完整交互界面
+  windrise ask                     启动普通回车对话模式，按需检索
+  windrise "303804是什么故障"       自动检索知识库并总结
+  windrise search 偏航 电机        直接检索多个关键词
+  windrise web 最新 风机固件       联网搜索并总结
+  windrise fetch https://example.com 抓取网页并总结
+  windrise weather 北京            查询天气预报
+  windrise read <路径>             读取 LLMWiki 文件
+  windrise tree [路径]             查看 LLMWiki 目录树
+  windrise skills                  查看本地离线 skills
+  windrise doctor                  检查本地 vLLM(OpenAI兼容) / LLMWiki 状态
+  windrise help                    显示帮助
+EOF
+}
+
+run_llmwiki() {
+  node "$RUNNER" --print --bare "$1"
+}
+
+normalize_fault_variant_query() {
+  printf '%s' "$*" | sed -E 's/[揽榄]/缆/g; s/纽缆/扭缆/g'
+}
+
+is_bare_fault_code_query() {
+  local query="$1"
+  local code="$2"
+  local rest
+  rest="$(printf '%s' "$query" \
+    | sed "s/$code//" \
+    | sed -E 's/(故障码|故障代码|报警码|告警码|代码|fault[[:space:]]*code|是什么|啥|含义|原因|处理|复位|报警|故障|逻辑|怎么|如何|的|为|是)//Ig' \
+    | sed -E 's/[？?，,。.、:：[:space:]]//g')"
+  [[ -z "$rest" ]]
+}
+
+search_query() {
+  local query
+  query="$(normalize_fault_variant_query "$*")"
+  local code
+  code="$(printf '%s' "$query" | grep -Eo '[0-9]{3,}' | head -n 1 || true)"
+
+  if [[ -n "$code" ]]; then
+    if is_bare_fault_code_query "$query" "$code"; then
+      run_llmwiki "/llmwiki ask $code --limit 8"
+    else
+      run_llmwiki "/llmwiki ask $query --limit 8"
+    fi
+    return
+  fi
+
+  if is_fault_code_lookup_query "$query"; then
+    run_llmwiki "/llmwiki ask $query --limit 20"
+    return
+  fi
+
+  if is_likely_fault_name_query "$query"; then
+    run_llmwiki "/llmwiki ask $query --limit 8"
+    return
+  fi
+
+  run_llmwiki "/llmwiki search $query --limit 8"
+}
+
+is_fault_code_lookup_query() {
+  local query="$*"
+  printf '%s' "$query" | grep -Eiq '(故障码|故障代码|报码|告警码|报警码|状态代码).*(是什么|多少|哪些|有啥|对应|查询|查|找)|(是什么|多少|哪些|有啥|对应|查询|查|找).*(故障码|故障代码|报码|告警码|报警码|状态代码)'
+}
+
+is_likely_fault_name_query() {
+  local prompt
+  prompt="$(normalize_fault_variant_query "$*")"
+  printf '%s' "$prompt" | grep -Eiq '(风机|风电|变桨|偏航|扭缆|风速仪|风向仪|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|制动|刹车|24v|plc|hw2s|华仪)' \
+    && printf '%s' "$prompt" | grep -Eiq '(故障|报警|告警|停机|复位|不可复位|异常|超出|超限|限制|最大|最小|过高|过低|高于|低于|温度|压力|电流|电压|频率|转速|功率)'
+}
+
+run_chat() {
+  export CLAUDE_CODE_FORCE_FULL_LOGO="${CLAUDE_CODE_FORCE_FULL_LOGO:-1}"
+  exec node "$RUNNER" "$@"
+}
+
+run_windrise_chat() {
+  exec node "$CHAT" "$@"
+}
+
+is_explicit_llmwiki_query() {
+  local prompt="$*"
+  printf '%s' "$prompt" | grep -Eiq '^[[:space:]]*/?(llmwiki|wiki)([[:space:]]|$)'
+}
+
+is_principle_query() {
+  local prompt="$*"
+  printf '%s' "$prompt" | grep -Eiq '(原理|机理|机制|工作方式|工作过程|运行方式|运行过程|怎么工作|如何工作|为什么能|为什么会|怎样实现|怎么实现|如何实现|结构|组成|作用|用途|区别|关系|解释一下|讲一下|介绍一下|科普|控制逻辑|运行逻辑)'
+}
+
+has_fault_knowledge_signal() {
+  local prompt="$*"
+  printf '%s' "$prompt" | grep -Eiq '([A-Za-z]?_?[0-9]{3,}|故障码|故障代码|报警码|告警码|fault[[:space:]]*code|怎么处理|如何处理|处理方法|处置|排查|检查|维修|复位|短路|断路|丢失|不可复位|停机|报警|告警|报错)'
+}
+
+is_knowledge_query() {
+  local prompt="$*"
+  if [[ "${WINDRISE_DISABLE_AUTO_LLMWIKI:-}" == "1" ]] && ! is_explicit_llmwiki_query "$prompt"; then
+    return 1
+  fi
+  if is_principle_query "$prompt" && ! has_fault_knowledge_signal "$prompt"; then
+    return 1
+  fi
+  if printf '%s' "$prompt" | grep -Eiq '^[[:space:]]*(故障码|代码|fault[[:space:]]*code)?[[:space:]]*[0-9]{3,}([是什么啥含义原因处理复位报警故障逻辑怎么如何？?，,。.、[:space:]]*)?$'; then
+    return 0
+  fi
+  if printf '%s' "$prompt" | grep -Eq '[0-9]{3,}' \
+    && printf '%s' "$prompt" | grep -Eiq '(故障|报警|告警|停机|复位|原因|处理|排查|检查|维修|逻辑|怎么|如何|为什么|是什么|含义)'; then
+    return 0
+  fi
+  if printf '%s' "$prompt" | grep -Eiq '(故障码|故障代码|报警码|告警码|fault[[:space:]]*code)'; then
+    return 0
+  fi
+  if printf '%s' "$prompt" | grep -Eiq '(风机|风电|变桨|偏航|风速仪|风向仪|主控|机舱|塔基|叶片|轮毂|变流器|变频器|发电机|齿轮箱|液压|制动|刹车|24v|plc|hw2s|华仪)' \
+    && printf '%s' "$prompt" | grep -Eiq '(故障|报警|告警|停机|复位|不可复位|异常|超出|超限|限制|最大|最小|过高|过低|高于|低于|温度|压力|电流|电压|频率|转速|功率|原因|处理|排查|检查|维修|设置值|逻辑|反馈|断开|短路|断路|丢失|怎么|如何|为什么|是什么|啥意思|含义)'; then
+    return 0
+  fi
+  return 1
+}
+
+is_web_query() {
+  local prompt="$*"
+  if printf '%s' "$prompt" | grep -Eiq '(天气|气温|降雨|下雨|空气质量|aqi|预报|新闻|最新|current|latest|today|tomorrow|明天|后天|今天|昨天|https?://)'; then
+    return 0
+  fi
+  if printf '%s' "$prompt" | grep -Eiq '^[[:space:]]*(帮我|给我|请)?[[:space:]]*(搜索|搜一下|搜索一下|查一下|查询|查找|查)([[:space:]]|一下|下|[:：]|$)' \
+    && ! is_knowledge_query "$prompt"; then
+    return 0
+  fi
+  return 1
+}
+
+answer_once() {
+  local prompt="$*"
+  if is_web_query "$prompt"; then
+    printf '%s\nexit\n' "$prompt" | node "$CHAT"
+    return
+  fi
+  if is_knowledge_query "$prompt"; then
+    printf '%s\nexit\n' "$prompt" | node "$CHAT"
+    return
+  fi
+  printf '%s\nexit\n' "$prompt" | node "$CHAT"
+}
+
+if [[ $# -eq 0 ]]; then
+  run_chat
+fi
+
+case "$1" in
+  help|-h|--help)
+    show_help
+    ;;
+  chat)
+    run_chat
+    ;;
+  ask)
+    run_windrise_chat
+    ;;
+  skills)
+    run_llmwiki "/lmstudio skills"
+    ;;
+  doctor)
+    run_llmwiki "/lmstudio"
+    ;;
+  search)
+    shift
+    if [[ $# -eq 0 ]]; then
+      echo "用法: windrise search <关键词>" >&2
+      exit 2
+    fi
+    search_query "$@"
+    ;;
+  web)
+    shift
+    printf '%s\nexit\n' "web $*" | node "$CHAT"
+    ;;
+  fetch)
+    shift
+    printf '%s\nexit\n' "fetch $*" | node "$CHAT"
+    ;;
+  weather)
+    shift
+    printf '%s\nexit\n' "weather $* 天气" | node "$CHAT"
+    ;;
+  read)
+    shift
+    run_llmwiki "/llmwiki read $*"
+    ;;
+  tree)
+    shift
+    if [[ $# -eq 0 ]]; then
+      run_llmwiki "/llmwiki tree --depth 2 --limit 50"
+    else
+      run_llmwiki "/llmwiki tree $* --depth 2 --limit 50"
+    fi
+    ;;
+  *)
+    answer_once "$@"
+    ;;
+esac

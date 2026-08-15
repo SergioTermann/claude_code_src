@@ -13,6 +13,7 @@ import {
   isCompactBoundaryMessage,
 } from '../../utils/messages.js'
 import { getMainLoopModel } from '../../utils/model/model.js'
+import { isAutoMemoryEnabled } from '../../memdir/paths.js'
 import { getSessionMemoryPath } from '../../utils/permissions/filesystem.js'
 import { processSessionStartHooks } from '../../utils/sessionStart.js'
 import { getTranscriptPath } from '../../utils/sessionStorage.js'
@@ -411,13 +412,13 @@ export function shouldUseSessionMemoryCompaction(): boolean {
 
   const sessionMemoryFlag = getFeatureValue_CACHED_MAY_BE_STALE(
     'tengu_session_memory',
-    false,
+    true,
   )
   const smCompactFlag = getFeatureValue_CACHED_MAY_BE_STALE(
     'tengu_sm_compact',
-    false,
+    true,
   )
-  const shouldUse = sessionMemoryFlag && smCompactFlag
+  const shouldUse = isAutoMemoryEnabled() && sessionMemoryFlag && smCompactFlag
 
   // Log flag states for debugging (ant-only to avoid noise in external logs)
   if (process.env.USER_TYPE === 'ant') {

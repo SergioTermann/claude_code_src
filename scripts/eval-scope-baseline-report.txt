@@ -1,0 +1,20 @@
+================================================================
+Scope-bound vs. naive chunk retrieval (held-out, ambiguous fault codes)
+================================================================
+Knowledge base: 14118 records, 10804 unique fault codes
+Ambiguous codes (>1 brand/model/name meaning): 1869
+  multi-site: 1818; distribution: 2:1075, 3:569, 4:99, 5:47, 6:48, 7:12, 8:8, 9:4, 10:6, 12:1
+  max meanings: 12 (code 111); mean: 2.69
+
+Held-out (farm, code) pairs: 150 (code length >= 3)
+Retrieval quality (scope-consistent precision/recall):
+  baseline P@1=33.3%  P@5=26.4%  R@1=22.2%  R@5=95.8%
+  framework P@1=100.0%  P@5=100.0%  R@1=80.6%  R@5=100.0%
+Top-1 scope-consistency accuracy:
+  baseline (naive, no scope): 33.3% (95% CI 26.3--41.2%)
+  chance (1/#farms per code): 26.4%
+  framework (scope-bound):     100.0% (150/150; one-sided 95% lower bound 98.0%)
+Evidence-grounding coverage (source path present):
+  framework fault-answers: 100.0% (150/150; 0 turbine-mapping answers)
+
+Framework misses (if any):

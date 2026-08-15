@@ -3724,6 +3724,14 @@ Read the team config to discover your teammates' names. Check the task list peri
         }),
       )
     }
+    case 'current_session_memory': {
+      return wrapMessagesInSystemReminder([
+        createUserMessage({
+          content: `Current session memory from ${attachment.path} (~${formatTokens(attachment.tokenCount)}):\n\n${attachment.content}\n\nUse this as continuity context for the current conversation. Prefer the newest user message if it conflicts with these notes, and do not mention this memory block unless it is directly relevant.`,
+          isMeta: true,
+        }),
+      ])
+    }
     case 'dynamic_skill': {
       // Dynamic skills are informational for the UI only - the skills themselves
       // are loaded separately and available via the Skill tool

@@ -41,7 +41,7 @@ async function step(name, [command, args]) {
         ANTHROPIC_MODEL_PROVIDER:
           process.env.ANTHROPIC_MODEL_PROVIDER || 'lmstudio',
         LMSTUDIO_BASE_URL: process.env.LMSTUDIO_BASE_URL || 'http://127.0.0.1:1234',
-        LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'qwen3.5-9b-coder',
+        LMSTUDIO_MODEL: process.env.LMSTUDIO_MODEL || 'qwen/qwen3.5-9b',
       },
       maxBuffer: 30 * 1024 * 1024,
       timeout: 180_000,

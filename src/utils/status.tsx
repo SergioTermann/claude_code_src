@@ -324,11 +324,11 @@ export function buildAPIProviderProperties(): Property[] {
   } else if (apiProvider === 'lmstudio') {
     properties.push({
       label: 'LM Studio base URL',
-      value: process.env.LMSTUDIO_BASE_URL || 'http://127.0.0.1:1234'
+      value: process.env.LMSTUDIO_BASE_URL || 'http://10.46.161.210:9527'
     });
     properties.push({
       label: 'LM Studio model',
-      value: process.env.LMSTUDIO_MODEL || 'qwen3.5-9b-coder'
+      value: process.env.LMSTUDIO_MODEL || 'Qwen-30B'
     });
   }
   const proxyUrl = getProxyUrl();

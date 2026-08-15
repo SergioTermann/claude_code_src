@@ -1,9 +1,12 @@
 import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'fs/promises'
+import { execFile } from 'node:child_process'
 import { createHash } from 'crypto'
 import { dirname, join, relative } from 'path'
 import { fileURLToPath } from 'url'
+import { promisify } from 'node:util'
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
+const execFileAsync = promisify(execFile)
 const SOURCE_DIR = join(ROOT, '风机故障码')
 const OUT_DIR = join(ROOT, 'wind-llmwiki')
 const WIKI_DIR = join(OUT_DIR, 'wiki')
@@ -25,13 +28,17 @@ await main()
 
 async function main() {
   const [standardText, faultLines, faultSummary] = await Promise.all([
-    readFile(STANDARD_MAPPING_FILE, 'utf8'),
+    readOptionalText(STANDARD_MAPPING_FILE),
     readJsonl(FAULT_INDEX_FILE),
     readJson(FAULT_SUMMARY_FILE),
   ])
 
-  const standardRows = parseStandardMapping(standardText)
   const records = faultLines.map(normalizeFaultRecord).filter(Boolean)
+  const parsedStandardRows = parseStandardMapping(standardText)
+  const standardRows =
+    parsedStandardRows.length > 0
+      ? parsedStandardRows
+      : deriveStandardRowsFromFaultRecords(records)
   const sourceStats = await collectSourceStats(SOURCE_DIR)
   const graph = buildKnowledgeGraph(standardRows, records, sourceStats)
 
@@ -55,6 +62,10 @@ async function main() {
 
   await writeWiki(graph, faultSummary)
   await writeGraphFiles(graph)
+  await execFileAsync(process.execPath, [join(ROOT, 'scripts', 'build-wind-graph-visual.mjs')], {
+    cwd: ROOT,
+    maxBuffer: 1024 * 1024 * 64,
+  })
   await writeSnapshot()
 
   console.log(`Built Wind LLMWiki at ${OUT_DIR}`)
@@ -86,6 +97,14 @@ async function readJson(filePath) {
   }
 }
 
+async function readOptionalText(filePath) {
+  try {
+    return await readFile(filePath, 'utf8')
+  } catch {
+    return ''
+  }
+}
+
 function parseStandardMapping(text) {
   const rows = []
   for (const line of text.split(/\r?\n/)) {
@@ -108,6 +127,35 @@ function parseStandardMapping(text) {
   return rows
 }
 
+function deriveStandardRowsFromFaultRecords(records) {
+  const rows = []
+  const seen = new Set()
+  for (const record of records) {
+    const sites = splitSiteLabels(record.site)
+    for (const site of sites.length > 0 ? sites : ['']) {
+      if (!site || !record.brand || !record.model) continue
+      const key = `${site}\u0000${record.brand}\u0000${record.model}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      rows.push({
+        site,
+        brand: record.brand,
+        model: record.model,
+        displayModel: `${record.brand} ${record.model}`,
+        source: relative(ROOT, FAULT_INDEX_FILE),
+      })
+    }
+  }
+  return rows
+}
+
+function splitSiteLabels(value) {
+  return String(value || '')
+    .split(/[、,，/]/u)
+    .map(item => item.trim())
+    .filter(Boolean)
+}
+
 function matchField(line, name) {
   const match = line.match(new RegExp(`${escapeRegExp(name)}：([^，。]+)`))
   return match?.[1]?.trim() ?? ''
@@ -120,7 +168,19 @@ function normalizeFaultRecord(raw) {
   const source = clean(raw.source || raw.location)
   if (!code || !source) return null
   const evidenceText = clean(
-    [name, raw.system, raw.category, raw.reason, raw.solution, raw.logic, raw.text]
+    [
+      name,
+      raw.system,
+      raw.category,
+      raw.classification,
+      raw.reason,
+      raw.solution,
+      raw.logic,
+      raw.signal,
+      raw.delay,
+      raw.program,
+      raw.text,
+    ]
       .filter(Boolean)
       .join(' '),
   )
@@ -134,8 +194,16 @@ function normalizeFaultRecord(raw) {
     solution: clean(raw.solution),
     reset: clean(raw.reset),
     logic: clean(raw.logic),
+    signal: clean(raw.signal),
+    delay: clean(raw.delay),
+    program: clean(raw.program),
+    yawProgram: clean(raw.yawProgram),
+    brakeProgram: clean(raw.brakeProgram),
+    alarmProgram: clean(raw.alarmProgram),
+    resetDelay: clean(raw.resetDelay),
+    resetProgram: clean(raw.resetProgram),
     system: normalizeSystem(raw.system) || inferSystem(evidenceText),
-    category: normalizeCategory(raw.category) || inferCategory(evidenceText),
+    category: normalizeCategory(raw.category || raw.classification) || inferCategory(evidenceText),
     source,
     text: clean(raw.text),
     resetModes: extractResetModes(raw.reset, evidenceText),
@@ -468,6 +536,16 @@ async function writeSnapshot() {
   await writeFile(
     join(META_DIR, 'file-snapshot.json'),
     `${JSON.stringify({ version: 1, updatedAt: Date.now(), files }, null, 2)}\n`,
+    'utf8',
+  )
+
+  await writeFile(
+    join(META_DIR, 'index-source.json'),
+    `${JSON.stringify(
+      { version: 1, indexPath: relative(OUT_DIR, FAULT_INDEX_FILE) },
+      null,
+      2,
+    )}\n`,
     'utf8',
   )
 }

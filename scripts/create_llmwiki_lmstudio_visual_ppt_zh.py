@@ -127,7 +127,7 @@ def make_architecture() -> Path:
         ((85, 255, 315, 385), "Claude Code\n界面", "用户工作流不变", "FFFFFF", RULE),
         ((425, 235, 690, 405), "LM Studio\n适配器", "stream / tools\nthinking:false", "E6F4F1", TEAL),
         ((810, 255, 1045, 385), "LM Studio API", "127.0.0.1:11434", "EFF6FF", BLUE),
-        ((1160, 255, 1425, 385), "qwen3.5:9b", "本地推理", "F0FDF4", GREEN),
+        ((1160, 255, 1425, 385), "qwen/qwen3.5-9b", "本地推理", "F0FDF4", GREEN),
         ((210, 610, 475, 740), "LLMWiki", "search / read", "FFFBEB", GOLD),
         ((610, 590, 900, 760), ".llm-wiki\n索引", "file-snapshot.json", "FFFFFF", RULE),
         ((1040, 610, 1310, 740), "本地资料", "8,657 个文件", "FFFFFF", RULE),
@@ -155,7 +155,7 @@ def make_evidence() -> Path:
     d.text((70, 55), "可复现验证", font=font(44, True), fill=rgb(INK))
     d.text((72, 115), "同一套脚本同时验证模型、知识库和成本口径。", font=font(26), fill=rgb(MUTED))
     kpis = [
-        ("模型字段", "qwen3.5:9b", "JSON init.model", TEAL),
+        ("模型字段", "qwen/qwen3.5-9b", "JSON init.model", TEAL),
         ("知识库规模", "8,657", "file-snapshot indexed files", BLUE),
         ("本地成本", "$0", "total_cost_usd", GREEN),
     ]
@@ -168,7 +168,7 @@ def make_evidence() -> Path:
         x += 500
     bars = [
         ("LM Studio 服务", 1.0, TEAL),
-        ("qwen3.5:9b 模型", 1.0, BLUE),
+        ("qwen/qwen3.5-9b 模型", 1.0, BLUE),
         ("LLMWiki 快路径", 1.0, GOLD),
         ("云端 API 费用", 0.0, GREEN),
     ]
@@ -369,7 +369,7 @@ def make_deck():
             pic_cover(2, "rId2", 6.15, 0.0, 7.18, 7.5),
             shape_text(3, emu(0.72), emu(0.78), emu(5.25), emu(1.25), ["面向领域工作的本地知识引擎"], 3300, INK, None, None, False, False, True),
             shape_text(4, emu(0.76), emu(2.02), emu(5.25), emu(0.85), ["将 Claude Code 的推理路径切换到本机 LM Studio，并用 LLMWiki 索引库提供项目知识。"], 1600, MUTED),
-            shape_text(5, emu(0.78), emu(3.35), emu(1.55), emu(0.7), ["模型\nqwen3.5:9b"], 1200, INK, "E6F4F1", TEAL, True, False, True),
+            shape_text(5, emu(0.78), emu(3.35), emu(1.55), emu(0.7), ["模型\nqwen/qwen3.5-9b"], 1200, INK, "E6F4F1", TEAL, True, False, True),
             shape_text(6, emu(2.48), emu(3.35), emu(1.55), emu(0.7), ["语料\n8,657 文件"], 1200, INK, "EFF6FF", BLUE, True, False, True),
             shape_text(7, emu(4.18), emu(3.35), emu(1.35), emu(0.7), ["成本\n$0"], 1200, INK, "F0FDF4", GREEN, True, False, True),
             shape_text(8, emu(0.78), emu(5.65), emu(5.25), emu(0.7), ["保留原有编码界面，同时把模型、知识库和成本控制放回本地。"], 1300, MUTED),
@@ -434,7 +434,7 @@ def make_deck():
 
     slides.append((
         slide_xml(title("边界必须说清楚。", "本地替换改变了风险和约束，但不会自动复制 Claude 的全部行为。") + [
-            shape_text(4, emu(0.75), emu(1.75), emu(11.75), emu(4.6), ["界面仍保留 Claude 品牌；只有使用 LM Studio provider 脚本/环境变量时，请求才走本地", "工具调用可靠性取决于 qwen3.5:9b 的 function-calling 表现", "检索质量取决于 LLMWiki 索引、排序和文件质量", "图像/文档在 LM Studio 适配器中目前以文本省略说明表示", "交互式 /llmwiki 走 CLI 本地命令；headless /llmwiki 由启动脚本快路径处理"], 1500, INK, PANEL, GOLD, True, True),
+            shape_text(4, emu(0.75), emu(1.75), emu(11.75), emu(4.6), ["界面仍保留 Claude 品牌；只有使用 LM Studio provider 脚本/环境变量时，请求才走本地", "工具调用可靠性取决于 qwen/qwen3.5-9b 的 function-calling 表现", "检索质量取决于 LLMWiki 索引、排序和文件质量", "图像/文档在 LM Studio 适配器中目前以文本省略说明表示", "交互式 /llmwiki 走 CLI 本地命令；headless /llmwiki 由启动脚本快路径处理"], 1500, INK, PANEL, GOLD, True, True),
         ]),
         []
     ))
@@ -445,7 +445,7 @@ def make_deck():
         slide_xml([
             pic_cover(2, "rId2", 7.05, 0.0, 6.28, 7.5),
             shape_text(3, emu(0.75), emu(1.05), emu(6.3), emu(1.1), ["真正的转变，是从云端助手走向本地知识仪器。"], 2850, INK, None, None, False, False, True),
-            shape_text(4, emu(0.78), emu(2.65), emu(6.0), emu(2.35), ["这个实现保留了熟悉的编码界面，把推理切换到 qwen3.5:9b，并让 LLMWiki 语料可以直接被查询。", "对于掌握大量私有运维资料、故障码文档和项目记录的团队，这是一个实用的 local-first 模式。"], 1650, INK, PANEL, RULE, True),
+            shape_text(4, emu(0.78), emu(2.65), emu(6.0), emu(2.35), ["这个实现保留了熟悉的编码界面，把推理切换到 qwen/qwen3.5-9b，并让 LLMWiki 语料可以直接被查询。", "对于掌握大量私有运维资料、故障码文档和项目记录的团队，这是一个实用的 local-first 模式。"], 1650, INK, PANEL, RULE, True),
             shape_text(5, emu(0.78), emu(5.65), emu(6.0), emu(0.55), ["推荐演示：模型问答 → /llmwiki search 303804 → /llmwiki read 源文件"], 1250, TEAL, "E6F4F1", TEAL, True, False, True),
         ]),
         [("rId2", media_names[hero])]

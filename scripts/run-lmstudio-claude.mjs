@@ -9,37 +9,34 @@ import { fileURLToPath } from 'node:url'
 const root = fileURLToPath(new URL('..', import.meta.url))
 const cliPath = join(root, 'dist', 'claude.js')
 const llmWikiEnv = resolveLlmWikiEnv()
+const modelMode = resolveModelMode()
+const modelDefaults = modelDefaultsForMode(modelMode)
 
 const env = {
   ...process.env,
   ANTHROPIC_MODEL_PROVIDER: 'lmstudio',
-  LMSTUDIO_CODER_MODEL:
-    process.env.LMSTUDIO_CODER_MODEL ||
-    process.env.LMSTUDIO_MODEL ||
-    'qwen3.5-9b-coder',
+  WINDRISE_MODEL_MODE: modelMode,
   LMSTUDIO_CHAT_MODEL:
     process.env.LMSTUDIO_CHAT_MODEL ||
     process.env.LMSTUDIO_MODEL ||
-    process.env.LMSTUDIO_CODER_MODEL ||
-    'qwen3.5-9b-coder',
-  LMSTUDIO_ROUTER_MODEL:
-    process.env.LMSTUDIO_ROUTER_MODEL ||
-    process.env.LMSTUDIO_CODER_MODEL ||
-    process.env.LMSTUDIO_MODEL ||
-    'qwen3.5-9b-coder',
+    modelDefaults.model,
   LMSTUDIO_MODEL:
     process.env.LMSTUDIO_MODEL ||
-    process.env.LMSTUDIO_CODER_MODEL ||
-    'qwen3.5-9b-coder',
+    modelDefaults.model,
   LMSTUDIO_BASE_URL: (
-    process.env.LMSTUDIO_BASE_URL || 'http://127.0.0.1:1234'
+    process.env.LMSTUDIO_BASE_URL || modelDefaults.baseUrl
   ).replace(/\/$/, ''),
   ...llmWikiEnv,
   DISABLE_INSTALLATION_CHECKS: process.env.DISABLE_INSTALLATION_CHECKS || '1',
+  MAX_THINKING_TOKENS: process.env.MAX_THINKING_TOKENS || '0',
+  WINDRISE_ENABLE_THINKING: process.env.WINDRISE_ENABLE_THINKING || '0',
   WINDRISE: '1',
 }
 
 const args = process.argv.slice(2)
+const launchArgs = args.includes('--thinking')
+  ? args
+  : ['--thinking', 'disabled', ...args]
 const llmwikiIndex = args.findIndex(
   arg => arg === '/llmwiki' || arg === '/wiki' || arg.startsWith('/llmwiki '),
 )
@@ -61,26 +58,27 @@ if (isPrintMode && lmstudioIndex >= 0) {
 }
 
 const localBaseUrl = env.LMSTUDIO_BASE_URL
-const localHealthUrl = `${localBaseUrl}/v1/models`
-const providerLabel = 'LM Studio'
+const localHealthUrl = openAICompatibleUrl(localBaseUrl, 'models')
+const providerLabel = modelDefaults.label
 
-if (!isLoopbackUrl(localBaseUrl)) {
+if (!isAllowedLocalModelUrl(localBaseUrl)) {
   console.error(
-    `Refusing non-local ${providerLabel} URL: ${localBaseUrl}. Use a localhost model server for offline mode.`,
+    `Refusing ${providerLabel} URL outside localhost/private LAN: ${localBaseUrl}.`,
   )
   process.exit(1)
 }
 
 try {
   const response = await fetch(localHealthUrl, {
-    signal: AbortSignal.timeout(2_000),
+    headers: modelApiHeaders(),
+    signal: AbortSignal.timeout(8_000),
   })
   if (!response.ok) {
     throw new Error(`${response.status} ${response.statusText}`)
   }
 } catch (error) {
   console.error(
-    `${providerLabel} is not reachable at ${localBaseUrl}. Start the local model server first, or set LMSTUDIO_BASE_URL.`,
+    `${providerLabel} is not reachable at ${localBaseUrl}. Start vLLM first, or set LMSTUDIO_BASE_URL.`,
   )
   if (error instanceof Error && error.message) {
     console.error(`Details: ${error.message}`)
@@ -88,7 +86,29 @@ try {
   process.exit(1)
 }
 
-const child = spawn(process.execPath, [cliPath, ...args], {
+function resolveModelMode() {
+  const raw = String(process.env.WINDRISE_MODEL_MODE || process.env.MODEL_MODE || 'vllm')
+    .trim()
+    .toLowerCase()
+  return raw === 'lmstudio' ? 'lmstudio' : 'vllm'
+}
+
+function modelDefaultsForMode(mode) {
+  if (mode === 'vllm') {
+    return {
+      baseUrl: 'http://127.0.0.1:9527',
+      model: 'Qwen-30B',
+      label: 'vLLM',
+    }
+  }
+  return {
+    baseUrl: 'http://127.0.0.1:1234',
+    model: 'qwen/qwen3.5-9b',
+    label: 'LM Studio',
+  }
+}
+
+const child = spawn(process.execPath, [cliPath, ...launchArgs], {
   env,
   stdio: 'inherit',
 })
@@ -110,7 +130,10 @@ async function runLlmWikiCommand(args, commandIndex, env) {
     : ''
   const trailingArgs = args.slice(commandIndex + 1).join(' ')
   const commandArgs = [inlineArgs, trailingArgs].filter(Boolean).join(' ')
-  const outfile = join(tmpdir(), 'claude-code-llmwiki-command.mjs')
+  const outfile = join(
+    tmpdir(),
+    `claude-code-llmwiki-command-${process.pid}.mjs`,
+  )
   const esbuild = await import('esbuild')
   await esbuild.build({
     entryPoints: [join(root, 'src', 'commands', 'llmwiki', 'llmwiki.ts')],
@@ -173,6 +196,10 @@ function resolveLlmWikiEnv() {
     if (existsSync(join(projectPath, '.llm-wiki'))) {
       return { LLMWIKI_PROJECT: projectPath }
     }
+    const windWikiProject = join(projectPath, 'wind-llmwiki')
+    if (existsSync(join(windWikiProject, '.llm-wiki'))) {
+      return { LLMWIKI_PROJECT: windWikiProject }
+    }
     const windFaultProject = join(projectPath, '风机故障码')
     if (existsSync(windFaultProject)) {
       return { LLMWIKI_PROJECT: windFaultProject }
@@ -182,9 +209,20 @@ function resolveLlmWikiEnv() {
   return {}
 }
 
-function isLoopbackUrl(value) {
+function isAllowedLocalModelUrl(value) {
   try {
     const hostname = new URL(value).hostname.toLowerCase()
+    const ipv4 = hostname.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)
+    if (ipv4) {
+      const first = Number(ipv4[1])
+      const second = Number(ipv4[2])
+      return (
+        first === 10 ||
+        (first === 172 && second >= 16 && second <= 31) ||
+        (first === 192 && second === 168) ||
+        first === 127
+      )
+    }
     return (
       hostname === 'localhost' ||
       hostname === '127.0.0.1' ||
@@ -195,4 +233,21 @@ function isLoopbackUrl(value) {
   } catch {
     return false
   }
+}
+
+function modelApiHeaders() {
+  const token =
+    process.env.LMSTUDIO_API_KEY ||
+    process.env.VLLM_API_KEY ||
+    process.env.OPENAI_API_KEY
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
+function openAICompatibleUrl(baseUrl, path) {
+  const normalizedBase = String(baseUrl || '').replace(/\/$/, '')
+  const normalizedPath = String(path || '').replace(/^\//, '')
+  if (normalizedBase.endsWith('/v1')) {
+    return `${normalizedBase}/${normalizedPath}`
+  }
+  return `${normalizedBase}/v1/${normalizedPath}`
 }
