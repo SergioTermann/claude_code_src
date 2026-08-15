@@ -639,7 +639,7 @@ FAULT_CODE_CONTEXT_PATTERNS = [
 ]
 MODEL_BRAND_KEYWORDS = (
     '华仪', '明阳', '金风', '远景', '运达', '三一', '歌美飒', '上海电气',
-    '华锐', '新誉', '湘电', '华能', 'Vestas', 'Gamesa', 'GE', 'ABB', 'Bachmann'
+    '华锐', '新誉', '湘电', 'Vestas', 'Gamesa', 'GE', 'ABB', 'Bachmann'
 )
 MODEL_ALIAS_PATTERNS = [
     r'(?i)HW\d+[A-Z0-9()\-]*',
@@ -810,7 +810,7 @@ def maybe_print_traceback():
 
 def store_bootstrap_admin_credentials(username, password):
     content = "\n".join([
-        "华能吉林公司智能助手初始管理员凭据",
+        "Windrise 风电智能助手初始管理员凭据",
         f"生成时间: {datetime.now().isoformat()}",
         f"用户名: {username}",
         f"密码: {password}",
@@ -10192,7 +10192,7 @@ if __name__ == '__main__':
     local_ip = get_local_ip()
     
     print("=" * 60)
-    print(f"🚀 华能吉林公司智能助手 Web 服务器启动中...")
+    print(f"🚀 Windrise 风电智能助手 Web 服务器启动中...")
     print("=" * 60)
     print(f"📂 工作目录: {BASE_DIR}")
     print(f"📄 HTML 文件: {HTML_FILE}")

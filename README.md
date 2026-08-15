@@ -290,4 +290,4 @@ VLLM_MODEL_NAME=Qwen-30B
 
 ## 致谢
 
-感谢华能吉林风电运维场景对 Windrise 智能助手改造的需求驱动。
+感谢风电运维场景对 Windrise 智能助手改造的需求驱动。

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>华能吉林公司智能助手</title>
+    <title>Windrise 风电智能助手</title>
     <style>
         * {
             margin: 0;
@@ -2278,11 +2278,11 @@
             <div class="header">
                 <div class="header-content">
                     <img src="/static/logo.png" 
-                         alt="中国华能集团标志" 
+                         alt="Windrise 标志" 
                          class="company-logo"
                          onerror="this.style.display='none';">
                     <div class="header-text">
-                        <h1>华能吉林公司智能助手</h1>
+                        <h1>Windrise 风电智能助手</h1>
                         <div class="status">
                             <span class="status-dot"></span>
                             <span id="statusText">✅ 智能助手服务已就绪</span>
@@ -4961,7 +4961,7 @@
                 
                 let markdown = `# 🎯 AI对话记录\n\n`;
                 markdown += `**保存时间**: ${dateStr} ${timeStr}\n\n`;
-                markdown += `**华能吉林公司智能助手** (知识库系统)\n\n`;
+                markdown += `**Windrise 风电智能助手** (知识库系统)\n\n`;
                 markdown += `---\n\n`;
                 
                 // 流程1内容
@@ -4990,7 +4990,7 @@
                 markdown += `- 对话轮数: ${Math.floor(process1Messages.length / 2)} 轮\n`;
                 markdown += `- 总计消息数: ${process1Messages.length} 条\n\n`;
                 markdown += `---\n\n`;
-                markdown += `*本文档由华能吉林公司智能助手系统自动生成*\n`;
+                markdown += `*本文档由Windrise 风电智能助手系统自动生成*\n`;
                 
                 // 检查是否有实际对话内容
                 if (process1Messages.length <= 1) {
@@ -5267,7 +5267,7 @@
                 
                 let markdown = `# 🔍 关键信息提取报告\n\n`;
                 markdown += `**导出时间**: ${dateStr} ${timeStr}\n\n`;
-                markdown += `**来源**: 华能吉林公司智能助手对话记录\n\n`;
+                markdown += `**来源**: Windrise 风电智能助手对话记录\n\n`;
                 markdown += `---\n\n`;
                 
                 // 故障信息
@@ -5323,7 +5323,7 @@
                 markdown += `- 位置信息: ${keyInfoData.location.length} 条\n`;
                 markdown += `- 总计: ${keyInfoData.fault.length + keyInfoData.maintenance.length + keyInfoData.equipment.length + keyInfoData.time.length + keyInfoData.location.length} 条\n\n`;
                 markdown += `---\n\n`;
-                markdown += `*本报告由华能吉林公司智能助手关键信息提取器自动生成*`;
+                markdown += `*本报告由Windrise 风电智能助手关键信息提取器自动生成*`;
                 
                 // 下载文件
                 const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });

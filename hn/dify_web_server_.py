@@ -825,7 +825,7 @@ FAULT_CODE_CONTEXT_PATTERNS = [
 ]
 MODEL_BRAND_KEYWORDS = (
     '华仪', '明阳', '金风', '远景', '运达', '三一', '歌美飒', '上海电气',
-    '华锐', '新誉', '湘电', '华能', '中车山东', 'Vestas', 'Gamesa', 'GE', 'ABB', 'Bachmann'
+    '华锐', '新誉', '湘电', '中车山东', 'Vestas', 'Gamesa', 'GE', 'ABB', 'Bachmann'
 )
 MODEL_ALIAS_PATTERNS = [
     r'(?i)SL\s*-?\s*1500\s*[-_/]?\s*(?:ABB|BACHMANN)\s*系列?',
@@ -20541,7 +20541,7 @@ if __name__ == '__main__':
     local_ip = get_local_ip()
     
     print("=" * 60)
-    print(f"🚀 华能吉林公司智能助手 Web 服务器启动中...")
+    print(f"🚀 Windrise 风电智能助手 Web 服务器启动中...")
     print("=" * 60)
     print(f"📂 工作目录: {BASE_DIR}")
     print(f"📄 HTML 文件: {HTML_FILE}")

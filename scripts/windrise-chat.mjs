@@ -206,7 +206,7 @@ function extractUserSlots(text) {
   }
   if (!normalized) return slots
 
-  const brand = normalized.match(/(三一|华锐|金风|华仪|明阳|运达|远景|上海电气|歌美飒|新誉|湘电|华能|Vestas|Gamesa|GE|ABB|Bachmann)/i)?.[1]
+  const brand = normalized.match(/(三一|华锐|金风|华仪|明阳|运达|远景|上海电气|歌美飒|新誉|湘电|Vestas|Gamesa|GE|ABB|Bachmann)/i)?.[1]
   if (brand) slots.brand = brand
 
   const site = normalized.match(/(新华|团结|四平|裕民|洮北|镇赉|镇赍|同发|什花道|良井子|前进|向荣|八面|富荣|福林|如意|长龙山)/)?.[1]
