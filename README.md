@@ -44,10 +44,10 @@
 同一个报警码，可能对应不同厂家的不同故障；同一座风场，也可能运行多种机型。Windrise 将设备范围识别、资料检索和回答组织串联起来，帮助运行、检修与集控人员找到适用于当前机组的依据。
 
 <p align="center">
-  <img src="hn/browser_experiment_screenshots/R_cwt_symptom_variants_04_1786294355.png" alt="Windrise 实际运行界面：左侧资源监控，中间运维回答与来源文件，右侧关键字段提取" width="100%" />
+  <img src="assets/readme/workspace.png" alt="Windrise 运维工作区：左侧资源监控，中间运维回答与来源文件，右侧关键字段提取" width="100%" />
 </p>
 
-<p align="center"><sub>仓库内留存的浏览器运行截图，展示回答来源、设备字段与资源监控；界面名称和布局随部署配置变化。</sub></p>
+<p align="center"><sub>实际运行截图，已裁去部署环境的品牌页眉，保留回答来源、设备字段与资源监控。</sub></p>
 
 | 现场输入 | 系统处理 | 回答依据 |
 | :--- | :--- | :--- |
