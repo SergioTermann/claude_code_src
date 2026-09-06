@@ -125,103 +125,11 @@ Windrise 通过 OpenAI 兼容接口接入本地模型服务，例如 vLLM 或 LM
 
 Windrise 的架构分成三条主线：**离线知识生产线**负责把原始资料变成可检索资产，**在线问答链路**负责把现场问题路由到正确证据，**运维治理闭环**负责监控、评测和持续更新。
 
-```mermaid
-flowchart LR
-    subgraph L0["资料与资产层"]
-      RawDocs["厂家手册 / 故障说明<br/>PDF、Markdown、表格、文本"]
-      FaultTables["故障码资料<br/>代码、名称、原因、处理、复位"]
-      AssetSource["资产映射资料<br/>风场、厂家、机型、风机编号"]
-      HumanNotes["现场经验与维护记录<br/>复盘、交接、补充说明"]
-    end
+<p align="center">
+  <img src="assets/readme/windrise-architecture.svg" alt="Windrise 端到端系统架构框图" width="100%" />
+</p>
 
-    subgraph L1["离线知识生产线"]
-      Parse["资料解析与清洗<br/>抽取故障条目、来源位置"]
-      Normalize["字段标准化<br/>品牌、机型、代码、部件、症状"]
-      Disambiguate["工业编号消歧<br/>故障码 / 风机号 / 机型 / 测量值"]
-      BuildFaultIndex["结构化故障索引<br/>fault-index.jsonl"]
-      BuildMapping["资产映射构建<br/>windFarmModels / turbineMapping"]
-      BuildWiki["LLMWiki 构建<br/>知识页面、Schema、图谱数据"]
-      Regression["构建后验证<br/>短码、同码多义、名称反查、上下文"]
-    end
-
-    subgraph L2["交互入口层"]
-      Web["Web 运维工作台<br/>问答、来源、资源监控、用户管理"]
-      CLI["CLI 工作流<br/>ask / search / doctor / build / eval"]
-      Admin["知识维护入口<br/>资料更新、日志查看、会话导出"]
-    end
-
-    subgraph L3["请求理解与路由层"]
-      Input["现场输入<br/>报警码、风机编号、风场、机型、现象"]
-      Preprocess["输入预处理<br/>术语规范、错别字兼容、编号抽取"]
-      Slots["槽位识别<br/>风场、厂家、机型、故障码、部件、症状"]
-      Intent["意图分类<br/>设备查询 / 故障处理 / 理论问答 / 工具任务"]
-      State["多轮状态管理<br/>补充信息、追问、纠正、切换新故障"]
-      Completeness["完备性闸门<br/>缺关键条件先澄清"]
-    end
-
-    subgraph L4["确定性服务层"]
-      TurbineLookup["风机编号映射<br/>机号 -> 风场 / 厂家 / 机型"]
-      FarmModelLookup["风场机型查询<br/>多期次、多机型消歧"]
-      CodeLookup["故障码精确匹配<br/>短码边界、字母数字代码"]
-      ScopeFilter["设备范围过滤<br/>按风场、品牌、机型收敛"]
-      Ambiguity["同码多义处理<br/>保留差异、分组展示"]
-    end
-
-    subgraph L5["知识检索与生成层"]
-      Retrieval["本地知识检索<br/>故障索引 + LLMWiki"]
-      Evidence["证据追踪<br/>来源文件、字段、匹配原因"]
-      ContextPack["上下文打包<br/>检索摘要、历史压缩、约束条件"]
-      LocalLLM["本地大模型<br/>vLLM / LM Studio / OpenAI 兼容接口"]
-      OptionalTools["可选联网工具<br/>天气、网页、最新信息"]
-    end
-
-    subgraph L6["输出与运营闭环"]
-      Answer["结构化回答<br/>结论、对象、原因、处理、复位、风险提示"]
-      SourceReview["来源回查<br/>原始资料位置、结构化字段"]
-      Export["会话沉淀<br/>记录导出、交接、复盘"]
-      Monitor["运行监控<br/>健康检查、日志、模型与知识库状态"]
-      Feedback["持续改进<br/>资料补充、索引重建、评测回归"]
-    end
-
-    RawDocs --> Parse
-    FaultTables --> Parse
-    AssetSource --> BuildMapping
-    HumanNotes --> BuildWiki
-    Parse --> Normalize --> Disambiguate --> BuildFaultIndex
-    Normalize --> BuildWiki
-    BuildFaultIndex --> Regression
-    BuildMapping --> Regression
-    BuildWiki --> Regression
-
-    Web --> Input
-    CLI --> Input
-    Admin --> Feedback
-    Input --> Preprocess --> Slots --> Intent --> State --> Completeness
-
-    Completeness -->|信息不足| Answer
-    Completeness -->|风机编号明确| TurbineLookup
-    Completeness -->|查询风场/机型| FarmModelLookup
-    Completeness -->|故障码明确| CodeLookup
-    Completeness -->|风场+机型+现象完整| ScopeFilter
-    Intent -->|纯理论问题| ContextPack
-    Intent -->|天气/网页/最新信息| OptionalTools
-
-    TurbineLookup --> ScopeFilter
-    FarmModelLookup --> ScopeFilter
-    CodeLookup --> Ambiguity --> ScopeFilter
-    ScopeFilter --> Retrieval
-    BuildFaultIndex --> Retrieval
-    BuildWiki --> Retrieval
-    BuildMapping --> TurbineLookup
-    BuildMapping --> FarmModelLookup
-    Retrieval --> Evidence --> ContextPack --> LocalLLM --> Answer
-    OptionalTools --> Answer
-    Answer --> SourceReview --> Export
-    Monitor --> Feedback
-    Export --> Feedback
-    Feedback --> Parse
-    Feedback --> Regression
-```
+<p align="center"><sub>展示从资料治理、知识构建、在线路由、确定性查询、本地生成到运营反馈的完整链路。</sub></p>
 
 **关键链路：**
 

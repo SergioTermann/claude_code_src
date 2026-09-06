@@ -1,0 +1,234 @@
+<svg width="1600" height="1080" viewBox="0 0 1600 1080" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Windrise 端到端系统架构框图</title>
+  <desc id="desc">Windrise 从风电资料与资产映射出发，经离线知识生产线、在线决策引擎、本地知识检索和本地大模型生成，形成可追溯回答与持续运营闭环。</desc>
+  <defs>
+    <linearGradient id="hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#102A43"/>
+      <stop offset="0.52" stop-color="#1F6F8B"/>
+      <stop offset="1" stop-color="#26734D"/>
+    </linearGradient>
+    <linearGradient id="cardBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF4FF"/>
+      <stop offset="1" stop-color="#D8ECFF"/>
+    </linearGradient>
+    <linearGradient id="cardGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF7EF"/>
+      <stop offset="1" stop-color="#D7F0E1"/>
+    </linearGradient>
+    <linearGradient id="cardGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF5E3"/>
+      <stop offset="1" stop-color="#FBE4BA"/>
+    </linearGradient>
+    <linearGradient id="cardPurple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F0ECFF"/>
+      <stop offset="1" stop-color="#E1DAFA"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#0F172A" flood-opacity="0.16"/>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="6" stdDeviation="7" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#435466"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1F6F8B"/>
+    </marker>
+    <style>
+      .bg { fill: #F6F8FB; }
+      .title { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 44px; font-weight: 800; fill: #FFFFFF; }
+      .subtitle { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 21px; font-weight: 500; fill: #D9F0F3; }
+      .small { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 16px; fill: #475569; }
+      .tiny { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 13px; fill: #64748B; }
+      .laneTitle { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 22px; font-weight: 800; fill: #172033; }
+      .laneKicker { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 13px; font-weight: 700; fill: #64748B; }
+      .boxTitle { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 17px; font-weight: 800; fill: #172033; }
+      .boxText { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 13px; fill: #475569; }
+      .metricNum { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 27px; font-weight: 850; fill: #FFFFFF; }
+      .metricText { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 12px; font-weight: 700; fill: #CFE8EE; }
+      .pillText { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 12px; font-weight: 750; fill: #234154; }
+      .linkLabel { font-family: Inter, "Microsoft YaHei", "PingFang SC", Arial, sans-serif; font-size: 12px; font-weight: 700; fill: #435466; }
+      .lane { fill: #FFFFFF; stroke: #D8E0E8; stroke-width: 1.4; rx: 18; filter: url(#shadow); }
+      .box { stroke: #C6D3DF; stroke-width: 1.2; rx: 12; filter: url(#softShadow); }
+      .store { fill: #FFFFFF; stroke: #B9C8D8; stroke-width: 1.2; rx: 12; }
+      .arrow { stroke: #435466; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+      .arrowBlue { stroke: #1F6F8B; stroke-width: 3; fill: none; marker-end: url(#arrowBlue); }
+      .feedback { stroke: #26734D; stroke-width: 2.6; fill: none; stroke-dasharray: 9 7; marker-end: url(#arrowBlue); }
+      .divider { stroke: #D8E0E8; stroke-width: 1.1; stroke-dasharray: 4 7; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1600" height="1080"/>
+  <rect x="0" y="0" width="1600" height="150" fill="url(#hero)"/>
+  <text class="title" x="70" y="64">Windrise Architecture</text>
+  <text class="subtitle" x="70" y="104">面向风电运维现场的证据驱动型本地知识智能体</text>
+
+  <g transform="translate(925 28)">
+    <rect x="0" y="0" width="135" height="82" rx="14" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.26"/>
+    <text class="metricNum" x="67" y="36" text-anchor="middle">14,118</text>
+    <text class="metricText" x="67" y="61" text-anchor="middle">故障记录</text>
+  </g>
+  <g transform="translate(1075 28)">
+    <rect x="0" y="0" width="112" height="82" rx="14" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.26"/>
+    <text class="metricNum" x="56" y="36" text-anchor="middle">12</text>
+    <text class="metricText" x="56" y="61" text-anchor="middle">设备品牌</text>
+  </g>
+  <g transform="translate(1202 28)">
+    <rect x="0" y="0" width="132" height="82" rx="14" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.26"/>
+    <text class="metricNum" x="66" y="36" text-anchor="middle">28</text>
+    <text class="metricText" x="66" y="61" text-anchor="middle">风场/机型</text>
+  </g>
+  <g transform="translate(1349 28)">
+    <rect x="0" y="0" width="158" height="82" rx="14" fill="#FFFFFF" fill-opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.26"/>
+    <text class="metricNum" x="79" y="36" text-anchor="middle">1,265</text>
+    <text class="metricText" x="79" y="61" text-anchor="middle">风机编号映射</text>
+  </g>
+
+  <g transform="translate(50 185)">
+    <rect class="lane" x="0" y="0" width="340" height="765"/>
+    <text class="laneKicker" x="26" y="42">01 / SOURCE OF TRUTH</text>
+    <text class="laneTitle" x="26" y="74">资料与资产层</text>
+    <line class="divider" x1="26" y1="96" x2="314" y2="96"/>
+
+    <rect class="box" x="26" y="124" width="288" height="90" fill="url(#cardBlue)"/>
+    <text class="boxTitle" x="48" y="158">厂家手册与故障说明</text>
+    <text class="boxText" x="48" y="184">PDF、Markdown、表格、文本</text>
+
+    <rect class="box" x="26" y="236" width="288" height="92" fill="url(#cardBlue)"/>
+    <text class="boxTitle" x="48" y="270">故障码资料</text>
+    <text class="boxText" x="48" y="296">代码、名称、原因、处理、复位</text>
+
+    <rect class="box" x="26" y="350" width="288" height="92" fill="url(#cardBlue)"/>
+    <text class="boxTitle" x="48" y="384">资产映射资料</text>
+    <text class="boxText" x="48" y="410">风场、厂家、机型、风机编号</text>
+
+    <rect class="box" x="26" y="464" width="288" height="92" fill="url(#cardBlue)"/>
+    <text class="boxTitle" x="48" y="498">现场经验与复盘记录</text>
+    <text class="boxText" x="48" y="524">交接、补充说明、维护沉淀</text>
+
+    <rect x="26" y="602" width="288" height="110" rx="14" fill="#F8FAFC" stroke="#D8E0E8"/>
+    <text class="boxTitle" x="48" y="636">输入原则</text>
+    <text class="boxText" x="48" y="664">保留原始来源和上下文</text>
+    <text class="boxText" x="48" y="689">用结构化字段承接现场语义</text>
+  </g>
+
+  <g transform="translate(430 185)">
+    <rect class="lane" x="0" y="0" width="350" height="765"/>
+    <text class="laneKicker" x="26" y="42">02 / KNOWLEDGE FACTORY</text>
+    <text class="laneTitle" x="26" y="74">离线知识生产线</text>
+    <line class="divider" x1="26" y1="96" x2="324" y2="96"/>
+
+    <rect class="box" x="28" y="122" width="294" height="82" fill="url(#cardGreen)"/>
+    <text class="boxTitle" x="50" y="153">资料解析与清洗</text>
+    <text class="boxText" x="50" y="179">抽取条目、字段、来源位置</text>
+
+    <rect class="box" x="28" y="226" width="294" height="82" fill="url(#cardGreen)"/>
+    <text class="boxTitle" x="50" y="257">字段标准化</text>
+    <text class="boxText" x="50" y="283">品牌、机型、代码、部件、症状</text>
+
+    <rect class="box" x="28" y="330" width="294" height="82" fill="url(#cardGreen)"/>
+    <text class="boxTitle" x="50" y="361">工业编号消歧</text>
+    <text class="boxText" x="50" y="387">故障码 / 风机号 / 机型 / 测量值</text>
+
+    <rect class="store" x="28" y="452" width="294" height="152"/>
+    <text class="boxTitle" x="50" y="486">生成知识资产</text>
+    <text class="boxText" x="50" y="516">fault-index.jsonl</text>
+    <text class="boxText" x="50" y="542">windFarmModels.json</text>
+    <text class="boxText" x="50" y="568">turbineMapping.json</text>
+    <text class="boxText" x="50" y="594">LLMWiki / Schema / 图谱</text>
+
+    <rect class="box" x="28" y="636" width="294" height="82" fill="#EEF7F0"/>
+    <text class="boxTitle" x="50" y="667">构建后验证</text>
+    <text class="boxText" x="50" y="693">短码、同码多义、名称反查、上下文</text>
+  </g>
+
+  <g transform="translate(820 185)">
+    <rect class="lane" x="0" y="0" width="360" height="765"/>
+    <text class="laneKicker" x="26" y="42">03 / RUNTIME DECISION ENGINE</text>
+    <text class="laneTitle" x="26" y="74">在线决策引擎</text>
+    <line class="divider" x1="26" y1="96" x2="334" y2="96"/>
+
+    <rect class="box" x="30" y="122" width="300" height="78" fill="url(#cardGold)"/>
+    <text class="boxTitle" x="52" y="151">Web / CLI 现场输入</text>
+    <text class="boxText" x="52" y="176">报警码、风机编号、风场、机型、现象</text>
+
+    <rect class="box" x="30" y="222" width="300" height="78" fill="url(#cardGold)"/>
+    <text class="boxTitle" x="52" y="251">输入预处理与槽位识别</text>
+    <text class="boxText" x="52" y="276">术语规范、错别字兼容、字段抽取</text>
+
+    <path d="M180 330 L316 402 L180 474 L44 402 Z" fill="#FFE9C4" stroke="#D5A245" stroke-width="1.5" filter="url(#softShadow)"/>
+    <text class="boxTitle" x="180" y="388" text-anchor="middle">完备性闸门</text>
+    <text class="boxText" x="180" y="414" text-anchor="middle">信息不足先澄清</text>
+
+    <rect class="store" x="30" y="512" width="300" height="172"/>
+    <text class="boxTitle" x="52" y="548">确定性服务</text>
+    <text class="boxText" x="52" y="578">风机编号 -> 风场 / 厂家 / 机型</text>
+    <text class="boxText" x="52" y="604">故障码精确匹配与短码边界</text>
+    <text class="boxText" x="52" y="630">风场机型查询与多期次消歧</text>
+    <text class="boxText" x="52" y="656">设备范围过滤与同码多义分组</text>
+
+    <rect x="64" y="714" width="232" height="32" rx="16" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text class="pillText" x="180" y="735" text-anchor="middle">不让模型替代确定性查询</text>
+  </g>
+
+  <g transform="translate(1220 185)">
+    <rect class="lane" x="0" y="0" width="330" height="765"/>
+    <text class="laneKicker" x="26" y="42">04 / ANSWER &amp; GOVERNANCE</text>
+    <text class="laneTitle" x="26" y="74">生成与治理闭环</text>
+    <line class="divider" x1="26" y1="96" x2="304" y2="96"/>
+
+    <rect class="box" x="26" y="122" width="278" height="78" fill="url(#cardPurple)"/>
+    <text class="boxTitle" x="48" y="151">本地知识检索</text>
+    <text class="boxText" x="48" y="176">故障索引 + LLMWiki + 来源字段</text>
+
+    <rect class="box" x="26" y="222" width="278" height="78" fill="url(#cardPurple)"/>
+    <text class="boxTitle" x="48" y="251">证据追踪与上下文打包</text>
+    <text class="boxText" x="48" y="276">检索摘要、历史压缩、约束条件</text>
+
+    <rect class="box" x="26" y="322" width="278" height="86" fill="#EEEAFB"/>
+    <text class="boxTitle" x="48" y="354">本地大模型</text>
+    <text class="boxText" x="48" y="380">vLLM / LM Studio / OpenAI 兼容接口</text>
+
+    <rect class="box" x="26" y="438" width="278" height="110" fill="#FFFFFF"/>
+    <text class="boxTitle" x="48" y="471">结构化回答</text>
+    <text class="boxText" x="48" y="499">结论、对象、原因、处理、复位</text>
+    <text class="boxText" x="48" y="524">来源位置与风险提示</text>
+
+    <rect class="store" x="26" y="584" width="278" height="134"/>
+    <text class="boxTitle" x="48" y="617">运营闭环</text>
+    <text class="boxText" x="48" y="647">来源回查、会话导出、交接复盘</text>
+    <text class="boxText" x="48" y="673">健康检查、日志、模型状态</text>
+    <text class="boxText" x="48" y="699">资料补充、索引重建、评测回归</text>
+  </g>
+
+  <path class="arrowBlue" d="M390 565 C410 565 410 565 430 565"/>
+  <path class="arrowBlue" d="M780 565 C800 565 800 565 820 565"/>
+  <path class="arrowBlue" d="M1180 565 C1200 565 1200 565 1220 565"/>
+  <text class="linkLabel" x="410" y="545" text-anchor="middle">清洗建库</text>
+  <text class="linkLabel" x="800" y="545" text-anchor="middle">装载资产</text>
+  <text class="linkLabel" x="1200" y="545" text-anchor="middle">证据生成</text>
+
+  <path class="arrow" d="M970 708 C970 790 1265 780 1265 712"/>
+  <text class="linkLabel" x="1100" y="774">确定性查询结果进入证据包</text>
+
+  <path class="feedback" d="M1385 930 C1385 1018 605 1030 220 930"/>
+  <text class="linkLabel" x="790" y="1016" text-anchor="middle">反馈闭环：资料补充 -> 重新构建 -> 回归评测 -> 上线使用</text>
+
+  <g transform="translate(70 976)">
+    <rect x="0" y="0" width="305" height="42" rx="21" fill="#EAF4FF" stroke="#BBD7F0"/>
+    <text class="pillText" x="152" y="27" text-anchor="middle">确定性查询优先，避免模型猜测</text>
+  </g>
+  <g transform="translate(410 976)">
+    <rect x="0" y="0" width="305" height="42" rx="21" fill="#EAF7EF" stroke="#BEE3C8"/>
+    <text class="pillText" x="152" y="27" text-anchor="middle">故障资料先检索，再组织答案</text>
+  </g>
+  <g transform="translate(750 976)">
+    <rect x="0" y="0" width="305" height="42" rx="21" fill="#FFF5E3" stroke="#F3CD8A"/>
+    <text class="pillText" x="152" y="27" text-anchor="middle">信息不足先澄清，减少串题</text>
+  </g>
+  <g transform="translate(1090 976)">
+    <rect x="0" y="0" width="390" height="42" rx="21" fill="#F0ECFF" stroke="#D8CEF7"/>
+    <text class="pillText" x="195" y="27" text-anchor="middle">本地部署适配内网、离线迁移和私有模型</text>
+  </g>
+</svg>
