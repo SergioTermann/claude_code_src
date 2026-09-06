@@ -8,35 +8,35 @@ from pathlib import Path
 import matplotlib as mpl
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
-from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch, Polygon
-from matplotlib.path import Path as MplPath
-from matplotlib.patches import PathPatch
+import numpy as np
+from matplotlib.patches import Circle, FancyArrowPatch, FancyBboxPatch, Polygon, Rectangle
 
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT_DIR = ROOT / "assets" / "readme"
-SVG_OUT = OUT_DIR / "windrise-architecture.svg"
-PNG_OUT = OUT_DIR / "windrise-architecture.png"
+ARCH_SVG = OUT_DIR / "windrise-architecture.svg"
+ARCH_PNG = OUT_DIR / "windrise-architecture.png"
+BANNER_PNG = OUT_DIR / "windrise-banner.png"
 
-W, H = 1600, 1080
-
-INK = "#172033"
-MUTED = "#586474"
-FAINT = "#8A97A6"
-BG = "#F7F9FB"
+INK = "#182033"
+TEXT = "#233044"
+MUTED = "#667488"
+FAINT = "#9AA7B5"
+BG = "#FBFCFE"
 PANEL = "#FFFFFF"
-RULE = "#D8E0E8"
+RULE = "#DDE5EE"
 BLUE = "#0F4D92"
-BLUE_2 = "#3775BA"
+BLUE_MID = "#3775BA"
+BLUE_SOFT = "#E9F3FF"
+GREEN = "#2A8C65"
+GREEN_SOFT = "#EAF7F0"
 TEAL = "#42949E"
-GREEN = "#2E9E44"
-ROSE = "#B64342"
+TEAL_SOFT = "#E9F7F8"
 GOLD = "#C58A21"
-P_BLUE = "#EAF4FF"
-P_GREEN = "#EAF7EF"
-P_GOLD = "#FFF4DE"
-P_PURPLE = "#F0ECFF"
-P_ROSE = "#FDECEC"
+GOLD_SOFT = "#FFF3DE"
+ROSE = "#B64342"
+NAVY = "#102A43"
+WHITE = "#FFFFFF"
 
 
 def pick_font() -> str:
@@ -57,26 +57,22 @@ FONT = pick_font()
 mpl.rcParams.update(
     {
         "font.family": "sans-serif",
-        "font.sans-serif": [FONT, "Arial", "DejaVu Sans", "sans-serif"],
+        "font.sans-serif": [FONT, "Arial", "Helvetica", "DejaVu Sans", "sans-serif"],
         "svg.fonttype": "none",
         "pdf.fonttype": 42,
         "font.size": 8,
         "axes.spines.right": False,
         "axes.spines.top": False,
+        "axes.linewidth": 0.8,
         "legend.frameon": False,
     }
 )
 
 
 def load_metrics() -> dict[str, str]:
-    summary_path = ROOT / "wind-llmwiki" / "fault-index-summary.json"
-    wind_models_path = ROOT / "src" / "data" / "windFarmModels.json"
-    turbine_path = ROOT / "src" / "data" / "turbineMapping.json"
-
-    summary = json.loads(summary_path.read_text(encoding="utf-8"))
-    wind_models = json.loads(wind_models_path.read_text(encoding="utf-8"))
-    turbine_mapping = json.loads(turbine_path.read_text(encoding="utf-8"))
-
+    summary = json.loads((ROOT / "wind-llmwiki" / "fault-index-summary.json").read_text(encoding="utf-8"))
+    wind_models = json.loads((ROOT / "src" / "data" / "windFarmModels.json").read_text(encoding="utf-8"))
+    turbine_mapping = json.loads((ROOT / "src" / "data" / "turbineMapping.json").read_text(encoding="utf-8"))
     return {
         "records": f"{summary['recordCount']:,}",
         "brands": f"{len(summary.get('byBrand', {})):,}",
@@ -85,88 +81,44 @@ def load_metrics() -> dict[str, str]:
     }
 
 
-def add_text(ax, x, y, text, size=12, weight="normal", color=INK, ha="left", va="center", **kwargs):
+def clean_svg(path: Path) -> None:
+    lines = path.read_text(encoding="utf-8").splitlines()
+    path.write_text("\n".join(line.rstrip() for line in lines) + "\n", encoding="utf-8")
+
+
+def add_text(ax, x, y, s, size=12, weight="normal", color=TEXT, ha="left", va="center", alpha=1.0, **kwargs):
     return ax.text(
         x,
         y,
-        text,
+        s,
         fontsize=size,
         fontweight=weight,
         color=color,
         ha=ha,
         va=va,
-        linespacing=1.25,
+        linespacing=1.18,
+        alpha=alpha,
         **kwargs,
     )
 
 
-def round_box(ax, x, y, w, h, fc=PANEL, ec=RULE, lw=1.2, radius=16, shadow=True, z=2):
-    if shadow:
-        ax.add_patch(
-            FancyBboxPatch(
-                (x + 5, y + 7),
-                w,
-                h,
-                boxstyle=f"round,pad=0.012,rounding_size={radius}",
-                linewidth=0,
-                facecolor="#0F172A",
-                alpha=0.08,
-                zorder=z - 1,
-            )
-        )
+def rounded_box(ax, x, y, w, h, fc=PANEL, ec=RULE, lw=1.0, radius=18, alpha=1.0, z=2):
     patch = FancyBboxPatch(
         (x, y),
         w,
         h,
-        boxstyle=f"round,pad=0.012,rounding_size={radius}",
+        boxstyle=f"round,pad=0,rounding_size={radius}",
         linewidth=lw,
         edgecolor=ec,
         facecolor=fc,
+        alpha=alpha,
         zorder=z,
     )
     ax.add_patch(patch)
     return patch
 
 
-def panel(ax, x, y, w, h, letter, title, subtitle):
-    round_box(ax, x, y, w, h, fc=PANEL, ec=RULE, lw=1.3, radius=22, shadow=True, z=1)
-    ax.add_patch(Circle((x + 30, y + 32), 15, facecolor=INK, edgecolor="none", zorder=3))
-    add_text(ax, x + 30, y + 32, letter, size=13, weight="bold", color="white", ha="center", va="center", zorder=4)
-    add_text(ax, x + 56, y + 30, title, size=18, weight="bold", color=INK, zorder=4)
-    add_text(ax, x + 56, y + 57, subtitle, size=10, color=MUTED, zorder=4)
-    ax.plot([x + 28, x + w - 28], [y + 82, y + 82], color=RULE, lw=1, ls=(0, (3, 5)), zorder=2)
-
-
-def card(ax, x, y, w, h, title, lines, fc=P_BLUE, ec="#BFD5EA", accent=BLUE, title_size=13):
-    round_box(ax, x, y, w, h, fc=fc, ec=ec, lw=1.15, radius=13, shadow=False, z=4)
-    ax.add_patch(
-        FancyBboxPatch(
-            (x, y),
-            8,
-            h,
-            boxstyle="round,pad=0.012,rounding_size=12",
-            linewidth=0,
-            facecolor=accent,
-            zorder=5,
-        )
-    )
-    if h <= 55:
-        title_y, body_y, body_gap, body_size = y + 18, y + 36, 15, 8.4
-    elif h <= 72:
-        title_y, body_y, body_gap, body_size = y + 21, y + 43, 16, 8.7
-    else:
-        title_y, body_y, body_gap, body_size = y + 24, y + 48, 17, 8.8
-    add_text(ax, x + 18, title_y, title, size=title_size, weight="bold", color=INK, zorder=6)
-    for i, line in enumerate(lines):
-        add_text(ax, x + 18, body_y + i * body_gap, line, size=body_size, color=MUTED, zorder=6)
-
-
-def pill(ax, x, y, w, h, text, fc="#EEF2F7", ec=RULE, color=INK, size=9.5):
-    round_box(ax, x, y, w, h, fc=fc, ec=ec, lw=1, radius=h / 2, shadow=False, z=6)
-    add_text(ax, x + w / 2, y + h / 2, text, size=size, weight="bold", color=color, ha="center", va="center", zorder=7)
-
-
-def arrow(ax, start, end, color="#4B5D70", lw=1.7, rad=0.0, ms=12, z=10, style="-|>"):
+def arrow(ax, start, end, color=BLUE_MID, lw=1.6, rad=0.0, ms=13, alpha=1.0, z=5, style="-|>"):
     ax.add_patch(
         FancyArrowPatch(
             start,
@@ -176,224 +128,313 @@ def arrow(ax, start, end, color="#4B5D70", lw=1.7, rad=0.0, ms=12, z=10, style="
             linewidth=lw,
             color=color,
             connectionstyle=f"arc3,rad={rad}",
-            shrinkA=3,
-            shrinkB=4,
+            shrinkA=5,
+            shrinkB=5,
+            alpha=alpha,
             zorder=z,
         )
     )
 
 
-def diamond(ax, cx, cy, w, h, title, lines):
-    pts = [(cx, cy - h / 2), (cx + w / 2, cy), (cx, cy + h / 2), (cx - w / 2, cy)]
-    ax.add_patch(Polygon([(px + 5, py + 7) for px, py in pts], closed=True, facecolor="#0F172A", alpha=0.08, lw=0, zorder=3))
-    ax.add_patch(Polygon(pts, closed=True, facecolor=P_GOLD, edgecolor="#E1B96A", lw=1.4, zorder=4))
-    add_text(ax, cx, cy - 12, title, size=13, weight="bold", color=INK, ha="center", zorder=5)
-    for i, line in enumerate(lines):
-        add_text(ax, cx, cy + 12 + i * 17, line, size=9.5, color=MUTED, ha="center", zorder=5)
+def draw_metric_card(ax, x, y, value, label, width=138, dark=False):
+    if dark:
+        rounded_box(ax, x, y, width, 58, fc="#173D5C", ec="#38637F", lw=1.0, radius=12, z=4)
+        add_text(ax, x + width / 2, y + 22, value, size=18, weight="bold", color=WHITE, ha="center", zorder=5)
+        add_text(ax, x + width / 2, y + 44, label, size=7.6, weight="bold", color="#CFE1EC", ha="center", zorder=5)
+    else:
+        rounded_box(ax, x, y, width, 58, fc=WHITE, ec=RULE, lw=1.0, radius=12, z=3)
+        add_text(ax, x + width / 2, y + 22, value, size=17, weight="bold", color=INK, ha="center", zorder=4)
+        add_text(ax, x + width / 2, y + 44, label, size=7.4, weight="bold", color=MUTED, ha="center", zorder=4)
 
 
-def brace(ax, x0, y0, x1, y1, color="#A7B2BF"):
-    verts = [
-        (x0, y0),
-        ((x0 + x1) / 2, y0 - 22),
-        (x1, y0),
-        ((x0 + x1) / 2, y1 + 22),
-        (x0, y1),
-    ]
-    codes = [MplPath.MOVETO, MplPath.CURVE3, MplPath.CURVE3, MplPath.CURVE3, MplPath.CURVE3]
-    ax.add_patch(PathPatch(MplPath(verts, codes), facecolor="none", edgecolor=color, lw=1.2, ls=(0, (4, 5)), zorder=3))
+def draw_turbine(ax, cx, cy, scale=1.0, color=WHITE, alpha=1.0, z=4):
+    ax.plot([cx, cx], [cy, cy - 118 * scale], color=color, lw=3.0 * scale, alpha=alpha, zorder=z)
+    ax.plot([cx - 36 * scale, cx + 36 * scale], [cy, cy], color=color, lw=2.4 * scale, alpha=alpha * 0.6, zorder=z)
+    hub = (cx, cy - 124 * scale)
+    ax.add_patch(Circle(hub, 8 * scale, facecolor=color, edgecolor="none", alpha=alpha, zorder=z + 2))
+    for dx, dy in [(-88, -38), (80, -45), (10, 92)]:
+        ax.plot([hub[0], hub[0] + dx * scale], [hub[1], hub[1] + dy * scale], color=color, lw=3.2 * scale, alpha=alpha, zorder=z + 1)
 
 
-def draw_header(ax, metrics: dict[str, str]):
-    ax.add_patch(FancyBboxPatch((0, 0), W, 145, boxstyle="square,pad=0", linewidth=0, facecolor="#102A43", zorder=0))
-    ax.add_patch(FancyBboxPatch((0, 119), W, 26, boxstyle="square,pad=0", linewidth=0, facecolor=TEAL, alpha=0.32, zorder=1))
-    add_text(ax, 70, 55, "Windrise Evidence Architecture", size=32, weight="bold", color="white", va="center", zorder=2)
-    add_text(ax, 72, 96, "资料治理、确定性路由、本地模型生成与运维反馈的一体化链路", size=14, color="#D7ECF2", va="center", zorder=2)
+def icon_field(ax, cx, cy, color):
+    rounded_box(ax, cx - 24, cy - 18, 48, 36, fc=WHITE, ec=color, lw=1.5, radius=12, z=7)
+    ax.add_patch(Polygon([(cx - 8, cy + 18), (cx + 3, cy + 18), (cx - 11, cy + 30)], closed=True, fc=WHITE, ec=color, lw=1.5, zorder=7))
+    for yy in [cy - 7, cy + 3, cy + 13]:
+        ax.plot([cx - 10, cx + 12], [yy, yy], color=color, lw=1.2, zorder=8)
+
+
+def icon_scope(ax, cx, cy, color):
+    for r, alpha in [(26, 0.10), (17, 0.16), (8, 0.95)]:
+        ax.add_patch(Circle((cx, cy), r, facecolor=color, edgecolor="none", alpha=alpha, zorder=7))
+    ax.plot([cx - 28, cx + 28], [cy, cy], color=color, lw=1.1, alpha=0.65, zorder=8)
+    ax.plot([cx, cx], [cy - 28, cy + 28], color=color, lw=1.1, alpha=0.65, zorder=8)
+
+
+def icon_index(ax, cx, cy, color):
+    for dx, dy in [(-18, -16), (18, -13), (-2, 18)]:
+        ax.add_patch(Circle((cx + dx, cy + dy), 7, facecolor=color, edgecolor="none", alpha=0.9, zorder=8))
+    ax.plot([cx - 18, cx + 18], [cy - 16, cy - 13], color=color, lw=1.4, alpha=0.65, zorder=7)
+    ax.plot([cx - 18, cx - 2], [cy - 16, cy + 18], color=color, lw=1.4, alpha=0.65, zorder=7)
+    ax.plot([cx + 18, cx - 2], [cy - 13, cy + 18], color=color, lw=1.4, alpha=0.65, zorder=7)
+
+
+def icon_gates(ax, cx, cy, color):
+    for i, yy in enumerate([-18, 0, 18]):
+        ax.plot([cx - 25, cx + 25], [cy + yy, cy + yy], color=color, lw=1.6, zorder=8)
+        ax.add_patch(Circle((cx - 9 + i * 9, cy + yy), 5, facecolor=color, edgecolor=WHITE, lw=0.8, zorder=9))
+
+
+def icon_llm(ax, cx, cy, color):
+    rounded_box(ax, cx - 28, cy - 22, 56, 44, fc=WHITE, ec=color, lw=1.5, radius=15, z=7)
+    for dx in [-14, 0, 14]:
+        ax.add_patch(Circle((cx + dx, cy), 4.5, facecolor=color, edgecolor="none", zorder=8))
+
+
+def icon_answer(ax, cx, cy, color):
+    rounded_box(ax, cx - 25, cy - 28, 50, 56, fc=WHITE, ec=color, lw=1.5, radius=10, z=7)
+    for yy in [-15, -3, 9, 21]:
+        ax.plot([cx - 12, cx + 14], [cy + yy, cy + yy], color=color, lw=1.2, alpha=0.75, zorder=8)
+    ax.add_patch(Circle((cx - 13, cy - 15), 2.7, facecolor=color, edgecolor="none", zorder=8))
+
+
+def chain_node(ax, x, y, w, h, title, subtitle, accent, soft, icon_fn, body_lines=None, dark=False):
+    if dark:
+        rounded_box(ax, x, y, w, h, fc=NAVY, ec=NAVY, lw=1.0, radius=26, z=3)
+        rounded_box(ax, x + 12, y + 12, 64, 64, fc=WHITE, ec=WHITE, lw=0, radius=22, alpha=0.10, z=4)
+        icon_fn(ax, x + 44, y + 44, WHITE)
+        add_text(ax, x + 94, y + 34, title, size=18, weight="bold", color=WHITE, zorder=6)
+        add_text(ax, x + 94, y + 61, subtitle, size=9.2, color="#CFE1EC", zorder=6)
+        line_color = "#D8EAF7"
+    else:
+        rounded_box(ax, x, y, w, h, fc=PANEL, ec=RULE, lw=1.1, radius=24, z=3)
+        rounded_box(ax, x + 13, y + 15, 58, 58, fc=soft, ec="none", lw=0, radius=18, z=4)
+        icon_fn(ax, x + 42, y + 44, accent)
+        add_text(ax, x + 88, y + 32, title, size=15.2, weight="bold", color=INK, zorder=6)
+        add_text(ax, x + 88, y + 56, subtitle, size=8.6, color=MUTED, zorder=6)
+        line_color = accent
+    if body_lines:
+        for i, line in enumerate(body_lines):
+            yy = y + 86 + i * 19
+            ax.add_patch(Circle((x + 26, yy), 3.4, facecolor=line_color, edgecolor="none", alpha=0.95, zorder=6))
+            add_text(ax, x + 39, yy, line, size=8.0, color=WHITE if dark else TEXT, zorder=6)
+
+
+def draw_architecture(metrics: dict[str, str]) -> None:
+    width, height = 1800, 980
+    fig = plt.figure(figsize=(18, 9.8), facecolor=BG)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, width)
+    ax.set_ylim(height, 0)
+    ax.axis("off")
+    ax.set_facecolor(BG)
+
+    add_text(ax, 82, 60, "Windrise evidence architecture", size=31, weight="bold", color=INK)
+    add_text(ax, 84, 101, "Local wind-turbine O&M intelligence with deterministic scope, evidence and review controls.", size=11.6, color=MUTED)
+    add_text(ax, 84, 132, "Core claim: the model speaks only after the asset scope and evidence packet are fixed.", size=10.4, weight="bold", color=BLUE)
 
     metric_items = [
-        (metrics["records"], "结构化故障记录"),
-        (metrics["brands"], "设备品牌"),
-        (metrics["models"], "风场/机型配置"),
-        (metrics["turbines"], "风机编号映射"),
+        (metrics["records"], "fault records"),
+        (metrics["brands"], "brands"),
+        (metrics["models"], "site-model maps"),
+        (metrics["turbines"], "turbine IDs"),
     ]
-    x = 895
-    widths = [155, 115, 145, 160]
-    for (value, label), width in zip(metric_items, widths):
-        round_box(ax, x, 32, width, 76, fc="#173D5C", ec="#315A77", lw=1.1, radius=14, shadow=False, z=2)
-        add_text(ax, x + width / 2, 61, value, size=20, weight="bold", color="white", ha="center", zorder=3)
-        add_text(ax, x + width / 2, 88, label, size=8.8, weight="bold", color="#CFE6EF", ha="center", zorder=3)
-        x += width + 18
+    for i, (value, label) in enumerate(metric_items):
+        draw_metric_card(ax, 1090 + i * 155, 52, value, label, width=135)
+    ax.plot([82, 1718], [172, 172], color=RULE, lw=1.1)
 
+    rounded_box(ax, 76, 214, 1648, 608, fc=WHITE, ec=RULE, lw=1.05, radius=32, z=1)
+    add_text(ax, 118, 256, "Schematic overview", size=13.5, weight="bold", color=INK, zorder=3)
+    add_text(ax, 118, 283, "Field context, evidence package and traceable answer.", size=8.8, color=MUTED, zorder=3)
 
-def draw_panel_a(ax):
-    panel(ax, 50, 175, 700, 365, "a", "离线知识生产线", "把原始资料变成可查询、可回溯、可验证的知识资产")
-    sources = [
-        ("厂家手册", ["PDF/Markdown · 控制逻辑"], P_BLUE, BLUE),
-        ("故障码表", ["代码/原因 · 处理/复位"], P_BLUE, BLUE),
-        ("资产映射", ["风场/厂家/机型/风机号"], P_GREEN, GREEN),
-        ("现场复盘", ["交接记录 · 维护经验"], P_GOLD, GOLD),
+    # Left: field and knowledge inputs.
+    rounded_box(ax, 118, 330, 340, 316, fc="#F8FAFC", ec="#DCE5EE", lw=0.9, radius=24, z=2)
+    add_text(ax, 150, 364, "Field signal", size=12.0, weight="bold", color=INK, zorder=4)
+    add_text(ax, 150, 391, "what the operator actually provides", size=7.8, color=MUTED, zorder=4)
+    ax.plot([150, 398], [417, 417], color="#DEE7F0", lw=0.9, zorder=4)
+    field_rows = [
+        ("Fault code", "ZC09 / 303804", BLUE),
+        ("Turbine ID", "farm unit number", GREEN),
+        ("Symptom", "yaw alarm, temperature, vibration", GOLD),
+        ("Knowledge", "manuals, fault tables, asset maps", TEAL),
     ]
-    for i, (title, lines, fc, accent) in enumerate(sources):
-        y = 275 + i * 53
-        card(ax, 82, y, 205, 44, title, lines, fc=fc, ec=RULE, accent=accent, title_size=11.5)
+    for i, (label, value, color) in enumerate(field_rows):
+        yy = 444 + i * 44
+        rounded_box(ax, 150, yy, 244, 31, fc=WHITE, ec="#D8E3EE", lw=0.85, radius=14, z=5)
+        ax.add_patch(Circle((172, yy + 15.5), 5.0, facecolor=color, edgecolor="none", zorder=6))
+        add_text(ax, 188, yy + 10, label, size=7.6, weight="bold", color=INK, zorder=6)
+        add_text(ax, 188, yy + 23, value, size=6.8, color=MUTED, zorder=6)
 
-    round_box(ax, 342, 307, 155, 112, fc="#FFFFFF", ec="#C7D2DE", lw=1.2, radius=16, shadow=False, z=4)
-    add_text(ax, 419.5, 336, "解析清洗", size=13, weight="bold", ha="center", zorder=6)
-    add_text(ax, 419.5, 363, "字段标准化", size=10, color=MUTED, ha="center", zorder=6)
-    add_text(ax, 419.5, 386, "工业编号消歧", size=10, color=MUTED, ha="center", zorder=6)
+    # Center: evidence operating system, with a strong visual core.
+    rounded_box(ax, 548, 304, 704, 366, fc=NAVY, ec=NAVY, lw=0, radius=34, z=2)
+    for r, alpha in [(235, 0.10), (170, 0.10), (108, 0.13)]:
+        ax.add_patch(Circle((900, 488), r, facecolor="#77BFE2", edgecolor="none", alpha=alpha, zorder=3))
+    add_text(ax, 590, 350, "Evidence operating system", size=20, weight="bold", color=WHITE, zorder=5)
+    add_text(ax, 592, 382, "Deterministic services package evidence before generation.", size=9.2, color="#CFE1EC", zorder=5)
 
-    outputs = [
-        ("fault-index", ["结构化故障索引"], P_GREEN, GREEN),
-        ("windFarmModels", ["风场/机型配置"], P_GREEN, GREEN),
-        ("turbineMapping", ["风机编号映射"], P_GREEN, GREEN),
-        ("LLMWiki", ["知识页面与图谱"], P_GREEN, GREEN),
+    # Graph motif inside the dark core.
+    graph_nodes = [(750, 466), (840, 420), (924, 486), (1014, 438), (1118, 492), (940, 568), (790, 552)]
+    for a, b in [(0, 1), (1, 2), (2, 3), (3, 4), (2, 5), (5, 6), (6, 0), (1, 5)]:
+        ax.plot([graph_nodes[a][0], graph_nodes[b][0]], [graph_nodes[a][1], graph_nodes[b][1]], color="#9ACBE2", lw=1.1, alpha=0.45, zorder=4)
+    for i, (gx, gy) in enumerate(graph_nodes):
+        col = [BLUE_MID, TEAL, GOLD, GREEN][i % 4]
+        ax.add_patch(Circle((gx, gy), 12, facecolor=col, edgecolor=WHITE, lw=1.2, alpha=0.96, zorder=5))
+
+    # Internal contract steps.
+    step_y = 602
+    step_specs = [("scope", GREEN), ("retrieve", BLUE_MID), ("gate", GOLD), ("generate", TEAL)]
+    sx = 632
+    for label, color in step_specs:
+        rounded_box(ax, sx, step_y, 126, 38, fc="#173D5C", ec="#38637F", lw=0.9, radius=18, z=6)
+        ax.add_patch(Circle((sx + 22, step_y + 19), 5.5, facecolor=color, edgecolor="none", zorder=7))
+        add_text(ax, sx + 38, step_y + 19, label, size=8.6, weight="bold", color=WHITE, zorder=7)
+        sx += 150
+    for x1, x2 in [(758, 782), (908, 932), (1058, 1082)]:
+        arrow(ax, (x1, step_y + 19), (x2, step_y + 19), color="#A7CFE1", lw=1.0, ms=8, alpha=0.9, z=8)
+
+    # Orbiting controls around the core.
+    controls = [
+        (632, 286, "exact code", BLUE),
+        (810, 256, "asset scope", GREEN),
+        (992, 256, "ambiguity hold", ROSE),
+        (1178, 286, "source trace", TEAL),
     ]
-    for i, (title, lines, fc, accent) in enumerate(outputs):
-        y = 247 + i * 63
-        card(ax, 560, y, 150, 50, title, lines, fc=fc, ec="#BFDCC7", accent=accent, title_size=10.5)
+    for cx, cy, label, color in controls:
+        rounded_box(ax, cx - 63, cy - 16, 126, 32, fc=WHITE, ec="#DCE5EF", lw=0.85, radius=16, z=6)
+        ax.add_patch(Circle((cx - 41, cy), 4.8, facecolor=color, edgecolor="none", zorder=7))
+        add_text(ax, cx - 27, cy, label, size=7.4, weight="bold", color=TEXT, zorder=7)
+    ax.plot([696, 342, 548], [470, 470, 470], color="#D6E7F6", lw=13, solid_capstyle="round", zorder=1)
+    arrow(ax, (382, 470), (548, 470), color=BLUE_MID, lw=1.8, ms=14, alpha=0.95, z=6)
 
-    for y in [292, 350, 408, 466]:
-        arrow(ax, (287, y), (342, 363), color="#7B8794", lw=1.1, ms=9, z=7)
-    for y in [272, 335, 398, 461]:
-        arrow(ax, (497, 363), (560, y), color=GREEN, lw=1.4, ms=10, z=7)
+    # Right: answer object.
+    rounded_box(ax, 1340, 330, 300, 316, fc="#F8FAFC", ec="#DCE5EE", lw=0.9, radius=24, z=2)
+    add_text(ax, 1372, 364, "Traceable answer", size=12.0, weight="bold", color=INK, zorder=4)
+    add_text(ax, 1372, 391, "not just a generated paragraph", size=7.8, color=MUTED, zorder=4)
+    for i, (k, v, color) in enumerate(
+        [
+            ("Object", "wind farm / model / unit", GREEN),
+            ("Fault", "code, name, trigger", BLUE),
+            ("Evidence", "source field + match reason", TEAL),
+            ("Action", "handling and reset conditions", GOLD),
+            ("Limit", "field verification required", ROSE),
+        ]
+    ):
+        yy = 436 + i * 37
+        ax.add_patch(Circle((1375, yy), 6, facecolor=color, edgecolor="none", zorder=5))
+        add_text(ax, 1392, yy - 2, k, size=8.2, weight="bold", color=INK, zorder=5)
+        add_text(ax, 1452, yy - 2, v, size=7.2, color=MUTED, zorder=5)
+    rounded_box(ax, 1372, 608, 220, 24, fc=BLUE_SOFT, ec="#C9DAEB", lw=0.8, radius=12, z=4)
+    add_text(ax, 1482, 620, "scope + evidence + boundary", size=7.0, weight="bold", color=BLUE, ha="center", zorder=5)
+    arrow(ax, (1252, 470), (1340, 470), color=BLUE_MID, lw=1.8, ms=14, alpha=0.95, z=6)
 
-    pill(ax, 93, 492, 590, 30, "构建后验证：短码边界 · 同码多义 · 名称反查 · 多轮上下文", fc="#F8FAFC", ec=RULE, color=INK, size=9.4)
+    # Quiet feedback band.
+    rounded_box(ax, 260, 720, 1280, 58, fc="#F8FAFC", ec="#E1E9F2", lw=0.9, radius=20, z=2)
+    add_text(ax, 300, 749, "Reviewed feedback loop", size=9.2, weight="bold", color=INK, zorder=4)
+    loop_x = 650
+    for label, color in [("logs", TEAL), ("human review", BLUE), ("curate", GREEN), ("rebuild / eval", GOLD)]:
+        ax.add_patch(Circle((loop_x, 749), 8, facecolor=color, edgecolor="none", zorder=4))
+        add_text(ax, loop_x + 16, 749, label, size=8.1, weight="bold", color=TEXT, zorder=4)
+        loop_x += 178
+    arrow(ax, (1490, 646), (1260, 720), color="#91A0AF", lw=1.0, ms=9, rad=0.25, alpha=0.72, z=3)
+    arrow(ax, (1166, 720), (916, 648), color=GREEN, lw=1.10, ms=9, rad=-0.14, alpha=0.78, z=3)
 
+    rounded_box(ax, 86, 872, 1628, 58, fc=WHITE, ec=RULE, lw=1.0, radius=18, z=2)
+    add_text(ax, 118, 901, "Boundary", size=9.5, weight="bold", color=ROSE, zorder=3)
+    add_text(
+        ax,
+        198,
+        901,
+        "Windrise supports field diagnosis and knowledge handoff; HMI/SCADA data, safety rules and OEM documents remain the operational authority.",
+        size=8.8,
+        color=MUTED,
+        zorder=3,
+    )
 
-def draw_panel_b(ax):
-    panel(ax, 790, 175, 760, 365, "b", "在线路由与完备性闸门", "先识别对象和意图，再决定澄清、确定性查询或检索生成")
-    card(ax, 826, 260, 170, 68, "现场输入", ["报警码 / 风机编号", "风场 / 机型 / 现象"], fc=P_GOLD, ec="#EBD3A2", accent=GOLD)
-    card(ax, 1050, 252, 185, 84, "预处理与槽位", ["术语规范、错别字", "抽取风场/厂家/机型", "抽取故障码/部件/症状"], fc=P_GOLD, ec="#EBD3A2", accent=GOLD)
-    card(ax, 1290, 252, 200, 84, "意图与状态", ["设备查询 / 故障处理", "理论问答 / 工具任务", "补充、追问、纠正、切换"], fc=P_GOLD, ec="#EBD3A2", accent=GOLD)
-    diamond(ax, 1168, 415, 205, 122, "完备性闸门", ["会影响现场判断时", "先澄清再检索"])
-
-    branches = [
-        (830, "缺条件", ["返回澄清问题"], P_ROSE, ROSE),
-        (1010, "风机编号", ["映射设备范围"], P_BLUE, BLUE),
-        (1190, "故障码", ["精确匹配"], P_GREEN, GREEN),
-        (1370, "理论/联网", ["走独立路径"], P_PURPLE, TEAL),
-    ]
-    for x, title, lines, fc, accent in branches:
-        card(ax, x, 462, 150, 54, title, lines, fc=fc, ec=RULE, accent=accent, title_size=10.8)
-
-    arrow(ax, (996, 294), (1050, 294), color=GOLD, lw=1.5, ms=10)
-    arrow(ax, (1235, 294), (1290, 294), color=GOLD, lw=1.5, ms=10)
-    arrow(ax, (1390, 336), (1230, 376), color=GOLD, lw=1.4, ms=10, rad=0.18)
-    arrow(ax, (1168, 476), (905, 462), color=ROSE, lw=1.2, ms=9, rad=0.15)
-    arrow(ax, (1168, 476), (1085, 462), color=BLUE, lw=1.2, ms=9, rad=0.06)
-    arrow(ax, (1168, 476), (1265, 462), color=GREEN, lw=1.2, ms=9, rad=-0.06)
-    arrow(ax, (1168, 476), (1445, 462), color=TEAL, lw=1.2, ms=9, rad=-0.16)
-
-
-def draw_panel_c(ax):
-    panel(ax, 50, 575, 865, 360, "c", "证据驱动的本地生成", "确定性服务先收敛范围，模型只负责组织证据化答案")
-    services = [
-        ("风机编号映射", ["机号 -> 风场 / 厂家 / 机型"], P_BLUE, BLUE),
-        ("故障码精确检索", ["短码边界、字母数字代码"], P_GREEN, GREEN),
-        ("设备范围过滤", ["按风场、品牌、机型收敛"], P_GOLD, GOLD),
-        ("同码多义分组", ["保留差异，不只返回第一条"], P_PURPLE, TEAL),
-    ]
-    for i, (title, lines, fc, accent) in enumerate(services):
-        card(ax, 84, 660 + i * 60, 220, 52, title, lines, fc=fc, ec=RULE, accent=accent, title_size=10.5)
-
-    round_box(ax, 365, 675, 218, 160, fc="#FFFFFF", ec="#BFD5EA", lw=1.4, radius=18, shadow=False, z=4)
-    add_text(ax, 474, 708, "Evidence packet", size=15, weight="bold", color=BLUE, ha="center", zorder=5)
-    add_text(ax, 474, 742, "对象范围", size=10.2, color=INK, ha="center", zorder=5)
-    add_text(ax, 474, 769, "故障字段", size=10.2, color=INK, ha="center", zorder=5)
-    add_text(ax, 474, 796, "来源位置", size=10.2, color=INK, ha="center", zorder=5)
-    pill(ax, 392, 847, 164, 28, "可复查，不凭空补全", fc="#EAF4FF", ec="#BED7EF", color=BLUE, size=8.8)
-
-    card(ax, 642, 684, 208, 72, "本地大模型", ["vLLM / LM Studio", "OpenAI 兼容接口"], fc=P_PURPLE, ec="#D9CEF6", accent=BLUE_2, title_size=12.5)
-    card(ax, 642, 792, 208, 86, "结构化回答", ["结论、对象、原因", "处理、复位、风险提示", "来源文件与字段"], fc="#FFFFFF", ec="#CCD6E0", accent=INK, title_size=12.5)
-
-    for y in [686, 746, 806, 866]:
-        arrow(ax, (304, y), (365, 755), color="#7B8794", lw=1.1, ms=8, rad=0.04)
-    arrow(ax, (583, 755), (642, 720), color=BLUE, lw=1.7, ms=11)
-    arrow(ax, (746, 756), (746, 792), color=BLUE, lw=1.7, ms=11)
-    brace(ax, 84, 652, 304, 894)
-    add_text(ax, 196, 910, "确定性服务", size=9.5, weight="bold", color=FAINT, ha="center", zorder=5)
+    fig.savefig(ARCH_SVG, format="svg", bbox_inches="tight", pad_inches=0.04, metadata={"Date": None})
+    fig.savefig(ARCH_PNG, format="png", dpi=220, bbox_inches="tight", pad_inches=0.04, metadata={"Software": "matplotlib"})
+    plt.close(fig)
+    clean_svg(ARCH_SVG)
 
 
-def draw_panel_d(ax):
-    panel(ax, 955, 575, 595, 360, "d", "运营治理与持续改进", "把使用记录、运行状态和回归评测接回知识生产线")
-    top = [
-        (1000, "健康检查", "模型/知识库/服务"),
-        (1190, "会话沉淀", "导出/交接/复盘"),
-        (1380, "回归评测", "短码/同码/上下文"),
-    ]
-    for x, title, line in top:
-        card(ax, x, 672, 150, 60, title, [line], fc="#FFFFFF", ec="#CDD7E2", accent=TEAL, title_size=10.4)
-    card(ax, 1100, 782, 170, 60, "资料补充", ["新手册/表格/经验"], fc=P_GREEN, ec="#BFDCC7", accent=GREEN, title_size=10.4)
-    card(ax, 1300, 782, 170, 60, "重建上线", ["索引/Wiki/映射"], fc=P_GREEN, ec="#BFDCC7", accent=GREEN, title_size=10.4)
-
-    arrow(ax, (1150, 702), (1190, 702), color=TEAL, lw=1.35, ms=10)
-    arrow(ax, (1340, 702), (1380, 702), color=TEAL, lw=1.35, ms=10)
-    arrow(ax, (1455, 733), (1385, 782), color=TEAL, lw=1.25, ms=10, rad=0.15)
-    arrow(ax, (1300, 812), (1270, 812), color=TEAL, lw=1.25, ms=10)
-    arrow(ax, (1100, 812), (1035, 733), color=TEAL, lw=1.25, ms=10, rad=0.16)
-
-    round_box(ax, 995, 862, 510, 48, fc="#F8FAFC", ec=RULE, lw=1.1, radius=15, shadow=False, z=3)
-    add_text(ax, 1250, 881, "部署边界：内网优先 · 离线迁移 · 私有模型 · 来源可追溯", size=11.2, weight="bold", color=INK, ha="center", zorder=4)
-    add_text(ax, 1250, 902, "现场处置仍以 HMI/SCADA、趋势数据、安全规程和厂家正式文件为准", size=8.7, color=MUTED, ha="center", zorder=4)
-    pill(ax, 1112, 622, 282, 30, "反馈闭环：补资料 -> 重建 -> 评测 -> 上线", fc="#EAF7EF", ec="#BFDCC7", color=GREEN, size=9.2)
+def add_banner_flow_line(ax, x0, y0, x1, y1, color, alpha=0.35, lw=1.2):
+    xs = np.linspace(x0, x1, 160)
+    ys = np.linspace(y0, y1, 160) + np.sin(np.linspace(0, np.pi * 2.4, 160)) * 8
+    ax.plot(xs, ys, color=color, lw=lw, alpha=alpha, zorder=2)
 
 
-def draw_cross_panel_arrows(ax):
-    arrow(ax, (750, 360), (790, 360), color=BLUE, lw=2.2, ms=14)
-    add_text(ax, 770, 337, "知识资产装载", size=9.5, color=BLUE, weight="bold", ha="center", zorder=20)
-    ax.plot([1170, 1170, 600], [540, 558, 558], color=BLUE, lw=1.8, zorder=8)
-    arrow(ax, (600, 558), (600, 575), color=BLUE, lw=1.8, ms=12, z=9)
-    add_text(ax, 888, 548, "路由结果进入证据包", size=9.3, color=BLUE, weight="bold", ha="center", zorder=20)
-    arrow(ax, (915, 760), (955, 760), color=TEAL, lw=2.2, ms=14)
-    add_text(ax, 935, 737, "答案与日志", size=9.3, color=TEAL, weight="bold", ha="center", zorder=20)
+def draw_banner(metrics: dict[str, str]) -> None:
+    width, height = 1600, 480
+    fig = plt.figure(figsize=(16, 4.8), facecolor=NAVY)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, width)
+    ax.set_ylim(height, 0)
+    ax.axis("off")
 
+    x = np.linspace(0, 1, width)
+    y = np.linspace(0, 1, height)
+    xx, yy = np.meshgrid(x, y)
+    base = np.zeros((height, width, 3))
+    left = np.array([10, 31, 47]) / 255
+    right = np.array([18, 58, 84]) / 255
+    for i in range(3):
+        base[:, :, i] = left[i] * (1 - xx) + right[i] * xx
+    glow = np.exp(-((xx - 0.78) ** 2 / 0.030 + (yy - 0.38) ** 2 / 0.22))
+    base[:, :, 1] += glow * 0.10
+    base[:, :, 2] += glow * 0.13
+    ax.imshow(np.clip(base, 0, 1), extent=[0, width, height, 0], zorder=0)
 
-def draw_footer(ax):
-    footer_y = 970
-    round_box(ax, 70, footer_y, 1460, 62, fc="#FFFFFF", ec=RULE, lw=1.2, radius=18, shadow=False, z=2)
-    items = [
-        ("确定性优先", "能查映射和代码就不交给模型猜", BLUE),
-        ("先检索后生成", "故障资料进入证据包再组织答案", GREEN),
-        ("先澄清后处置", "缺风场/机型/代码时避免硬答", GOLD),
-        ("本地可部署", "适配内网、离线迁移和私有模型", TEAL),
-    ]
-    x = 105
-    for title, line, color in items:
-        ax.add_patch(Circle((x, footer_y + 31), 7, facecolor=color, edgecolor="none", zorder=4))
-        add_text(ax, x + 18, footer_y + 22, title, size=10.5, weight="bold", color=INK, zorder=4)
-        add_text(ax, x + 18, footer_y + 43, line, size=8.7, color=MUTED, zorder=4)
-        x += 350
+    for yy0 in [108, 152, 204, 262]:
+        add_banner_flow_line(ax, 790, yy0, 1515, yy0 + 28, "#A5D6D9", alpha=0.11, lw=1.0)
+    ax.add_patch(Polygon([(0, 400), (235, 374), (520, 389), (790, 360), (1110, 383), (1600, 342), (1600, 480), (0, 480)], fc="#0B1C28", ec="none", alpha=0.76, zorder=1))
+    ax.add_patch(Polygon([(0, 435), (300, 408), (650, 424), (1020, 392), (1600, 414), (1600, 480), (0, 480)], fc="#091720", ec="none", alpha=0.82, zorder=2))
+
+    for cx, cy, sc, alpha in [(1170, 388, 0.70, 0.40), (1332, 364, 0.96, 0.78), (1476, 396, 0.61, 0.38)]:
+        draw_turbine(ax, cx, cy, sc, color="#DCEFF6", alpha=alpha, z=4)
+
+    # Glass product motif on the right.
+    rounded_box(ax, 928, 104, 556, 186, fc="#F7FBFE", ec="#83AFC3", lw=0.8, radius=30, alpha=0.13, z=3)
+    add_text(ax, 972, 139, "Evidence packet", size=12.5, weight="bold", color="#EFF8FB", zorder=5)
+    add_text(ax, 972, 165, "asset scope  ·  fault semantics  ·  source trace", size=8.8, color="#BFD6DE", zorder=5)
+    px = 998
+    for label, color in [("scope", GREEN), ("evidence", BLUE_MID), ("gates", GOLD), ("answer", TEAL)]:
+        ax.add_patch(Circle((px, 226), 20, facecolor=color, edgecolor="#DAEEF5", lw=1.0, zorder=5))
+        add_text(ax, px, 226, label[0].upper(), size=10.0, weight="bold", color=WHITE, ha="center", zorder=6)
+        add_text(ax, px, 263, label, size=7.8, weight="bold", color="#D8E7EC", ha="center", zorder=6)
+        px += 126
+    for x1, x2 in [(1018, 1104), (1144, 1230), (1270, 1356)]:
+        arrow(ax, (x1, 226), (x2, 226), color="#A7D3DE", lw=1.0, ms=9, alpha=0.76, z=6)
+
+    ax.add_patch(Rectangle((78, 68), 8, 28, facecolor="#8ED6AF", edgecolor="none", zorder=5))
+    add_text(ax, 108, 81, "WIND ENERGY / OPERATIONS INTELLIGENCE", size=15.5, color="#C5D5D2", va="center", zorder=5)
+    add_text(ax, 78, 177, "Windrise", size=80, weight="bold", color=WHITE, zorder=5)
+    add_text(ax, 84, 248, "Evidence-grounded intelligence for wind turbine operations.", size=18.5, color="#D6E1DF", zorder=5)
+    add_text(ax, 84, 286, "面向风电运维现场的本地知识智能体", size=17.0, color="#A8E0C2", weight="bold", zorder=5)
+
+    ax.plot([82, 700], [332, 332], color="#6E8792", lw=1.0, alpha=0.45, zorder=5)
+    for bx, (num, label) in zip(
+        [82, 370, 668],
+        [("01", "LOCAL INFERENCE"), ("02", "TRACEABLE KNOWLEDGE"), ("03", "CONTEXT ROUTING")],
+    ):
+        add_text(ax, bx, 386, num, size=11.0, weight="bold", color="#8ED6AF", zorder=5)
+        add_text(ax, bx + 42, 386, label, size=11.0, color=WHITE, zorder=5)
+
+    draw_metric_card(ax, 1016, 332, metrics["records"], "fault records", width=126, dark=True)
+    draw_metric_card(ax, 1160, 332, metrics["brands"], "brands", width=98, dark=True)
+    draw_metric_card(ax, 1276, 332, metrics["models"], "site maps", width=108, dark=True)
+    draw_metric_card(ax, 1402, 332, metrics["turbines"], "turbines", width=118, dark=True)
+
+    fig.savefig(BANNER_PNG, format="png", dpi=200, bbox_inches="tight", pad_inches=0, metadata={"Software": "matplotlib"})
+    plt.close(fig)
 
 
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     metrics = load_metrics()
-
-    fig = plt.figure(figsize=(16, 10.8), facecolor=BG)
-    ax = fig.add_axes([0, 0, 1, 1])
-    ax.set_xlim(0, W)
-    ax.set_ylim(H, 0)
-    ax.axis("off")
-    ax.set_facecolor(BG)
-
-    draw_header(ax, metrics)
-    draw_panel_a(ax)
-    draw_panel_b(ax)
-    draw_panel_c(ax)
-    draw_panel_d(ax)
-    draw_cross_panel_arrows(ax)
-    draw_footer(ax)
-
-    fig.savefig(SVG_OUT, format="svg", bbox_inches="tight", pad_inches=0.08, metadata={"Date": None})
-    fig.savefig(PNG_OUT, format="png", dpi=220, bbox_inches="tight", pad_inches=0.08, metadata={"Software": "matplotlib"})
-    plt.close(fig)
-
-    cleaned_svg = "\n".join(line.rstrip() for line in SVG_OUT.read_text(encoding="utf-8").splitlines()) + "\n"
-    SVG_OUT.write_text(cleaned_svg, encoding="utf-8")
-
+    draw_architecture(metrics)
+    draw_banner(metrics)
     print(f"font={FONT}")
-    print(f"wrote={SVG_OUT.relative_to(ROOT)}")
-    print(f"wrote={PNG_OUT.relative_to(ROOT)}")
+    print(f"wrote={ARCH_SVG.relative_to(ROOT)}")
+    print(f"wrote={ARCH_PNG.relative_to(ROOT)}")
+    print(f"wrote={BANNER_PNG.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
